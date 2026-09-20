@@ -3,7 +3,7 @@
 
 ---
 
-## 🎯 MỤC TIÊU DỰ ÁN (TIÊU CHÍ: DỄ LÀM – XONG NHANH – ĐỦ ĐIỂM)
+## 🎯 MỤC TIÊU DỰ ÁN
 
 - **Mục tiêu ưu tiên số 1:** Xây dựng code đơn giản, phân tách rõ ràng giữa khai báo (`include/`) và cài đặt (`src/`), dễ chia việc cho từng thành viên. Không sa đà vào kỹ thuật phức tạp để cả nhóm hoàn thành đúng hạn.
 - **Yêu cầu cốt lõi bắt buộc phải đạt:**
