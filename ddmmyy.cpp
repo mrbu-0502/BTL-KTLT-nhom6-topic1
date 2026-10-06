@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -21,8 +22,25 @@ public:
     }
 
     void input() {
-        char c1, c2;
-        cin >> x >> c1 >> y >> c2 >> m;
+        string a;
+        while (true) {
+            cin >> a;
+            x = 0; y = 0; m = 0;
+            int c = 0, n = 1;
+            for (int b = 0; b < a.size(); b++) {
+                if (a[b] == '/') {
+                    c++;
+                } else if (a[b] >= '0' && a[b] <= '9') {
+                    if (c == 0) x = x * 10 + (a[b] - '0');
+                    if (c == 1) y = y * 10 + (a[b] - '0');
+                    if (c == 2) m = m * 10 + (a[b] - '0');
+                } else {
+                    n = 0;
+                }
+            }
+            if (c == 2 && n == 1) break;
+            cout << "sai dinh dang, moi ban nhap lai code\n";
+        }
     }
 
     void output() {
@@ -34,10 +52,10 @@ public:
 };
 
 int main() {
-    date d;
-    d.input();
-    if (d.valid()) {
-        d.output();
+    date c;
+    c.input();
+    if (c.valid()) {
+        c.output();
     } else {
         cout << "0\n";
     }
