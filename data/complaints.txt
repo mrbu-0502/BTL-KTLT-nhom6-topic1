@@ -1,10 +1,10 @@
-KN01|KH01|10/01/2024|Mang 4G cham vao gio cao diem|Da giai quyet
-KN02|KH02|15/01/2024|Bi tru tien tai khoan chinh bat thuong|Da giai quyet
-KN03|KH03|02/02/2024|Khong nhan duoc ma OTP ngan hang|Dang xu ly
-KN04|KH04|20/02/2024|Yeu cau kiem tra lai hoa don cuoc thang 1|Dang xu ly
-KN05|KH05|05/03/2024|Sim dot ngot bi mat song khong goi duoc|Tiep nhan
-KN06|KH06|12/03/2024|Goi cuoc data 4G khong tu dong gia han|Tiep nhan
-KN07|KH07|18/03/2024|Yeu cau huy dich vu gia tri gia tang khong dang ky|Tiep nhan
-KN08|KH08|25/03/2024|Cuoc goi hay bi ngat quang chap chon|Da giai quyet
-KN09|KH09|02/04/2024|Khong the nap the cao qua cu phap USSD|Tiep nhan
-KN10|KH10|10/04/2024|Yeu cau doi thong tin chu thue bao|Dang xu ly
+KN01|KH01|0981234567|10/01/2024|Mang 4G cham vao gio cao diem|Da giai quyet
+KN02|KH01|0981234567|15/01/2024|Bi tru tien tai khoan chinh bat thuong|Da giai quyet
+KN03|KH02|0972345678|02/02/2024|Khong nhan duoc ma OTP ngan hang|Dang xu ly
+KN04|KH03|0963456789|20/02/2024|Yeu cau kiem tra lai hoa don cuoc thang 1|Dang xu ly
+KN05|KH04|0914567890|05/03/2024|Sim dot ngot bi mat song khong goi duoc|Tiep nhan
+KN06|KH05|0945678901|12/03/2024|Goi cuoc data 4G khong tu dong gia han|Tiep nhan
+KN07|KH06|0886789012|18/03/2024|Yeu cau huy dich vu gia tri gia tang khong dang ky|Tiep nhan
+KN08|KH07|0897890123|25/03/2024|Cuoc goi hay bi ngat quang chap chon|Da giai quyet
+KN09|KH08|0908901234|02/04/2024|Khong the nap the cao qua cu phap USSD|Tiep nhan
+KN10|KH09|0939012345|10/04/2024|Yeu cau doi thong tin chu thue bao|Dang xu ly

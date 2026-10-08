@@ -1,10 +1,10 @@
-LT01|Tra truoc ca nhan|Thue bao tra truoc danh cho ca nhan|0
-LT02|Tra sau ca nhan|Thue bao tra sau danh cho ca nhan|49000
-LT03|Tra truoc sinh vien|Thue bao tra truoc uu dai sinh vien|0
-LT04|Tra sau doanh nghiep|Thue bao tra sau danh cho khach hang doanh nghiep|69000
-LT05|Tra truoc Tourist|Thue bao tra truoc danh cho khach du lich|0
-LT06|Tra sau VIP|Thue bao tra sau hang thuong gia cham soc dac biet|99000
-LT07|Tra truoc Data Only|Thue bao chuyen dung data 4G 5G khong nghe goi|0
-LT08|Tra sau Fast Connect|Thue bao tra sau chuyen data dung cho thiet bi Router|50000
-LT09|Tra truoc MobiEZ|Thue bao tra truoc goi cuoc gia dinh|0
-LT10|Tra sau Gia dinh|Thue bao tra sau goi nhom gia dinh mien phi noi mang|79000
+LTB01|Tra truoc ca nhan|Thue bao tra truoc danh cho ca nhan|0
+LTB02|Tra sau ca nhan|Thue bao tra sau danh cho ca nhan|49000
+LTB03|Tra truoc sinh vien|Thue bao tra truoc uu dai sinh vien|0
+LTB04|Tra sau doanh nghiep|Thue bao tra sau danh cho khach hang doanh nghiep|69000
+LTB05|Tra truoc Tourist|Thue bao tra truoc danh cho khach du lich|0
+LTB06|Tra sau VIP|Thue bao tra sau hang thuong gia cham soc dac biet|99000
+LTB07|Tra truoc Data Only|Thue bao chuyen dung data 4G 5G khong nghe goi|0
+LTB08|Tra sau Fast Connect|Thue bao tra sau chuyen data dung cho thiet bi Router|50000
+LTB09|Tra truoc MobiEZ|Thue bao tra truoc goi cuoc gia dinh|0
+LTB10|Tra sau Gia dinh|Thue bao tra sau goi nhom gia dinh mien phi noi mang|79000
