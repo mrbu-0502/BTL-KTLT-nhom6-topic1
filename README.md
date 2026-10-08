@@ -108,15 +108,17 @@ BTL-KTLT-nhom6-topic1/
 Toàn bộ dữ liệu được lưu trữ bền vững trong các tệp văn bản (`.txt`), các trường thông tin phân tách bởi dấu gạch đứng `|`[cite: 1, 7]. Mỗi tệp phải có sẵn **tối thiểu 10 bản ghi mẫu hợp lệ** và đồng bộ chuẩn xác về các khóa ngoại tham chiếu[cite: 1, 7]:
 
 1. `data/packages.txt`: `MaGoi|TenGoi|GiaCuoc|DataMB|ThoaiPhut|SMS|ChuKyNgay`
-2. `data/customers.txt`: `MaKH|HoTen|CCCD|DiaChi|SDT|NgaySinh`
+2. `data/customers.txt`: `MaKH|HoTen|CCCD|DiaChi|NgaySinh`
 3. `data/sub_types.txt`: `MaLoai|TenLoai|MoTa|CuocThang`
-4. `data/complaints.txt`: `MaKN|MaKH|NgayGui|NoiDung|TrangThai`
+4. `data/complaints.txt`: `MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai`
 5. `data/devices.txt`: `MaIMEI|TenMay|HangSX|NamSX|TinhTrang`[cite: 7]
 6. `data/cdrs.txt`: `MaCDR|SoGoi|SoNhan|ThoiDiem|SoGiay|CuocPhi`[cite: 7]
-7. `data/sims.txt`: `SoSim|MaIMSI|MaLoai|MaIMEI|NgayKichHoat|TrangThai`[cite: 7]
-8. `data/bills.txt`: `MaHD|SoSim|ThangNam|TongTien|TrangThai`[cite: 7]
-9. `data/recharges.txt`: `MaPhieu|SoSim|MenhGia|NgayNap|HinhThuc`[cite: 7]
-10. `data/contracts.txt`: `MaHD|MaKH|SoSim|MaGoi|NgayDangKy|TrangThai`[cite: 7]
+7. `data/sims.txt`: `SoSim|MaIMSI|MaLoai|MaIMEI(có thể để trống, trống thì để là NONE)|NgayKichHoat|TrangThai`[cite: 7]
+8. `data/bills.txt`: `MaHoaDon|SoSim|ThangNam|TongTien|TrangThai`[cite: 7]
+9. `data/recharges.txt`: `MaPhieu|SoSim|MenhGia|NgayNap|HinhThuc`[cite: 7] 
+10. `data/contracts.txt`: `MaHopDong|MaKH|SoSim|MaGoi|NgayDangKy|TrangThai`[cite: 7]
+
+Những thứ liên quan đến ngày tháng thì thống nhất chuẩn chung DD/MM/YYYY;
 
 ---
 
