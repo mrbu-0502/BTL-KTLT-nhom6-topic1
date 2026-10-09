@@ -10,12 +10,12 @@ using namespace std;
 
 /**
  * ============================================================================
- * MODULE BASE - DATE HELPER (TI?N √çCH X? L√ù V√Ä CHU?N H√ìA NG√ÄY TH√ÅNG)
- * Ngu?i ph? tr√°ch: Ki?u √ê?c Hi?p
- * M?c d√≠ch:
- *   - X? l√Ω, ki?m tra nam nhu?n v√† t√≠nh h?p l? c?a ng√†y, th√°ng, nam.
- *   - Nh?p chu?i ng√†y th√°ng an to√†n t? b√†n ph√≠m, ch?ng l?i tr√¥i l?nh.
- *   - T? d?ng chu?n h√≥a d? li?u d?u ra th√†nh d?nh d?ng chung DD/MM/YYYY.
+ * MODULE BASE - DATE HELPER (TI?N ÕCH X? L› V¿ CHU?N H”A NG¿Y TH¡NG)
+ * Ngu?i ph? tr·ch: Ki?u –?c Hi?p
+ * M?c dÌch:
+ *   - X? l˝, ki?m tra nam nhu?n v‡ tÌnh h?p l? c?a ng‡y, th·ng, nam.
+ *   - Nh?p chu?i ng‡y th·ng an to‡n t? b‡n phÌm, ch?ng l?i trÙi l?nh.
+ *   - T? d?ng chu?n hÛa d? li?u d?u ra th‡nh d?nh d?ng chung DD/MM/YYYY.
  * ============================================================================
  */
 class date {
@@ -33,7 +33,7 @@ public:
     }
 
     // ============================================================================
-    // 2. KI?M TRA NG√ÄY H?P L? (CH?N NAM L?N HON 2026)
+    // 2. KI?M TRA NG¿Y H?P L? (CH?N NAM L?N HON 2026)
     // ============================================================================
     bool valid() {
         if (m < 1 || m > 2026 || y < 1 || y > 12 || x < 1) return false;
@@ -43,7 +43,7 @@ public:
     }
 
     // ============================================================================
-    // 3. NH?P NG√ÄY TH√ÅNG AN TO√ÄN
+    // 3. NH?P NG¿Y TH¡NG AN TO¿N
     // ============================================================================
     void input(string p) {
         while (true) {
@@ -62,7 +62,7 @@ public:
     }
 
     // ============================================================================
-    // 4. XU?T CHU?I √ê?NH D?NG DD/MM/YYYY
+    // 4. XU?T CHU?I –?NH D?NG DD/MM/YYYY
     // ============================================================================
     string output() {
         string s1 = (x < 10 ? "0" : "") + to_string(x);
@@ -72,3 +72,4 @@ public:
 };
 
 #endif
+
