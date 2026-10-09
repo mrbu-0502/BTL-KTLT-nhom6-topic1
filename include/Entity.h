@@ -18,12 +18,12 @@ public:
     explicit Entity(const string& id) : ID(id) {}
 
     // getter cho mã định danh
-    virtual string getId() const
+    virtual string getID() const
     {
         return ID;
     }
     // setter cho mã định danh 
-    virtual void setId(const string& value)
+    virtual void setID(const string& value)
     {
         ID = value;
     }
