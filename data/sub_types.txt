@@ -1,10 +1,11 @@
-LTB01|Tra truoc ca nhan|Thue bao tra truoc danh cho ca nhan|0
-LTB02|Tra sau ca nhan|Thue bao tra sau danh cho ca nhan|49000
-LTB03|Tra truoc sinh vien|Thue bao tra truoc uu dai sinh vien|0
-LTB04|Tra sau doanh nghiep|Thue bao tra sau danh cho khach hang doanh nghiep|69000
-LTB05|Tra truoc Tourist|Thue bao tra truoc danh cho khach du lich|0
-LTB06|Tra sau VIP|Thue bao tra sau hang thuong gia cham soc dac biet|99000
-LTB07|Tra truoc Data Only|Thue bao chuyen dung data 4G 5G khong nghe goi|0
-LTB08|Tra sau Fast Connect|Thue bao tra sau chuyen data dung cho thiet bi Router|50000
-LTB09|Tra truoc MobiEZ|Thue bao tra truoc goi cuoc gia dinh|0
-LTB10|Tra sau Gia dinh|Thue bao tra sau goi nhom gia dinh mien phi noi mang|79000
+SUB01|Tra Truoc Economy|Thue bao tra truoc goi cuoc thong thuong|0
+SUB02|Tra Truoc Tomato|Thue bao tra truoc khong gioi han thoi gian su dung|0
+SUB03|Tra Truoc Student|Thue bao tra truoc uu dai sinh vien hoc sinh|0
+SUB04|Tra Sau Basic+|Thue bao tra sau ca nhan goi noi mang ngoai mang|50000
+SUB05|Tra Sau Family|Thue bao tra sau goi nhom gia dinh|70000
+SUB06|Tra Sau Corporate|Thue bao tra sau danh rieng cho doanh nghiep|90000
+SUB07|Tra Sau VIP|Thue bao tra sau han muc cao kem dich vu CSKH|150000
+SUB08|Dcom 4G Prepaid|Thue bao data chuyen dung tra truoc khong thoai|0
+SUB09|Dcom 4G Postpaid|Thue bao data chuyen dung tra sau cho Router|50000
+SUB10|eSIM IoT|Thue bao chuyen dung cho thiet bi thong minh va dong ho|20000
+MaLoai|TenLoai|MoTa|CuocThang

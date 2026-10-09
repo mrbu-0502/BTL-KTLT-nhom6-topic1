@@ -113,7 +113,7 @@ Toàn bộ dữ liệu được lưu trữ bền vững trong các tệp văn b�
 4. `data/complaints.txt`: `MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai`
 5. `data/devices.txt`: `MaIMEI|TenMay|HangSX|NamSX|TinhTrang`[cite: 7]
 6. `data/cdrs.txt`: `MaCDR|SoGoi|SoNhan|ThoiDiem|SoGiay|CuocPhi`[cite: 7]
-7. `data/sims.txt`: `SoSim|MaIMSI|MaLoai|MaIMEI(có thể để trống, trống thì để là NONE)|NgayKichHoat|TrangThai`[cite: 7]
+7. `data/sims.txt`: `SoSim|MaIMSI|MaLoai|MaIMEI|NgayKichHoat|TrangThai`[cite: 7]
 8. `data/bills.txt`: `MaHoaDon|SoSim|ThangNam|TongTien|TrangThai`[cite: 7]
 9. `data/recharges.txt`: `MaPhieu|SoSim|MenhGia|NgayNap|HinhThuc`[cite: 7] 
 10. `data/contracts.txt`: `MaHopDong|MaKH|SoSim|MaGoi|NgayDangKy|TrangThai`[cite: 7]
