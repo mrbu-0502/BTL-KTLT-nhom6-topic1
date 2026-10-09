@@ -33,7 +33,7 @@ public:
 
     T* findById(string id) {
         for (int i = 0; i < records.size(); i++) {
-            if (records[i].getId() == id) {
+            if (records[i].getID() == id) {
                 return &records[i];
             }
         }
@@ -41,7 +41,7 @@ public:
     }
 
     void add(T item) {
-        if (findById(item.getId()) != nullptr) {
+        if (findById(item.getID()) != nullptr) {
             throw invalid_argument("Loi: Ma dinh danh da ton tai!");
         }
         // Giữ bản cũ để khôi phục nếu thao tác thất bại.
@@ -57,12 +57,12 @@ public:
 
     void update(string id, T newItem) {
         // Mã định danh được giữ nguyên khi sửa.
-        if (newItem.getId() != id) {
+        if (newItem.getID() != id) {
             throw invalid_argument("Loi: Khong duoc thay doi ma dinh danh!");
         }
 
         for (int i = 0; i < records.size(); i++) {
-            if (records[i].getId() == id) {
+            if (records[i].getID() == id) {
                 vector<T> oldRecords = records;
                 try {
                     records[i] = newItem;
@@ -79,7 +79,7 @@ public:
 
     void remove(string id) {
         for (int i = 0; i < records.size(); i++) {
-            if (records[i].getId() == id) {
+            if (records[i].getID() == id) {
                 vector<T> oldRecords = records;
                 try {
                     records.erase(records.begin() + i);
@@ -141,7 +141,7 @@ public:
 
                 T item;
                 item.fromString(line);
-                if (findById(item.getId()) != nullptr) {
+                if (findById(item.getID()) != nullptr) {
                     throw invalid_argument("Loi: Ma dinh danh bi trung trong file!");
                 }
                 records.push_back(item);
@@ -157,5 +157,4 @@ public:
         }
     }
 };
-
 
