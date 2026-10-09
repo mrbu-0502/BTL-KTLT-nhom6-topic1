@@ -8,7 +8,7 @@ class Entity
 {
 protected:
     // Thuộc tính mã định danh  
-    string ID; 
+    string ID;
 
 public:
     // Constructor không có tham số: Cho phép tạo đối tượng rỗng  
@@ -18,12 +18,12 @@ public:
     explicit Entity(const string& id) : ID(id) {}
 
     // getter cho mã định danh
-    virtual string getID() const
+    virtual string getId() const
     {
         return ID;
     }
     // setter cho mã định danh 
-    virtual void setID(const string& value)
+    virtual void setId(const string& value)
     {
         ID = value;
     }
