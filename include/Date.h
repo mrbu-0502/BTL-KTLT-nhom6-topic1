@@ -1,21 +1,18 @@
-#ifndef DATE_H
-#define DATE_H
-
+#pragma once
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <windows.h> 
 
 using namespace std;
 
 /**
  * ============================================================================
- * MODULE BASE - DATE HELPER (TI?N ÍCH X? LÝ VÀ CHU?N HÓA NGÀY THÁNG)
- * Ngu?i ph? trách: Ki?u Ð?c Hi?p
- * M?c dích:
- *   - X? lý, ki?m tra nam nhu?n và tính h?p l? c?a ngày, tháng, nam.
- *   - Nh?p chu?i ngày tháng an toàn t? bàn phím, ch?ng l?i trôi l?nh.
- *   - T? d?ng chu?n hóa d? li?u d?u ra thành d?nh d?ng chung DD/MM/YYYY.
+ * MODULE BASE - DATE (TIEN ICH XU LY VA CHUAN HOA NGAY THANG)
+ * Nguoi phu trach: Kieu Duc Hiep
+ * Muc dich:
+ *   - Xu ly, kiem tra nam nhuan va tinh hop le cua ngay, thang, nam.
+ *   - Nhap chuoi ngay thang an toan tu ban phim, chong loi troi lenh.
+ *   - Tu dong chuan hoa du lieu dau ra thanh dinh dang chung DD/MM/YYYY.
  * ============================================================================
  */
 class date {
@@ -26,14 +23,14 @@ public:
     date(int x = 1, int y = 1, int m = 2000) : x(x), y(y), m(m) {}
 
     // ============================================================================
-    // 1. KI?M TRA NAM NHU?N
+    // 1. KIEM TRA NAM NHUAN
     // ============================================================================
     bool leap() {
         return m % 400 == 0 || (m % 4 == 0 && m % 100 != 0);
     }
 
     // ============================================================================
-    // 2. KI?M TRA NGÀY H?P L? (CH?N NAM L?N HON 2026)
+    // 2. KIEM TRA NGAY HOP LE (CHAN NAM LON HON 2026)
     // ============================================================================
     bool valid() {
         if (m < 1 || m > 2026 || y < 1 || y > 12 || x < 1) return false;
@@ -43,7 +40,7 @@ public:
     }
 
     // ============================================================================
-    // 3. NH?P NGÀY THÁNG AN TOÀN
+    // 3. NHAP NGAY THANG AN TOAN
     // ============================================================================
     void input(string p) {
         while (true) {
@@ -62,7 +59,7 @@ public:
     }
 
     // ============================================================================
-    // 4. XU?T CHU?I Ð?NH D?NG DD/MM/YYYY
+    // 4. XUAT CHUOI DINH DANG DD/MM/YYYY
     // ============================================================================
     string output() {
         string s1 = (x < 10 ? "0" : "") + to_string(x);
@@ -70,6 +67,3 @@ public:
         return s1 + "/" + s2 + "/" + to_string(m);
     }
 };
-
-#endif
-
