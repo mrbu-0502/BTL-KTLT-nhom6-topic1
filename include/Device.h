@@ -1,20 +1,20 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include "Entity.h" // Nhúng class Entity th?t c?a nhóm vào dây
+#include "Entity.h" // Nhung class Entity that cua nhom vao day
 
 using namespace std;
 
 // =========================================================
-// CLASS DEVICE (K? th?a Entity)
+// CLASS DEVICE (Ke thua Entity)
 // =========================================================
 class Device : public Entity {
 private:
-    string a; // a: Mã IMEI
-    string b; // b: Tên thi?t b?
+    string a; // a: Ma IMEI
+    string b; // b: Ten thiet bi
 
 public:
-    // 1. Kh?i t?o
+    // 1. Khoi tao
     Device() { 
         a = ""; 
         b = ""; 
@@ -25,17 +25,17 @@ public:
         b = y; 
     }
 
-    // 2. Getter / Setter truy xu?t an toàn
+    // 2. Getter / Setter truy xuat an toan
     string getA() const { return a; }
     void setA(string x) { a = x; }
     
     string getB() const { return b; }
     void setB(string y) { b = y; }
 
-    // 3. Ghi dè (override) các hàm t? class Entity theo chu?n OOP c?a nhóm
+    // 3. Ghi de (override) cac ham tu class Entity theo chuan OOP cua nhom
     void setId(const string& x) override {
         ID = x;
-        a = x; // Dùng luôn ID làm mã IMEI
+        a = x; // Dung luon ID lam ma IMEI
     }
 
     void getDetail() const override {
@@ -43,11 +43,11 @@ public:
     }
 
     string toString() const override {
-        // Tr? v? chu?i phân cách b?i d?u | d? chu?n b? ghi ra file text devices.txt
+        // Tra ve chuoi phan cach boi dau | de chuan bi ghi ra file text devices.txt
         return a + "|" + b; 
     }
 
-    // 4. Hàm nh?p th? công co b?n
+    // 4. Ham nhap thu cong co ban
     void nhap() {
         cout << "Nhap ma IMEI: ";
         getline(cin, a);
