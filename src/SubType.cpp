@@ -52,13 +52,9 @@ void SubType::fromString(const string& line) {
     getline(ss, moTa, '|');
     getline(ss, cuocStr, '|');
 
-    try {
-        if (!cuocStr.empty()) {
-            cuocThang = stod(cuocStr);
-        } else {
-            cuocThang = 0.0;
-        }
-    } catch (...) {
+    if (!cuocStr.empty()) {
+        cuocThang = stod(cuocStr);
+    } else {
         cuocThang = 0.0;
     }
 }
