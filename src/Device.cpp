@@ -1,98 +1,98 @@
-#include "Device.h"      // Nhap ban ve Device tu thu muc include
-#include "InputHelper.h" // Nhap cong cu ho tro nhap lieu an toan cua Cuong
+#include "Device.h"      // Goi ban ve Device vao day
+#include "InputHelper.h" // Goi cong cu nhap lieu chong troi lenh
 
 using namespace std;
 
 // =========================================================================
-// PHAN 1: KHOI TAO THIET BI (CONSTRUCTOR)
-// Dung de tao ra doi tuong ngay khi chuong trinh vua chay
+// 1. KHOI TAO THIET BI RONG (CONSTRUCTOR)
 // =========================================================================
-
-// Ham khoi tao mac dinh (Chay khi tao mot thiet bi moi tinh ma chua co thong tin)
 Device::Device() {
-    a = ""; // De trong ma IMEI
-    b = ""; // De trong ten thiet bi
-}
-
-// Ham khoi tao co tham so (Chay khi muon tao thiet bi va gan luon du lieu x, y vao)
-Device::Device(string x, string y) {
-    a = x;  // Gan chuoi x vao bien a (Ma IMEI)
-    b = y;  // Gan chuoi y vao bien b (Ten thiet bi)
-    ID = x; // Trong do an nay, ID he thong chinh la ma IMEI
+    a = ""; // Ma IMEI ban dau de trong
+    b = ""; // Ten may ban dau de trong
+    c = ""; // Hang san xuat ban dau de trong
+    d = ""; // Nam san xuat ban dau de trong
+    e = ""; // Tinh trang may ban dau de trong
 }
 
 // =========================================================================
-// PHAN 2: CAC HAM GET/SET DE LAY HOAC SUA DU LIEU (DUNG DE BAO MAT)
+// 2. DONG BO ID HE THONG VOI MA IMEI
 // =========================================================================
-
-// Ham getA: Goi ham nay khi muon lay ma IMEI ra de xem
-string Device::getA() const { 
-    return a; 
-}
-
-// Ham setA: Goi ham nay khi muon sua ma IMEI thanh mot ma khac (x)
-void Device::setA(string x) { 
-    a = x;  // Sua ma IMEI
-    ID = x; // Cap nhat luon ID cho dong bo voi ma IMEI moi
-}
-
-// Ham getB: Goi ham nay khi muon lay ten thiet bi ra de xem
-string Device::getB() const { 
-    return b; 
-}
-
-// Ham setB: Goi ham nay khi muon sua ten thiet bi thanh ten khac (y)
-void Device::setB(string y) { 
-    b = y; 
-}
-
-// =========================================================================
-// PHAN 3: GHI DE CAC HAM CUA CLASS CHA "ENTITY" DE CHUAN HOA VOI NHOM
-// =========================================================================
-
-// 1. Ham cai dat ID (Ham nay do nhom truong Khanh yeu cau co)
 void Device::setID(const string& value) {
-    ID = value; // Gan ID chung cua he thong
-    a = value;  // Dong bo ma IMEI (a) giong y het ID do
+    ID = value; // Gan ID chung do he thong quan ly yeu cau
+    a = value;  // Doi voi thiet bi, ma IMEI (a) cung chinh la ID
 }
 
-// 2. Ham nhap du lieu tu ban phim (Thay the cho viec dung cin >> gay troi lenh)
+// =========================================================================
+// 3. NHAP THONG TIN TU BAN PHIM (5 THONG TIN)
+// =========================================================================
 void Device::getInformation() {
-    // Dung InputHelper::getString de man hinh dung lai cho minh nhap an toan
+    // Dung InputHelper de mang hinh dung lai cho minh nhap tung dong
     a = InputHelper::getString("Nhap ma IMEI: ");
-    ID = a; // Nhap IMEI xong thi cho bien ID bang luon ma IMEI vua nhap
-    
-    // Tiep tuc cho nhap ten may
-    b = InputHelper::getString("Nhap ten thiet bi: ");
+    ID = a; // Nhap xong IMEI thi cap nhat luon vao ID cua he thong
+
+    b = InputHelper::getString("Nhap ten may: ");
+    c = InputHelper::getString("Nhap hang san xuat (VD: Apple, Samsung): ");
+    d = InputHelper::getString("Nhap nam san xuat (VD: 2021): ");
+    e = InputHelper::getString("Nhap tinh trang (VD: Moi/Cu): ");
 }
 
-// 3. Ham in thong tin ra man hinh console cho dep
+// =========================================================================
+// 4. IN THONG TIN RA MAN HINH DE NGUOI DUNG XEM
+// =========================================================================
 void Device::display() const {
-    // In ra theo mau: "IMEI: 123456 | Ten thiet bi: Samsung S24"
-    cout << "IMEI: " << a << " | Ten thiet bi: " << b << endl;
+    // In lan luot 5 bien ra, ngan cach nhau boi dau "|" cho dep mat
+    cout << "IMEI: " << a 
+         << " | May: " << b 
+         << " | Hang: " << c 
+         << " | Nam: " << d 
+         << " | Tinh trang: " << e << endl;
 }
 
-// 4. Ham ghep 2 bien a va b thanh 1 chuoi lien nhau de luu vao file
+// =========================================================================
+// 5. GHEP CHUOI DE LUU KHO (GHI RA FILE TXT)
+// =========================================================================
 string Device::toString() const {
-    // Dung dau "+" de noi chuoi. Ket qua se ra dang: "123456789|iPhone 15"
-    return a + "|" + b;
+    // Ghep 5 bien lai, nhet dau "|" vao giua cac bien.
+    // Ket qua ra se dung chuan: "861234|iPhone 13|Apple|2021|Moi"
+    return a + "|" + b + "|" + c + "|" + d + "|" + e;
 }
 
-// 5. Ham boc tach chuoi doc duoc tu file text de nhet lai vao may tinh
-// Tham so "line" la 1 dong text no doc duoc. Vi du line = "86123|Oppo"
+// =========================================================================
+// 6. CAT CHUOI TU FILE TXT DE NAP VAO MAY TINH (QUAN TRONG NHAT)
+// =========================================================================
 void Device::fromString(const string& line) {
+    // Gia su tham so line dang la dong chu: "861234|iPhone|Apple|2021|Moi"
     
-    // Buoc 1: Tim xem cai dau gach dung '|' no nam o vi tri thu may
-    int vitri = line.find('|');
-
-    // Buoc 2: Cat tu dau (vi tri 0) lay dung so luong chu cai bang 'vitri', roi gan vao a
-    // Voi vi du "86123|Oppo", no se cat lay chu "86123" roi luu vao bien a (Ma IMEI)
-    a = line.substr(0, vitri);
-
-    // Buoc 3: Cat tu ngay sau dau '|' (tuc la vitri + 1) cho den het, roi gan vao b
-    // No se cat lay chu "Oppo" roi luu vao bien b (Ten thiet bi)
-    b = line.substr(vitri + 1);
-
-    // Buoc 4: Lay ma IMEI (a) vua tach duoc gan cho bien ID cua he thong
+    // --------------------------------------------------
+    // B1: Tim dau '|' thu 1 (ky hieu la p1)
+    int p1 = line.find('|');
+    // Cat tu dau (vi tri 0), cat mot doan dai bang dung p1. Gan vao a
+    a = line.substr(0, p1); 
+    
+    // --------------------------------------------------
+    // B2: Tim dau '|' thu 2 (ky hieu la p2). Bat dau tim tu sau p1 (p1 + 1)
+    int p2 = line.find('|', p1 + 1);
+    // Cat doan nam giua p1 va p2. Do dai doan chu = (p2 - p1 - 1). Gan vao b
+    b = line.substr(p1 + 1, p2 - p1 - 1);
+    
+    // --------------------------------------------------
+    // B3: Tim dau '|' thu 3 (ky hieu la p3). Bat dau tim tu sau p2 (p2 + 1)
+    int p3 = line.find('|', p2 + 1);
+    // Cat doan nam giua p2 va p3. Do dai doan chu = (p3 - p2 - 1). Gan vao c
+    c = line.substr(p2 + 1, p3 - p2 - 1);
+    
+    // --------------------------------------------------
+    // B4: Tim dau '|' thu 4 (ky hieu la p4). Bat dau tim tu sau p3 (p3 + 1)
+    int p4 = line.find('|', p3 + 1);
+    // Cat doan nam giua p3 va p4. Do dai doan chu = (p4 - p3 - 1). Gan vao d
+    d = line.substr(p3 + 1, p4 - p3 - 1);
+    
+    // --------------------------------------------------
+    // B5: Lay phan cuoi cung. Khong can tim diem ket thuc nua!
+    // Cat tu sau p4 (p4 + 1) cho den tan day cuoi cung cua cau chu. Gan vao e
+    e = line.substr(p4 + 1);
+    
+    // --------------------------------------------------
+    // Cuoi cung: Lay ma IMEI vua tach duoc gan vao ID
     ID = a; 
 }
