@@ -8,15 +8,17 @@
 
 using namespace std;
 
-
+// ============================================================================
 // CONSTRUCTOR
+// ============================================================================
 SubType::SubType() : Entity(""), tenLoai(""), moTa(""), cuocThang(0.0) {}
 
 SubType::SubType(string maLoai, string tenLoai, string moTa, double cuocThang)
     : Entity(maLoai), tenLoai(tenLoai), moTa(moTa), cuocThang(cuocThang) {}
 
-
+// ============================================================================
 // PHUONG THUC KE THUA TU ENTITY
+// ============================================================================
 string SubType::getID() const {
     return ID;
 }
@@ -50,15 +52,20 @@ void SubType::fromString(const string& line) {
     getline(ss, moTa, '|');
     getline(ss, cuocStr, '|');
 
-    if (!cuocStr.empty()) {
-        cuocThang = stod(cuocStr);
-    } else {
+    try {
+        if (!cuocStr.empty()) {
+            cuocThang = stod(cuocStr);
+        } else {
+            cuocThang = 0.0;
+        }
+    } catch (...) {
         cuocThang = 0.0;
     }
 }
 
-
+// ============================================================================
 // GETTER & SETTER
+// ============================================================================
 string SubType::getTenLoai() const {
     return tenLoai;
 }
@@ -89,8 +96,9 @@ void SubType::setCuocThang(double cuoc) {
     }
 }
 
-
+// ============================================================================
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
+// ============================================================================
 static void inTieuDeBangSubType() {
     cout << string(95, '-') << endl;
     cout << left << setw(10) << "Ma Loai"
@@ -100,8 +108,9 @@ static void inTieuDeBangSubType() {
     cout << string(95, '-') << endl;
 }
 
-
+// ============================================================================
 // THAO TAC CRUD
+// ============================================================================
 static void xemDanhSachSubType(Repository<SubType>& repo) {
     vector<SubType> list = repo.getAll();
     if (list.empty()) {
@@ -118,14 +127,17 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    SubType st;
-    st.getInformation();
-
-    if (repo.findById(st.getID()) != nullptr) {
-        cout << "[Loi] Ma loai hinh '" << st.getID() << "' da ton tai!\n";
+    string id = InputHelper::getString("Nhap ma loai hinh (vi du: SUB11): ", false);
+    if (repo.findById(id) != nullptr) {
+        cout << "[Loi] Ma loai hinh '" << id << "' da ton tai!\n";
         return;
     }
 
+    string ten = InputHelper::getString("Nhap ten loai hinh: ", false);
+    string moTa = InputHelper::getString("Nhap mo ta: ", false);
+    double cuoc = InputHelper::getDouble("Nhap cuoc phi thang (VND): ", 0.0);
+
+    SubType st(id, ten, moTa, cuoc);
     repo.add(st);
     cout << "Them loai hinh thue bao thanh cong!\n";
 }
@@ -221,4 +233,3 @@ void menuLoaiHinh() {
         }
     } while (chon != 0);
 }
-

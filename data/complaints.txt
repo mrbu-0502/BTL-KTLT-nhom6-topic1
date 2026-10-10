@@ -8,4 +8,4 @@ KN07|KH07|0981000007|05/03/2024|Chua nhan duoc tin nhan ma OTP|DangXuLy
 KN08|KH08|0981000008|12/03/2024|Yeu cau cap lai hoa don dien tu thang 2|DaXuLy
 KN09|KH09|0981000009|25/03/2024|Thiet bi Dcom khong nhan song LTE|DangXuLy
 KN10|KH10|0981000010|02/04/2024|Phan anh thai do nhan vien tong dai|DaXuLy
-MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai
+KN22|KH10|0981000007|30/05/2026|khong dung duoc|TiepNhan

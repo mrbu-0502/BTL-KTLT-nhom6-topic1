@@ -1,5 +1,8 @@
 #include <iostream>
 #include <limits>
+#include "SubType.h"
+#include "Complaint.h"
+#include "InputHelper.h"
 
 using namespace std;
 
@@ -15,15 +18,8 @@ void menuKhachHang() {
     cout << "(Chuc nang dang duoc hoan thien...)\n";
 }
 
-void menuLoaiHinh() {
-    cout << "\n--- [USE CASE 3: QUAN LY LOAI HINH THUE BAO] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
-
-void menuKhieuNai() {
-    cout << "\n--- [USE CASE 4: QUAN LY KHIEU NAI] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+// USE CASE 3 (SubType) & USE CASE 4 (Complaint) do Nguyen Van Cuong phu trach
+// Da duoc khai bao trong SubType.h va Complaint.h
 
 void menuThietBi() {
     cout << "\n--- [USE CASE 5: QUAN LY THIET BI] ---\n";
@@ -71,7 +67,6 @@ void hienThiMenuChinh() {
     cout << "10. Quan ly Hop dong (Contract)\n";
     cout << "0.  Thoat chuong trinh\n";
     cout << "======================================================\n";
-    cout << "Nhap lua chon cua ban (0-10): ";
 }
 
 int main() {
@@ -79,12 +74,7 @@ int main() {
 
     do {
         hienThiMenuChinh();
-        if (!(cin >> luaChon)) {
-            cout << "\n[Loi] Vui long chi nhap so nguyen hop le!\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
-        }
+        luaChon = InputHelper::getInt("Nhap lua chon cua ban (0-10): ", 0, 10);
 
         switch (luaChon) {
             case 1:  menuGoiCuoc();  break;

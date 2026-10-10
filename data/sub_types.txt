@@ -8,4 +8,3 @@ SUB07|Tra Sau VIP|Thue bao tra sau han muc cao kem dich vu CSKH|150000
 SUB08|Dcom 4G Prepaid|Thue bao data chuyen dung tra truoc khong thoai|0
 SUB09|Dcom 4G Postpaid|Thue bao data chuyen dung tra sau cho Router|50000
 SUB10|eSIM IoT|Thue bao chuyen dung cho thiet bi thong minh va dong ho|20000
-MaLoai|TenLoai|MoTa|CuocThang
