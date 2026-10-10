@@ -9,18 +9,16 @@
 
 using namespace std;
 
-// ============================================================================
+
 // CONSTRUCTOR
-// ============================================================================
 Complaint::Complaint()
     : Entity(""), maKH(""), soSim(""), ngayGui(""), noiDung(""), trangThai("DangXuLy") {}
 
 Complaint::Complaint(string maKN, string maKH, string soSim, string ngayGui, string noiDung, string trangThai)
     : Entity(maKN), maKH(maKH), soSim(soSim), ngayGui(ngayGui), noiDung(noiDung), trangThai(trangThai) {}
 
-// ============================================================================
+
 // PHUONG THUC KE THUA TU ENTITY
-// ============================================================================
 string Complaint::getID() const {
     return ID;
 }
@@ -31,7 +29,7 @@ void Complaint::getInformation() {
     setSoSim(InputHelper::getString("Nhap so thue bao/SIM (vi du: 0981000001): ", false));
     setNgayGui(InputHelper::getString("Nhap ngay gui (dd/mm/yyyy): ", false));
     setNoiDung(InputHelper::getString("Nhap noi dung khieu nai: ", false));
-    setTrangThai(InputHelper::getString("Nhap trang thai (DangXuLy / DaXuLy): ", false));
+    setTrangThai(InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false));
 }
 
 void Complaint::display() const {
@@ -59,9 +57,7 @@ void Complaint::fromString(const string& line) {
     getline(ss, trangThai, '|');
 }
 
-// ============================================================================
-// GETTER & SETTER
-// ============================================================================
+// GETTER 
 string Complaint::getMaKH() const {
     return maKH;
 }
@@ -82,39 +78,30 @@ string Complaint::getTrangThai() const {
     return trangThai;
 }
 
+//SETTER
 void Complaint::setMaKH(const string& mkh) {
-    if (!mkh.empty()) {
         maKH = mkh;
-    }
 }
 
 void Complaint::setSoSim(const string& sim) {
-    if (!sim.empty()) {
+
         soSim = sim;
-    }
 }
 
 void Complaint::setNgayGui(const string& ngay) {
-    if (!ngay.empty()) {
         ngayGui = ngay;
-    }
 }
 
 void Complaint::setNoiDung(const string& nd) {
-    if (!nd.empty()) {
         noiDung = nd;
-    }
 }
 
 void Complaint::setTrangThai(const string& tt) {
-    if (!tt.empty()) {
         trangThai = tt;
-    }
 }
 
-// ============================================================================
+
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
-// ============================================================================
 static void inTieuDeBangComplaint() {
     cout << string(95, '-') << endl;
     cout << left << setw(8)  << "Ma KN"
@@ -126,9 +113,8 @@ static void inTieuDeBangComplaint() {
     cout << string(95, '-') << endl;
 }
 
-// ============================================================================
+
 // THAO TAC CRUD
-// ============================================================================
 static void xemDanhSachComplaint(Repository<Complaint>& repo) {
     vector<Complaint> list = repo.getAll();
     if (list.empty()) {
@@ -236,9 +222,8 @@ static void xoaComplaint(Repository<Complaint>& repo) {
     }
 }
 
-// ============================================================================
+
 // MENU QUAN LY PHIEU KHIEU NAI
-// ============================================================================
 void menuKhieuNai() {
     Repository<Complaint> repo("data/complaints.txt");
     repo.loadFromFile();

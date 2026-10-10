@@ -8,17 +8,15 @@
 
 using namespace std;
 
-// ============================================================================
+
 // CONSTRUCTOR
-// ============================================================================
 SubType::SubType() : Entity(""), tenLoai(""), moTa(""), cuocThang(0.0) {}
 
 SubType::SubType(string maLoai, string tenLoai, string moTa, double cuocThang)
     : Entity(maLoai), tenLoai(tenLoai), moTa(moTa), cuocThang(cuocThang) {}
 
-// ============================================================================
+
 // PHUONG THUC KE THUA TU ENTITY
-// ============================================================================
 string SubType::getID() const {
     return ID;
 }
@@ -59,9 +57,8 @@ void SubType::fromString(const string& line) {
     }
 }
 
-// ============================================================================
+
 // GETTER & SETTER
-// ============================================================================
 string SubType::getTenLoai() const {
     return tenLoai;
 }
@@ -92,9 +89,8 @@ void SubType::setCuocThang(double cuoc) {
     }
 }
 
-// ============================================================================
+
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
-// ============================================================================
 static void inTieuDeBangSubType() {
     cout << string(95, '-') << endl;
     cout << left << setw(10) << "Ma Loai"
@@ -104,9 +100,8 @@ static void inTieuDeBangSubType() {
     cout << string(95, '-') << endl;
 }
 
-// ============================================================================
+
 // THAO TAC CRUD
-// ============================================================================
 static void xemDanhSachSubType(Repository<SubType>& repo) {
     vector<SubType> list = repo.getAll();
     if (list.empty()) {
