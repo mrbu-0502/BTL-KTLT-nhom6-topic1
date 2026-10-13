@@ -1,3 +1,8 @@
+/**
+ * ==============================================================================
+ * Người phụ trách: Lương Đức Anh (B24DCVT006)
+ * ==============================================================================
+ */
 #pragma once
 #include "Entity.h"
 #include <string>
@@ -6,28 +11,28 @@ using namespace std;
 
 class Recharge : public Entity {
 private:
-    string maPhieu;
-    string soSim;
-    long long menhGia;
-    string ngayNap;
-    string hinhThuc; 
+    string Ref;
+    string PhoneNumber;
+    long long PraValue;
+    string Date;
+    string Payment; 
 public:
     Recharge();
-    Recharge(const string& maPhieu, const string& soSim, long long menhGia, const string& ngayNap, const string& hinhThuc);
+    Recharge(const string& Ref, const string& PhoneNumber, long long PraValue, const string& Date, const string& Payment);
     
     // Getter 
-    string getmaPhieu() const;
-    string getsoSim() const;
-    long long getmenhGia() const;
-    string getngayNap() const;
-    string gethinhThuc() const;
+    string getRef() const;
+    string getPhoneNumber() const;
+    long long getPraValue() const;
+    string getDate() const;
+    string getPayment() const;
     
     // Setter
-    void setmaPhieu(string value);
-    void setsoSim(string value);
-    void setmenhGia(long long value);
-    void setngayNap(string value);
-    void sethinhThuc(string value);
+    void setRef(string value);
+    void setPhoneNumber(string value);
+    void setPraValue(long long value);
+    void setDate(string value);
+    void setPayment(string value);
 
     string getID() const override;                
     string toString() const override;
