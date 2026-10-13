@@ -13,7 +13,7 @@ using namespace std;
 // CONSTRUCTOR
 // ============================================================================
 Complaint::Complaint()
-    : Entity(""), maKH(""), soSim(""), ngayGui(""), noiDung(""), trangThai("DangXuLy") {}
+    : Entity(""), maKH(""), soSim(""), ngayGui(""), noiDung(""), trangThai("") {}
 
 Complaint::Complaint(string maKN, string maKH, string soSim, string ngayGui, string noiDung, string trangThai)
     : Entity(maKN), maKH(maKH), soSim(soSim), ngayGui(ngayGui), noiDung(noiDung), trangThai(trangThai) {}
@@ -24,7 +24,7 @@ Complaint::Complaint(string maKN, string maKH, string soSim, string ngayGui, str
 string Complaint::getID() const {
     return ID;
 }
-
+    
 void Complaint::getInformation() {
     setID(InputHelper::getString("Nhap ma khieu nai (vi du: KN11): ", false));
     setMaKH(InputHelper::getString("Nhap ma khach hang (vi du: KH01): ", false));
