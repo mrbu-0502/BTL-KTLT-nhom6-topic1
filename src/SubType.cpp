@@ -116,7 +116,7 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
     cout << "\n=== DANH SACH LOAI HINH THUE BAO (" << list.size() << ") ===\n";
     inTieuDeBangSubType();
     for (size_t i = 0; i < list.size(); i++) {
-        list[i].display();
+        list[i].display();  
     }
     cout << string(95, '-') << endl;
 }
