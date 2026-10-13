@@ -3,6 +3,7 @@
  * Người phụ trách: Lương Đức Anh (B24DCVT006)
  * ==============================================================================
  */
+#pragma once
 #include "Entity.h"
 #include <string>
 

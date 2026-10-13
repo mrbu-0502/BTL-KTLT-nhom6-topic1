@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include<cctype>
 #include <sstream>
 using namespace std;
 
@@ -148,5 +149,16 @@ public:
                 cout << "[Loi] Vui long nhap so nguyen hop le hoac nhan Enter de giu nguyen!\n";
             }
         }
+    }
+
+    static bool CheckSdt(const string& sdt){
+        if(!(sdt.size() == 10)) return false;
+        else{
+            for(int i =0; i< 10; i++){
+                if(!isdigit(sdt[i])) return false;
+            }
+        }
+
+        return true;
     }
 };
