@@ -1,7 +1,7 @@
 #include "Recharge.h"
 #include "Contract.h"
-#include "InputHelper.h"
 #include "Date.h"
+#include "InputHelper.h"
 #include "Exceptions.h"
 #include "Repository.h"
 #include <iomanip>
@@ -35,11 +35,11 @@ void Recharge::getInformation(){
     setPayment(InputHelper::getString("Hinh thuc (Tien mat|Chuyen khoan|Vi dien tu): "));
 }
 void Recharge::display() const {
-    cout << left << setw(30) << getRefID() << " | " 
-         << setw(20) << getPhoneNumber() << " | " 
-         << setw(18) << getPraValue() << " | " 
-         << setw(20) << getRDate() << " | " 
-         << setw(20) << getPayment() << " |\n";
+    cout << left  << setw(10) << getRefID()      << " | "
+         << setw(13) << getPhoneNumber()          << " | "
+         << right << setw(14) << getPraValue()    << " | "
+         << left  << setw(13) << getRDate()       << " | "
+         << getPayment() << '\n';
 }
 string Recharge::toString() const{
     ostringstream out;
@@ -69,6 +69,14 @@ string Recharge::getRDate()const {return RDate;}
 string Recharge::getPayment()const {return Payment;}
 
 void Recharge::setRefID(const string& value){
+    if (value.size() < 3 || value.substr(0, 2) != "RC") {
+        throw InvalidDataException("Ma phieu phai bat dau bang RC va co so theo sau!");
+    }
+    for (int i = 2; i < value.size(); ++i) {
+        if (value[i] < '0' || value[i] > '9') {
+            throw InvalidDataException("Sau RC chi duoc nhap chu so!");
+        }
+    }
     RefID = value;
 }
 void Recharge::setPhoneNumber(const string& value){
@@ -82,8 +90,25 @@ void Recharge::setPraValue(int value){
     }
     PraValue = value;
 }
-void Recharge::setRDate(const string& value){
-    RDate = value;
+void Recharge::setRDate(const string& value) {
+    int day, month, year;
+    char slash1, slash2;
+    stringstream ss(value);
+
+    if (!(ss >> day >> slash1 >> month >> slash2 >> year) ||
+        slash1 != '/' || slash2 != '/') {
+        throw InvalidDataException("Ngay nap phai co dang DD/MM/YYYY!");
+    }
+    ss >> ws;
+    if (!ss.eof()) {
+        throw InvalidDataException("Ngay nap co ky tu thua!");
+    }
+    Date rechargeDate(day, month, year);
+    if (!rechargeDate.valid()) {
+        throw InvalidDataException("Ngay nap khong hop le!");
+    }
+
+    RDate = rechargeDate.output();
 }
 void Recharge::setPayment(const string& value) {
     if (value != "Tien mat" && value != "Chuyen khoan" && value != "Vi dien tu") {
@@ -94,13 +119,18 @@ void Recharge::setPayment(const string& value) {
 // ============================================================================
 // CHECK
 // ============================================================================
-bool checkPhoneNumber(const string& PhoneNumber){
-    Repository<Contract> repoContract("data/Contract.txt");
-    repoContract.loadFromFile();
-    vector<Contract> list = repoContract.getAll();
+bool checkPhoneNumber(const string& phoneNumber) {
+    ifstream file("data/contracts.txt");
 
-    for(int i = 0; i < list.size(); i++){
-        if(list[i].getPhoneNumber() == PhoneNumber){
+    string line;
+    while (getline(file, line)) {
+        string contractID, customerID, phone;
+        stringstream ss(line);
+
+        if (getline(ss, contractID, '|') &&
+            getline(ss, customerID, '|') &&
+            getline(ss, phone, '|') &&
+            phone == phoneNumber) {
             return true;
         }
     }
@@ -110,7 +140,13 @@ bool checkRefID(const string& RefID, Repository<Recharge>& repo) {
     return repo.findById(RefID) == nullptr;
 }
 static void printTitleRecharge() {
-    cout << "Ma phieu | So SIM | Menh gia (VND) | Ngay nap (DD/MM/YYYY) | Hinh thuc (Tien mat/Chuyen khoan/Vi dien tu)\n";
+    cout << '\n' << string(80, '-') << '\n';
+    cout << left  << setw(10) << "Ma phieu"       << " | "
+         << setw(13) << "So SIM"                 << " | "
+         << right << setw(14) << "Menh gia (VND)" << " | "
+         << left  << setw(13) << "Ngay nap"       << " | "
+         << "Hinh thuc" << '\n';
+    cout << string(80, '-') << '\n';
 }
 static void listRecharge(Repository<Recharge>& repo) {
     vector<Recharge> items = repo.getAll();
@@ -125,7 +161,7 @@ static void addRecharge(Repository<Recharge>& repo){
         try{
             string text = InputHelper::getString("Ma Phieu (RCxxx): ",false);
             if(!checkRefID(text,repo))
-                throw InvalidDataException("Ma phieu da ton tai");
+                throw InvalidDataException("Ma phieu da ton tai!");
             item.setRefID(text);
             break;
         }   
@@ -140,7 +176,7 @@ static void addRecharge(Repository<Recharge>& repo){
                 throw InvalidDataException("SDT phai gom 10 chu so va bat dau bang 0!");
             }
             if(!checkPhoneNumber(text)){
-                throw InvalidDataException("So dien thoai chua co hop dong dang ky!");
+                 throw InvalidDataException("So dien thoai chua co hop dong dang ky!");
             }
             item.setPhoneNumber(text);
             break;
@@ -182,21 +218,23 @@ static void addRecharge(Repository<Recharge>& repo){
     repo.add(item);
     cout << "Nap tien thanh cong!\n";
 }
-
-void menuRecharge(){
+static FindIDRecharge(Repository<Recharge>& repo){
+    
+}
+void menuNapTien(){
     Repository<Recharge> repo("data/recharges.txt");
     repo.loadFromFile();
 
     int choice = -1;
     do {
         cout << "\n========================================\n";
-        cout << "     PHIEU NAP TIEN        ";
+        cout << "             PHIEU NAP TIEN\n";
         cout << "========================================\n";
-        cout << "1. Xem danh sach loai hinh\n";
-        cout << "2. Them moi loai hinh\n";
-        cout << "3. Tim kiem loai hinh theo ma\n";
-        cout << "4. Cap nhat loai hinh\n";
-        cout << "5. Xoa loai hinh\n";
+        cout << "1. Xem danh sach phieu nap tien\n";
+        cout << "2. Them phieu nap tien\n";
+        cout << "3. Tim phieu nap tien theo ma\n";
+        cout << "4. Cap nhat phieu nap tien\n";
+        cout << "5. Xoa phieu nap tien\n";
         cout << "0. Quay lai menu chinh\n";
         cout << "========================================\n";
         choice = InputHelper::getInt("Nhap lua chon cua ban (0-5): ", 0, 5);

@@ -40,5 +40,4 @@ public:
 
     void getInformation() override;
     void display() const override;
-    void setID(const string& value) override;
 };
