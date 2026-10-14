@@ -151,14 +151,13 @@ public:
         }
     }
 
-    static bool CheckSdt(const string& sdt){
-        if(!(sdt.size() == 10)) return false;
+    static bool checkPhoneNumber(const string& PhoneNumber){
+        if(!(PhoneNumber.size() == 10)) return false;
         else{
-            for(int i =0; i< 10; i++){
-                if(!isdigit(sdt[i])) return false;
+            for(int i = 0; i < 10; i++){
+                if(!isdigit(PhoneNumber[i])) return false;
             }
         }
-
         return true;
     }
 };

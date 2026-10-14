@@ -31,4 +31,8 @@ public:
     string getID() const override;                
     string toString() const override;
     void fromString(const string& line) override;
+    
+    void getInformation() override;
+    void display() const override;
+    void setID(const string& value) override;
 };
