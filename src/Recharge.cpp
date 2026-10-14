@@ -148,6 +148,9 @@ static void printTitleRecharge() {
          << "Hinh thuc" << '\n';
     cout << string(80, '-') << '\n';
 }
+// ============================================================================
+// IN DANH SACH
+// ============================================================================
 static void listRecharge(Repository<Recharge>& repo) {
     vector<Recharge> items = repo.getAll();
     printTitleRecharge();
@@ -155,6 +158,9 @@ static void listRecharge(Repository<Recharge>& repo) {
         item.display();
     cout << "Tong: " << items.size() << " ban ghi.\n";
 }
+// ============================================================================
+// THEM MA PHIEU
+// ============================================================================
 static void addRecharge(Repository<Recharge>& repo){
     Recharge item;
     while(true){
@@ -218,6 +224,9 @@ static void addRecharge(Repository<Recharge>& repo){
     repo.add(item);
     cout << "Nap tien thanh cong!\n";
 }
+// ============================================================================
+// TIM THEO MA PHIEU
+// ============================================================================
 static void FindIDRecharge(Repository<Recharge>& repo){
     while (true) {
         string code = InputHelper::getString("Nhap ma phieu can tim (0 de quay lai): ", false);
@@ -241,6 +250,18 @@ static void FindIDRecharge(Repository<Recharge>& repo){
         }
     }
 }
+// ============================================================================
+// CAP NHAT MA PHIEU
+// ============================================================================
+static void UpdateRecharge(Repository<Recharge>& repo){
+
+}
+// ============================================================================
+// XOA MA PHIEU
+// ============================================================================
+static void RemoveRecharge(Repository<Recharge>& repo){
+
+}
 void menuNapTien(){
     Repository<Recharge> repo("data/recharges.txt");
     repo.loadFromFile();
@@ -261,14 +282,10 @@ void menuNapTien(){
 
         switch (choice) {
             case 1: listRecharge(repo); break;
-            case 2: addRecharge(repo);  break;
-            case 3: FindIDRecharge(repo);   break;
-            case 4:
-                cout << "Tinh nang dang cap nhat.\n";
-                break;
-            case 5:
-                cout << "Tinh nang dang cap nhat.\n";
-                break;
+            case 2: addRecharge(repo); break;
+            case 3: FindIDRecharge(repo); break;
+            case 4: UpdateRecharge(repo); break;
+            case 5: RemoveRecharge(repo); break;
             case 0: 
                 break;
         }
