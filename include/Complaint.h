@@ -6,7 +6,7 @@ using namespace std;
 
 // ============================================================================
 // LOP THUC THE PHIEU KHIEU NAI (COMPLAINT)
-// Format luu file: MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai
+// Format luu file: MaKN|MaHD|NgayGui|NoiDung|TrangThai
 // ============================================================================
 class Complaint : public Entity {
 private:

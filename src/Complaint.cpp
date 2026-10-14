@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -104,6 +105,20 @@ static void inTieuDeBangComplaint() {
     cout << string(100, '-') << endl;
 }
 
+//tu dong sinh ma KN;
+string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
+    int max = 0;
+    vector<Complaint> list = repo_complaint.getAll();
+
+    string maKNmax = list[list.size() - 1].getID();
+    max =stoi(maKNmax.substr(2));
+
+    stringstream ss;
+    ss << "KN" << setw(2) << setfill('0') << max + 1;
+    
+    return ss.str();
+}
+
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -124,12 +139,7 @@ static void xemDanhSachComplaint(Repository<Complaint> repo) {
 static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract ) {
     cout << "\n=== THEM MOI PHIEU KHIEU NAI ===\n";
 
-    string maKN = InputHelper::getString("Nhap ma khieu nai (nhap 0 de thoat): ", false);
-    if(maKN == "0") return;
-    if (repo_complaint.findById(maKN) != nullptr) {
-        cout << "[Loi] Ma khieu nai '" << maKN << "' da ton tai!\n";
-        return;
-    }
+    string maKN = sinhmaKNmoi(repo_complaint);
 
     string maHD = InputHelper::getString("Nhap ma hop dong (vi du: HD01): ", false);
     while(repo_contract.findById(maHD) == nullptr) {
@@ -218,9 +228,10 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
 
     if (InputHelper::getConfirm("Ban co chac chan muon dong phieu khieu nai nay khong (y/n)? ")) {
         p -> setTrangThai("Dong");
+        repo_complaint.update(id, *p);
         cout << "dong phieu khieu nai thanh cong!\n";
     } else {
-        cout << "Da huy thao tac xoa.\n";
+        cout << "Da huy thao tac dong phieu khieu nai.\n";
     }
 }
 
@@ -241,7 +252,7 @@ void menuKhieuNai() {
         cout << "2. Them moi phieu khieu nai\n";
         cout << "3. Tim kiem khieu nai theo ma\n";
         cout << "4. Cap nhat khieu nai\n";
-        cout << "5. Xoa phieu khieu nai\n";
+        cout << "5. Dong phieu khieu nai\n";
         cout << "0. Quay lai menu chinh\n";
         cout << "========================================\n";
         chon = InputHelper::getInt("Nhap lua chon cua ban (0-5): ", 0, 5);
