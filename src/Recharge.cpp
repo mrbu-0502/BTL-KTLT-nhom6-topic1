@@ -218,8 +218,28 @@ static void addRecharge(Repository<Recharge>& repo){
     repo.add(item);
     cout << "Nap tien thanh cong!\n";
 }
-static FindIDRecharge(Repository<Recharge>& repo){
-    
+static void FindIDRecharge(Repository<Recharge>& repo){
+    while (true) {
+        string code = InputHelper::getString("Nhap ma phieu can tim (0 de quay lai): ", false);
+        if (code == "0") return;
+        try {
+            Recharge candidate;
+            candidate.setRefID(code);  // Kiem tra dinh dang RC + chu so
+            Recharge* item = repo.findById(candidate.getID());
+            if (item == nullptr) {
+                cout << "Khong tim thay ma " << code
+                     << ". Vui long nhap lai.\n";
+                continue;
+            }
+            printTitleRecharge();
+            item->display();
+            return;
+        }
+        catch (const InvalidDataException& error) {
+            cout << "Loi: " << error.what()
+                 << " Vui long nhap lai.\n";
+        }
+    }
 }
 void menuNapTien(){
     Repository<Recharge> repo("data/recharges.txt");
@@ -240,15 +260,9 @@ void menuNapTien(){
         choice = InputHelper::getInt("Nhap lua chon cua ban (0-5): ", 0, 5);
 
         switch (choice) {
-            case 1: 
-                listRecharge(repo);  
-                break;
-            case 2:
-                addRecharge(repo);
-                break;
-            case 3:
-                cout << "Tinh nang dang cap nhat.\n";
-                break;
+            case 1: listRecharge(repo); break;
+            case 2: addRecharge(repo);  break;
+            case 3: FindIDRecharge(repo);   break;
             case 4:
                 cout << "Tinh nang dang cap nhat.\n";
                 break;
