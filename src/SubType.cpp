@@ -11,9 +11,9 @@ using namespace std;
 // ============================================================================
 // CONSTRUCTOR
 // ============================================================================
-SubType::SubType() : Entity(""), tenLoai(""), moTa(""), cuocThang(0.0) {}
+SubType::SubType() : Entity(""), tenLoai(""), moTa(""), cuocThang(0) {}
 
-SubType::SubType(string maLoai, string tenLoai, string moTa, double cuocThang)
+SubType::SubType(string maLoai, string tenLoai, string moTa, long long cuocThang)
     : Entity(maLoai), tenLoai(tenLoai), moTa(moTa), cuocThang(cuocThang) {}
 
 // ============================================================================
@@ -27,19 +27,19 @@ void SubType::getInformation() {
     setID(InputHelper::getString("Nhap ma loai hinh (vi du: SUB01): ", false));
     setTenLoai(InputHelper::getString("Nhap ten loai hinh: ", false));
     setMoTa(InputHelper::getString("Nhap mo ta: ", false));
-    setCuocThang(InputHelper::getDouble("Nhap cuoc phi thang (VND): ", 0.0));
+    setCuocThang(InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0));
 }
 
 void SubType::display() const {
     cout << left << setw(10) << ID
          << setw(25) << tenLoai
          << setw(45) << moTa
-         << right << setw(12) << fixed << setprecision(0) << cuocThang << endl;
+         << right << setw(12) << cuocThang << endl;
 }
 
 string SubType::toString() const {
     stringstream ss;
-    ss << ID << "|" << tenLoai << "|" << moTa << "|" << fixed << setprecision(0) << cuocThang;
+    ss << ID << "|" << tenLoai << "|" << moTa << "|" << cuocThang;
     return ss.str();
 }
 
@@ -50,12 +50,12 @@ void SubType::fromString(const string& line) {
     getline(ss, ID, '|');
     getline(ss, tenLoai, '|');
     getline(ss, moTa, '|');
-    getline(ss, cuocStr, '|');
+    getline(ss, cuocStr);
 
     if (!cuocStr.empty()) {
-        cuocThang = stod(cuocStr);
+        cuocThang = stoll(cuocStr);
     } else {
-        cuocThang = 0.0;
+        cuocThang = 0;
     }
 }
 
@@ -70,24 +70,20 @@ string SubType::getMoTa() const {
     return moTa;
 }
 
-double SubType::getCuocThang() const {
+long long SubType::getCuocThang() const {
     return cuocThang;
 }
 
 void SubType::setTenLoai(const string& ten) {
-    if (!ten.empty()) {
-        tenLoai = ten;
-    }
+    tenLoai = ten;
 }
 
 void SubType::setMoTa(const string& mt) {
-    if (!mt.empty()) {
-        moTa = mt;
-    }
+    moTa = mt;
 }
 
-void SubType::setCuocThang(double cuoc) {
-    if (cuoc >= 0.0) {
+void SubType::setCuocThang(long long cuoc) {
+    if (cuoc >= 0) {
         cuocThang = cuoc;
     }
 }
@@ -123,7 +119,9 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh (vi du: SUB11): ", false);
+    string id = InputHelper::getString("Nhap ma loai hinh (nhap 0 de thoat): ", false);
+    if(id == "0") return;
+
     if (repo.findById(id) != nullptr) {
         cout << "[Loi] Ma loai hinh '" << id << "' da ton tai!\n";
         return;
@@ -131,16 +129,18 @@ static void themMoiSubType(Repository<SubType>& repo) {
 
     string ten = InputHelper::getString("Nhap ten loai hinh: ", false);
     string moTa = InputHelper::getString("Nhap mo ta: ", false);
-    double cuoc = InputHelper::getDouble("Nhap cuoc phi thang (VND): ", 0.0);
+    long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
 
-    SubType st(id, ten, moTa, cuoc);
-    repo.add(st);
+    SubType subtypenew(id, ten, moTa, cuoc);
+    repo.add(subtypenew);
     cout << "Them loai hinh thue bao thanh cong!\n";
 }
 
 static void timKiemSubType(Repository<SubType>& repo) {
     cout << "\n=== TIM KIEM LOAI HINH THEO MA ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can tim: ", false);
+    string id = InputHelper::getString("Nhap ma loai hinh can tim (nhap 0 de thoat): ", false);
+    if(id == "0") return;
+
     SubType* p = repo.findById(id);
     if (p == nullptr) {
         cout << "[Thong bao] Khong tim thay loai hinh co ma: " << id << endl;
@@ -169,7 +169,7 @@ static void suaSubType(Repository<SubType>& repo) {
     cout << "(Luu y: Nhan Enter de giu nguyen gia tri cu)\n";
     string tenMoi = InputHelper::getStringOrDefault("Ten loai hinh moi: ", p->getTenLoai());
     string moTaMoi = InputHelper::getStringOrDefault("Mo ta moi: ", p->getMoTa());
-    double cuocMoi = InputHelper::getDoubleOrDefault("Cuoc thang moi: ", p->getCuocThang());
+    long long cuocMoi = InputHelper::getLongLongOrDefault("Cuoc thang moi: ", p->getCuocThang());
 
     SubType updated(id, tenMoi, moTaMoi, cuocMoi);
     repo.update(id, updated);
