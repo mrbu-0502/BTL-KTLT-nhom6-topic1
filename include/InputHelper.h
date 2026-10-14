@@ -68,6 +68,26 @@ public:
     }
 
     // ==========================================================================
+    // NHẬP SỐ NGUYÊN DÀI AN TOÀN (GET LONG LONG)
+    // ==========================================================================
+    static long long getLongLong(const string& CauThongBao, long long minVal = 0, long long maxVal = numeric_limits<long long>::max()) {
+        while (true) {
+            cout << CauThongBao;
+            long long value;
+            if (cin >> value) {
+                clearBuffer();
+                if (value >= minVal && value <= maxVal) {
+                    return value;
+                }
+                cout << "[Loi] Gia tri phai trong khoang [" << minVal << ", " << maxVal << "]! Vui long nhap lai.\n";
+            } else {
+                cout << "[Loi] Vui long chi nhap so nguyen hop le!\n";
+                clearBuffer();
+            }
+        }
+    }
+
+    // ==========================================================================
     // 4. NHẬP CHUỖI AN TOÀN - CHỐNG TRÔI LỆNH (GET STRING)
     // ==========================================================================
     static string getString(const string& CauThongBao, bool allowEmpty = false) {
@@ -129,6 +149,28 @@ public:
                 }
             } else {
                 cout << "[Loi] Vui long nhap so thuc hop le hoac nhan Enter de giu nguyen!\n";
+            }
+        }
+    }
+
+    static long long getLongLongOrDefault(const string& CauThongBao, long long oldValue) {
+        while (true) {
+            cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
+            string newstring;
+            getline(cin, newstring);
+            if (newstring.empty()) return oldValue;
+
+            stringstream ss(newstring);
+            long long newvalue;
+            char extra;
+            if (ss >> newvalue && !(ss >> extra)) {
+                if (newvalue >= 0) {
+                    return newvalue;
+                } else {
+                    cout << "[Loi] Gia tri khong duoc am! Vui long nhap lai.\n";
+                }
+            } else {
+                cout << "[Loi] Vui long nhap so nguyen hop le hoac nhan Enter de giu nguyen!\n";
             }
         }
     }

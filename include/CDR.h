@@ -1,37 +1,35 @@
-#pragma once
+#pragma once 
 #include <iostream>
 #include <string>
 #include "Entity.h" 
-// #include "Date.h" // Neu cau muon dung class Date cua cau vao day thi mo // ra
 
 using namespace std;
 
 class CDR : public Entity {
-private:
-    // 6 bien tuong ung voi 6 cot trong file cdrs.txt
-    string a; // Ma CDR (VD: CDR01)
-    string b; // So dien thoai goi (VD: 0981000000)
-    string c; // So dien thoai nhan (VD: 0912345678)
-    string d; // Thoi diem goi (VD: 01/01/2024 08:30:15)
-    string e; // Thoi luong tinh bang giay (VD: 120)
-    string f; // Cuoc phi (VD: 0)
 
+// ============================================================================
+// VUNG PRIVATE: Chua 6 thuoc tinh theo dung 6 cot trong file data/cdrs.txt
+// ============================================================================
+private:
+    string MaCDR;     // Cot 1: Ma ban ghi cuoc goi (VD: CDR01)
+    string SoGoi;     // Cot 2: So dien thoai goi di (VD: 0981000001)
+    string SoNhan;    // Cot 3: So dien thoai nghe may (VD: 0912345678)
+    string ThoiDiem;  // Cot 4: Ngay gio goi (VD: 02/01/2024 08:30:15)
+    string SoGiay;    // Cot 5: Thoi luong cuoc goi tinh bang giay (VD: 120)
+    string CuocPhi;   // Cot 6: So tien cuoc phi (VD: 0)
+
+// ============================================================================
+// VUNG PUBLIC: Cac ham giao tiep voi he thong ben ngoai
+// ============================================================================
 public:
-    // Ham khoi tao
+    // 1. Ham khoi tao ban ghi rong
     CDR();
 
-    // Cac ham Get/Set co ban de lay va sua du lieu (Toi chi khai bao ten)
-    string getA() const; void setA(string x);
-    string getB() const; void setB(string x);
-    string getC() const; void setC(string x);
-    string getD() const; void setD(string x);
-    string getE() const; void setE(string x);
-    string getF() const; void setF(string x);
-
-    // 5 ham BAT BUOC phai ghi de tu class cha Entity
-    void setID(const string& value) override;
-    void getInformation() override;
-    void display() const override;
-    string toString() const override;
-    void fromString(const string& line) override;
+    // 2. Cac ham bat buoc ghi de (override) tu lop cha Entity
+    string getID() const override;              // Lay maCDR lam ID dinh danh
+    void setID(const string& value) override;   // Gan maCDR
+    void getInformation() override;             // Nhap 6 thong tin tu ban phim
+    void display() const override;              // Hien thi 6 thong tin ra man hinh
+    string toString() const override;           // Ghep 6 bien thanh chuoi co dau '|'
+    void fromString(const string& line) override; // Tach chuoi co dau '|' thanh 6 bien
 };

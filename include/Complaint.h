@@ -6,19 +6,18 @@ using namespace std;
 
 // ============================================================================
 // LOP THUC THE PHIEU KHIEU NAI (COMPLAINT)
-// Format luu file: MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai
+// Format luu file: MaKN|MaHD|NgayGui|NoiDung|TrangThai
 // ============================================================================
 class Complaint : public Entity {
 private:
-    string maKH;
-    string soSim;
+    string maHD;
     string ngayGui;
     string noiDung;
     string trangThai;
 
 public:
     Complaint();
-    Complaint(string maKN, string maKH, string soSim, string ngayGui, string noiDung, string trangThai);
+    Complaint(string maKN, string maHD, string ngayGui, string noiDung, string trangThai);
 
     // Cac phuong thuc thuan ao ke thua tu Entity
     string getID() const override;
@@ -28,14 +27,12 @@ public:
     void fromString(const string& line) override;
 
     // Getter va Setter
-    string getMaKH() const;
-    string getSoSim() const;
+    string getMaHD() const;
     string getNgayGui() const;
     string getNoiDung() const;
     string getTrangThai() const;
 
-    void setMaKH(const string& mkh);
-    void setSoSim(const string& sim);
+    void setMaHD(const string& mahd);
     void setNgayGui(const string& ngay);
     void setNoiDung(const string& nd);
     void setTrangThai(const string& tt);

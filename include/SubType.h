@@ -12,11 +12,11 @@ class SubType : public Entity {
 private:
     string tenLoai;
     string moTa;
-    double cuocThang;
+    long long cuocThang;
 
 public:
     SubType();
-    SubType(string maLoai, string tenLoai, string moTa, double cuocThang);
+    SubType(string maLoai, string tenLoai, string moTa, long long cuocThang);
 
     // Cac phuong thuc thuan ao ke thua tu Entity
     string getID() const override;
@@ -28,11 +28,11 @@ public:
     // Getter va Setter
     string getTenLoai() const;
     string getMoTa() const;
-    double getCuocThang() const;
+    long long getCuocThang() const;
 
     void setTenLoai(const string& ten);
     void setMoTa(const string& mt);
-    void setCuocThang(double cuoc);
+    void setCuocThang(long long cuoc);
 };
 
 // ============================================================================
