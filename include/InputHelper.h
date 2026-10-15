@@ -193,9 +193,10 @@ public:
         }
     }
 
+    //kiem tra xem sdt co hop le khong: 10 so va so 0 o dau;
     static bool checkPhoneNumber(const string& PhoneNumber){
         if(PhoneNumber[0] != '0') return false;
-        if(!(PhoneNumber.size() == 10)) return false;
+        if(PhoneNumber.size() != 10) return false;
         else{
             for(int i = 0; i < 10; i++){
                 if(!isdigit(PhoneNumber[i])) return false;
@@ -204,10 +205,18 @@ public:
         return true;
     }
 
-
+    //doi phan dau +84 thanh 0;
     static void xuly_84(string& phone){
         if(phone[0] == '+'){
             phone = "0" + phone.substr(3);
         }
+    }
+
+    //kiem tra ma id xem co dung dinh dang khong (vi du HDxxxx, kiem tra xem 2 chu dau co phai HD khong);
+    static bool checkidvalid(const string& id, const string& check){
+        if(id[0] != check[0]) return false;
+        if(id[1] != check[1]) return false;
+
+        return true;
     }
 };
