@@ -28,7 +28,7 @@ string Recharge::getID() const{
     return RefID;
 }
 void Recharge::getInformation(){
-    setRefID(InputHelper::getString("Ma Phieu (RCxxx): ",false));
+    setRefID(InputHelper::getString("Ma Phieu (RC + so): ",false));
     setPhoneNumber(InputHelper::getString("So Sim: ", false));
     setPraValue(InputHelper::getInt("Menh gia (VND): ", false));
     setRDate(InputHelper::getString("Ngay nap (DD/MM/YYYY): ", false));
@@ -56,8 +56,8 @@ void Recharge::fromString(const string& line) {
     getline(ss, RDate, '|');
     getline(ss, Payment, '|');
 
-    if (!temp.empty()) PraValue = stod(temp);
-    else  PraValue = 0;
+    if (!temp.empty()) PraValue = stoi(temp);
+    else PraValue = 0;
 }
 // ============================================================================
 // GETTER & SETTER
@@ -165,7 +165,7 @@ static void addRecharge(Repository<Recharge>& repo){
     Recharge item;
     while(true){
         try{
-            string text = InputHelper::getString("Ma phieu (RCxxx): ",false);
+            string text = InputHelper::getString("Ma phieu (RC + so): ",false);
             Recharge* found = repo.findById(text);
             if(found != nullptr)
                 throw InvalidDataException("Ma phieu da ton tai!");
@@ -255,7 +255,7 @@ static void updateRecharge(Repository<Recharge>& repo){
     string code;
     while(true){
         try{
-            code = InputHelper::getString("Nhap ma phieu can sua (RCxxx): ", false);
+            code = InputHelper::getString("Nhap ma phieu can sua (RC + so): ", false);
             Recharge candidate;
             candidate.setRefID(code);
         }
@@ -325,7 +325,7 @@ static void updateRecharge(Repository<Recharge>& repo){
 // ============================================================================
 static void removeRecharge(Repository<Recharge>& repo) {
     while (true) {
-        string text = InputHelper::getString("Nhap ma phieu can xoa (RCxxx hoac nhap 0 de quay lai): ", false);
+        string text = InputHelper::getString("Nhap ma phieu can xoa (RC + so hoac nhap 0 de quay lai): ", false);
         if (text == "0") return;
         try {
             Recharge candidate;
