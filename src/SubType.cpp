@@ -119,12 +119,18 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh (nhap 0 de thoat): ", false);
-    if(id == "0") return;
+    string id;
+    while (true) {
+        id = InputHelper::getString("Nhap ma loai hinh (vi du: SUB01, nhap 0 de thoat): ", false);
+        if (id == "0") return;
 
-    if (repo.findById(id) != nullptr) {
-        cout << "[Loi] Ma loai hinh '" << id << "' da ton tai!\n";
-        return;
+        if (!InputHelper::checkidvalid(id, "SUB")) {
+            cout << "[Loi] Ma loai hinh phai bat dau bang 'SUB'! Vui long nhap lai.\n";
+        } else if (repo.findById(id) != nullptr) {
+            cout << "[Loi] Ma loai hinh '" << id << "' da ton tai! Vui long nhap lai.\n";
+        } else {
+            break;
+        }
     }
 
     string ten = InputHelper::getString("Nhap ten loai hinh: ", false);
@@ -141,6 +147,11 @@ static void timKiemSubType(Repository<SubType>& repo) {
     string id = InputHelper::getString("Nhap ma loai hinh can tim (nhap 0 de thoat): ", false);
     if(id == "0") return;
 
+    if (!InputHelper::checkidvalid(id, "SUB")) {
+        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+        return;
+    }
+
     SubType* p = repo.findById(id);
     if (p == nullptr) {
         cout << "[Thong bao] Khong tim thay loai hinh co ma: " << id << endl;
@@ -154,7 +165,14 @@ static void timKiemSubType(Repository<SubType>& repo) {
 
 static void suaSubType(Repository<SubType>& repo) {
     cout << "\n=== CAP NHAT LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can sua: ", false);
+    string id = InputHelper::getString("Nhap ma loai hinh can sua (nhap 0 de thoat): ", false);
+    if (id == "0") return;
+
+    if (!InputHelper::checkidvalid(id, "SUB")) {
+        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+        return;
+    }
+
     SubType* p = repo.findById(id);
     if (p == nullptr) {
         cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
@@ -178,7 +196,14 @@ static void suaSubType(Repository<SubType>& repo) {
 
 static void xoaSubType(Repository<SubType>& repo) {
     cout << "\n=== XOA LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can xoa: ", false);
+    string id = InputHelper::getString("Nhap ma loai hinh can xoa (nhap 0 de thoat): ", false);
+    if (id == "0") return;
+
+    if (!InputHelper::checkidvalid(id, "SUB")) {
+        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+        return;
+    }
+
     SubType* p = repo.findById(id);
     if (p == nullptr) {
         cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
