@@ -194,6 +194,7 @@ public:
     }
 
     static bool checkPhoneNumber(const string& PhoneNumber){
+        if(PhoneNumber[0] != '0') return false;
         if(!(PhoneNumber.size() == 10)) return false;
         else{
             for(int i = 0; i < 10; i++){
@@ -201,5 +202,12 @@ public:
             }
         }
         return true;
+    }
+
+
+    static void xuly_84(string& phone){
+        if(phone[0] == '+'){
+            phone = "0" + phone.substr(3);
+        }
     }
 };
