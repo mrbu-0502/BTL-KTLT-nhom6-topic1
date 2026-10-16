@@ -14,12 +14,11 @@ class Customer : public Entity {
     string FullName;
     string CCCD;
     string Address;
-    string Phone;
-    string Date;
+    string DateOfBirth;
 
     public:
     Customer();
-    Customer(string FullName, string CCCD, string Address, string Phone, string Date);
+    Customer(string FullName, string CCCD, string Address, string Date);
 
     string getID() const override;
     string toString() const override;
@@ -30,14 +29,12 @@ class Customer : public Entity {
     string getFullName() const;
     string getCCCD() const;
     string getAddress() const;
-    string getPhone() const;
-    string getDate() const;
+    string getDateOfBirth() const;
 
     void setFullName(const string& n);
     void setCCCD(const string& c);;
     void setAddress(const string& a);
-    void setPhone(const string& p);
-    void setDate(const string& d);
+    void setDateOfBirth(const string& d);
 };
 
 // ===========================================
@@ -49,9 +46,8 @@ public:
     static void run(Repository<Customer>& Repo);
 private:
     static void handleCreate(Repository<Customer>& Repo);
-    static void handleReadALL(Repository<Customer>& Repo);
+    static void handleReadAll(Repository<Customer>& Repo);
     static void handleSearch(Repository<Customer>& Repo);
-    static void handleSort(Repository<Customer>& Repo);
     static void handleUpdate(Repository<Customer>& Repo);
     static void handleDelete(Repository<Customer>& Repo);
     static void printHeader();
