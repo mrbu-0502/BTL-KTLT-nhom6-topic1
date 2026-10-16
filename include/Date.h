@@ -1,59 +1,83 @@
-#ifndef DATE_H
-#define DATE_H
-
+#pragma once 
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <windows.h> 
+#include <sstream> 
 
 using namespace std;
 
 /**
  * ============================================================================
- * MODULE BASE - DATE HELPER (TI?N ÍCH X? LÝ VÀ CHU?N HÓA NGÀY THÁNG)
- * Ngu?i ph? trách: Ki?u Ð?c Hi?p
- * M?c dích:
- *   - X? lý, ki?m tra nam nhu?n và tính h?p l? c?a ngày, tháng, nam.
- *   - Nh?p chu?i ngày tháng an toàn t? bàn phím, ch?ng l?i trôi l?nh.
- *   - T? d?ng chu?n hóa d? li?u d?u ra thành d?nh d?ng chung DD/MM/YYYY.
+ * MODULE BASE - DATE (TIEN ICH XU LY VA CHUAN HOA NGAY THANG)
+ * Nguoi phu trach: Kieu Duc Hiep
+ * Muc dich:
+ *   - Xu ly, kiem tra nam nhuan va tinh hop le cua ngay, thang, nam.
+ *   - Nhap chuoi ngay thang an toan tu ban phim, chong loi troi lenh.
+ *   - Tu dong chuan hoa du lieu dau ra thanh dinh dang chung DD/MM/YYYY.
  * ============================================================================
  */
-class date {
+class Date {
 private:
-    int x, y, m;
+    // Khai bao 3 thuoc tinh ro rang trong vung bao mat (private)
+    int Ngay;   // Luu ngay (1 -> 31)
+    int Thang;  // Luu thang (1 -> 12)
+    int Nam;    // Luu nam (1 -> 2026)
 
 public:
-    date(int x = 1, int y = 1, int m = 2000) : x(x), y(y), m(m) {}
+    // ========================================================================
+    // 1. HAM KHOI TAO (CONSTRUCTOR)
+    // Neu khong truyen gi vao, mac dinh se tao ra ngay 01/01/2000
+    // ========================================================================
+    Date(int d = 1, int m = 1, int y = 2000) {
+        Ngay = d;
+        Thang = m;
+        Nam = y;
+    }
 
-    // ============================================================================
-    // 1. KI?M TRA NAM NHU?N
-    // ============================================================================
+    // ========================================================================
+    // 2. KIEM TRA NAM NHUAN
+    // Nam nhuan la nam chia het cho 400, HOAC (chia het cho 4 nhung khong chia het cho 100)
+    // ========================================================================
     bool leap() {
-        return m % 400 == 0 || (m % 4 == 0 && m % 100 != 0);
+        return Nam % 400 == 0 || (Nam % 4 == 0 && Nam % 100 != 0);
     }
 
-    // ============================================================================
-    // 2. KI?M TRA NGÀY H?P L? (CH?N NAM L?N HON 2026)
-    // ============================================================================
+    // ========================================================================
+    // 3. KIEM TRA NGAY THANG NAM CO HOP LE HAY KHONG
+    // ========================================================================
     bool valid() {
-        if (m < 1 || m > 2026 || y < 1 || y > 12 || x < 1) return false;
-        int n[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        if (leap()) n[2] = 29;
-        return x <= n[y];
+        // Neu nam ngoai khoang (1 -> 2026), thang ngoai (1 -> 12), hoac ngay < 1 thi bao SAI ngay
+        if (Nam < 1 || Nam > 2026 || Thang < 1 || Thang > 12 || Ngay < 1) {
+            return false;
+        }
+        
+        // Bang tra cuu so ngay toi da cua 12 thang (Bo qua vi tri so 0 cho de dem tu thang 1 -> 12)
+        int soNgay[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        
+        // Neu la nam nhuan thi thang 2 (vi tri so 2) se co 29 ngay
+        if (leap()) {
+            soNgay[2] = 29;
+        }
+        
+        // Kiem tra xem ngay nhap vao co vuot qua so ngay toi da cua thang do khong
+        return Ngay <= soNgay[Thang];
     }
 
-    // ============================================================================
-    // 3. NH?P NGÀY THÁNG AN TOÀN
-    // ============================================================================
-    void input(string p) {
-        while (true) {
-            cout << p;
-            string a;
-            getline(cin, a);
-            char c1 = 0, c2 = 0;
-            stringstream ss(a);
-            ss >> x >> c1 >> y >> c2 >> m;
+    // ========================================================================
+    // 4. NHAP NGAY THANG AN TOAN TU BAN PHIM (BAT NHAP LAI NEU SAI)
+    // ========================================================================
+    void input(string thongBao) {
+        while (true) { // Vong lap vo tan, chi thoat ra khi nhap DUNG
+            cout << thongBao;
+            string chuoi;
+            getline(cin, chuoi); // Doc ca dong nguoi dung go vao (VD: "05/09/2024")
             
+            char c1 = 0, c2 = 0; // 2 bien ky tu de hung 2 dau gach cheo '/'
+            stringstream ss(chuoi); // Dua chuoi vao may loc stringstream
+            
+            // May loc tu dong tach: so dau vao 'Ngay', dau '/' vao c1, so giua vao 'Thang', dau '/' vao c2, so cuoi vao 'Nam'
+            ss >> Ngay >> c1 >> Thang >> c2 >> Nam;
+            
+            // Neu dung la 2 dau '/' va ngay thang hop le thi cho phep thoat vong lap (break)
             if (c1 == '/' && c2 == '/' && valid()) {
                 break; 
             }
@@ -61,14 +85,13 @@ public:
         }
     }
 
-    // ============================================================================
-    // 4. XU?T CHU?I Ð?NH D?NG DD/MM/YYYY
-    // ============================================================================
+    // ========================================================================
+    // 5. XUAT RA CHUOI CHUAN DINH DANG DD/MM/YYYY
+    // Neu ngay hoac thang nho hon 10 thi tu dong cong them so "0" o dang truoc (VD: 5 -> "05")
+    // ========================================================================
     string output() {
-        string s1 = (x < 10 ? "0" : "") + to_string(x);
-        string s2 = (y < 10 ? "0" : "") + to_string(y);
-        return s1 + "/" + s2 + "/" + to_string(m);
+        string s1 = (Ngay < 10 ? "0" : "") + to_string(Ngay);
+        string s2 = (Thang < 10 ? "0" : "") + to_string(Thang);
+        return s1 + "/" + s2 + "/" + to_string(Nam);
     }
 };
-
-#endif

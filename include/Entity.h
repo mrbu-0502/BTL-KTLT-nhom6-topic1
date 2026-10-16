@@ -8,7 +8,7 @@ class Entity
 {
 protected:
     // Thuộc tính mã định danh  
-    string ID; 
+    string ID;
 
 public:
     // Constructor không có tham số: Cho phép tạo đối tượng rỗng  
