@@ -1,4 +1,5 @@
 #include "Complaint.h"
+#include "Date.h"
 #include "Repository.h"
 #include "InputHelper.h"
 #include "Contract.h"
@@ -30,7 +31,9 @@ string Complaint::getID() const {
 void Complaint::getInformation() {
     setID(InputHelper::getString("Nhap ma khieu nai (vi du: KN11): ", false));
     setMaHD(InputHelper::getString("Nhap ma hop dong (vi du: HD01): ", false));
-    setNgayGui(InputHelper::getString("Nhap ngay gui (dd/mm/yyyy): ", false));
+    Date d;
+    d.input("Nhap ngay gui (dd/mm/yyyy): ");
+    setNgayGui(d.output());
     setNoiDung(InputHelper::getString("Nhap noi dung khieu nai: ", false));
     setTrangThai(InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false));
 }
@@ -162,7 +165,9 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
         break;
     }
 
-    string ngayGui = InputHelper::getString("Nhap ngay gui (dd/mm/yyyy): ", false);
+    Date d;
+    d.input("Nhap ngay gui (dd/mm/yyyy): ");
+    string ngayGui = d.output();
     string noiDung = InputHelper::getString("Nhap noi dung khieu nai: ", false);
     string trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false);
 
@@ -229,7 +234,10 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
         }
         cout << "[Canh bao] Ma hop dong '" << maHDMoi << "' chua ton tai trong he thong! Vui long nhap lai.\n";
     }
-    string ngayGuiMoi = InputHelper::getStringOrDefault("Ngay gui moi: ", p->getNgayGui());
+    Date ngaygui;
+    ngaygui.input("nhap ngay gui moi (DD/MM/YYYY): ");
+    string ngayGuiMoi = ngaygui.output();
+    
     string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
     string trangThaiMoi = InputHelper::getStringOrDefault("Trang thai moi: ", p->getTrangThai());
 
