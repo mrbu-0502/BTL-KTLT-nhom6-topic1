@@ -100,6 +100,19 @@ static void inTieuDeBangSubType() {
     cout << string(95, '-') << endl;
 }
 
+static string sinhMaLoaimoi(Repository<SubType>& repo) {
+    int moi = 1;
+    stringstream Maloaimoi;
+    Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
+    while (repo.findById(Maloaimoi.str()) != nullptr) {
+        moi++;
+        Maloaimoi.clear();
+        Maloaimoi.str("");
+        Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
+    }
+
+    return Maloaimoi.str();
+}
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -119,21 +132,12 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    string id;
-    while (true) {
-        id = InputHelper::getString("Nhap ma loai hinh (vi du: SUB01, nhap 0 de thoat): ", false);
-        if (id == "0") return;
+    string id = sinhMaLoaimoi(repo);
+    cout << "Ma loai hinh (tu dong sinh): " << id << endl;
 
-        if (!InputHelper::checkidvalid(id, "SUB")) {
-            cout << "[Loi] Ma loai hinh phai bat dau bang 'SUB'! Vui long nhap lai.\n";
-        } else if (repo.findById(id) != nullptr) {
-            cout << "[Loi] Ma loai hinh '" << id << "' da ton tai! Vui long nhap lai.\n";
-        } else {
-            break;
-        }
-    }
+    string ten = InputHelper::getString("Nhap ten loai hinh (nhap 0 de thoat): ", false);
+    if (ten == "0") return;
 
-    string ten = InputHelper::getString("Nhap ten loai hinh: ", false);
     string moTa = InputHelper::getString("Nhap mo ta: ", false);
     long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
 

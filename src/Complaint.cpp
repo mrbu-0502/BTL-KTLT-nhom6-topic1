@@ -107,7 +107,7 @@ static void inTieuDeBangComplaint() {
 
 //tu dong sinh ma KN;
 //lay phan tu cuoi cung lam max roi ma KN moi = KN max + 1;
-string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
+static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
     int max = 0;
     vector<Complaint> list = repo_complaint.getAll();
     if (list.empty()) {
