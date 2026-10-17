@@ -12,7 +12,6 @@ Hệ thống kiểm thử tự động dành cho 2 module chức năng do **Nguy
 scripts_auto_test/
 ├── runner.py                  # Script chính thực thi kiểm thử bằng Python
 ├── run_tests.bat              # Script Batch tiện lợi chạy trên Windows
-├── generate_testcases.py      # Script sinh / tái tạo danh sách testcase mẫu
 ├── README.md                  # Tài liệu hướng dẫn sử dụng
 ├── testcase/                  # Thư mục chứa từng file testcase (.txt) riêng biệt
 │   ├── TC_SUB_01_view_all.txt
