@@ -1,0 +1,12 @@
+[DESCRIPTION]
+Dong phieu khieu nai khong ton tai trong he thong (KN99)
+
+[EXPECTED]
+[Loi] Khong tim thay khieu nai co ma: KN99
+
+[INPUT]
+4
+5
+KN99
+0
+0

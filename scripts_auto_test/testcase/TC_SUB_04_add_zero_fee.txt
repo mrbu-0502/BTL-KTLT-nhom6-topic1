@@ -1,0 +1,17 @@
+[DESCRIPTION]
+Them moi loai hinh tra truoc voi cuoc phi thang bang 0 VND
+
+[EXPECTED]
+Them loai hinh thue bao thanh cong!
+SUB11
+Tra Truoc 0 Dong
+
+[INPUT]
+3
+2
+Tra Truoc 0 Dong
+Goi cuoc mac dinh khong phi duy tri
+0
+1
+0
+0

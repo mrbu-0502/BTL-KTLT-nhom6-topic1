@@ -1,0 +1,14 @@
+[DESCRIPTION]
+Tim kiem loai hinh thue bao ton tai theo ma SUB01
+
+[EXPECTED]
+Ket qua tim thay:
+SUB01
+Tra Truoc Economy
+
+[INPUT]
+3
+3
+SUB01
+0
+0

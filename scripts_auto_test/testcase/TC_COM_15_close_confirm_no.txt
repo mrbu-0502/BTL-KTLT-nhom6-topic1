@@ -1,0 +1,18 @@
+[DESCRIPTION]
+Huy thao tac dong phieu khieu nai khi duoc hoi xac nhan (chon n)
+
+[EXPECTED]
+Da huy thao tac dong phieu khieu nai.
+Ket qua tim thay:
+KN04
+DangXuLy
+
+[INPUT]
+4
+5
+KN04
+n
+3
+KN04
+0
+0

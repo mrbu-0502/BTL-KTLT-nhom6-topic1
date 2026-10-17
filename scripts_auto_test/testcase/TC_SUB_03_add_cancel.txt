@@ -1,0 +1,16 @@
+[DESCRIPTION]
+Huy them moi loai hinh thue bao bang cach nhap 0 tai ten loai hinh
+
+[EXPECTED]
+=== THEM MOI LOAI HINH THUE BAO ===
+QUAN LY LOAI HINH THUE BAO
+
+[EXPECTED_NOT]
+Them loai hinh thue bao thanh cong!
+
+[INPUT]
+3
+2
+0
+0
+0

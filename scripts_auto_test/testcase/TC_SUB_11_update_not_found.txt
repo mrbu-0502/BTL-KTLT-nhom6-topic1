@@ -1,0 +1,12 @@
+[DESCRIPTION]
+Cap nhat loai hinh khong ton tai trong he thong (SUB88)
+
+[EXPECTED]
+[Loi] Khong tim thay loai hinh co ma: SUB88
+
+[INPUT]
+3
+4
+SUB88
+0
+0

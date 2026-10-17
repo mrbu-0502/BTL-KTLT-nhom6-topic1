@@ -1,0 +1,13 @@
+[DESCRIPTION]
+Huy thao tac cap nhat loai hinh bang cach nhap 0
+
+[EXPECTED]
+=== CAP NHAT LOAI HINH THUE BAO ===
+QUAN LY LOAI HINH THUE BAO
+
+[INPUT]
+3
+4
+0
+0
+0
