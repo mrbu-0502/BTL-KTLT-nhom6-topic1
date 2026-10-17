@@ -178,7 +178,7 @@ static void addRecharge(Repository<Recharge>& repo){
     }
     while(true){
         try{
-            string text = InputHelper::getString("So Sim: ", false);
+            string text = InputHelper::getString("Nhap so sim: ", false);
             item.setPhoneNumber(text);
             if(!checkPhoneNumberContract(text)){
                  throw InvalidDataException("So dien thoai chua co hop dong dang ky!");
@@ -222,6 +222,8 @@ static void addRecharge(Repository<Recharge>& repo){
     repo.add(item);
     repo.saveToFile();
     cout << "Nap tien thanh cong!\n";
+    printTitleRecharge();
+    item.display();
 }
 // ============================================================================
 // TIM THEO MA PHIEU
