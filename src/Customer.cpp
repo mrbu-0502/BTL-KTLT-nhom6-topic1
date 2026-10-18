@@ -1,15 +1,16 @@
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <cctype>
-#include <stdexcept>
-#include "Customer.h"
-#include "Contract.h"
-#include "InputHelper.h"
-#include "Date.h"
+#include "Customer.h"       // Header khai báo lớp Customer và CustomerMenu
+#include "Contract.h"       // Khai báo lớp Contract (để kiểm tra khóa ngoại trước khi xóa khách)
+#include "Date.h"           // Xử lý và kiểm tra ngày sinh hợp lệ (leap, valid, output)
+#include "InputHelper.h"    // Tiện ích nhập xuất an toàn trên console
+#include <iostream>         // Luồng xuất nhập cout, cin
+#include <iomanip>          // Định dạng căn lề cột in bảng khách hàng
+#include <string>           // Xử lý chuỗi string
+#include <vector>           // Chứa danh sách dữ liệu trong Repository
+#include <sstream>          // Tách/ghép chuỗi qua dấu '|'
+#include <cctype>           // Dùng hàm isdigit() kiểm tra 12 số CCCD
+#include <stdexcept>        // Bắt và ném ngoại lệ
+
+using namespace std; 
 
 using namespace std;
 
@@ -284,7 +285,13 @@ void CustomerMenu::handleDelete(Repository<Customer>& repo) {
 // PHẦN 4: MENU CONSOLE ĐIỀU KHIỂN
 // =====================================================================
 
-void CustomerMenu ::run (Repository<Customer>& repo){
+void CustomerMenu::run() {
+    // Tự khởi tạo Repository và nạp dữ liệu từ file khi mở menu
+    Repository<Customer> repo("data/customers.txt");
+    try {
+        repo.loadFromFile();
+    } catch (...) {}
+
     int choice;
     do {
         cout << "\n============ QUAN LY KHACH HANG ============\n";
@@ -310,4 +317,9 @@ void CustomerMenu ::run (Repository<Customer>& repo){
                 cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 5!\n";
         }
     } while (choice != 0);
+}
+
+// Hàm để main.cpp gọi trực tiếp
+void menuKhachHang() {
+    CustomerMenu::run();
 }

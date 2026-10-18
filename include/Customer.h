@@ -37,18 +37,12 @@ class Customer : public Entity {
     void setDateOfBirth(const string& d);
 };
 
-// ===========================================
-// 2. GIAO DIỆN ĐIỀU KHIỂN (Menu / Controller)
-// ===========================================
-
-class CustomerMenu{
+// Trong class CustomerMenu:
+class CustomerMenu {
 public:
-    static void run(Repository<Customer>& Repo);
-private:
-    static void handleCreate(Repository<Customer>& Repo);
-    static void handleReadAll(Repository<Customer>& Repo);
-    static void handleSearch(Repository<Customer>& Repo);
-    static void handleUpdate(Repository<Customer>& Repo);
-    static void handleDelete(Repository<Customer>& Repo);
-    static void printHeader();
+    static void run(); // Bỏ tham số Repository<Customer>& Repo
+    // ... các hàm handleCreate, handleReadAll... giữ nguyên
 };
+
+// Khai báo hàm để main.cpp gọi trực tiếp:
+void menuKhachHang();

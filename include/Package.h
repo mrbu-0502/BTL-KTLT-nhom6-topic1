@@ -47,15 +47,12 @@ public:
 // 2: Giao diện điều khiển menu console
 // =====================================
 
+// Trong class PackageMenu:
 class PackageMenu {
 public:
-    static void run(Repository<Package>& repo);
-
-private:
-    static void handleCreate(Repository<Package>& repo);
-    static void handleReadAll(Repository<Package>& repo);
-    static void handleSearch(Repository<Package>& repo);
-    static void handleUpdate(Repository<Package>& repo);
-    static void handleDelete(Repository<Package>& repo);
-    static void printHeader();
+    static void run(); // Bỏ tham số Repository<Package>& repo
+    // ... các hàm handleCreate, handleReadAll... giữ nguyên
 };
+
+// Hoặc khai báo hàm độc lập để main.cpp gọi trực tiếp:
+void menuGoiCuoc();

@@ -1,15 +1,12 @@
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <cctype>
+#include "Package.h"        // Header khai báo lớp Package và PackageMenu
+#include "Contract.h"       // Khai báo lớp Contract (để kiểm tra khóa ngoại trước khi xóa gói)
+#include "InputHelper.h"    // Tiện ích nhập xuất an toàn trên console
+#include <iostream>         // Luồng xuất nhập cout, cin
+#include <iomanip>          // Định dạng bảng (setw, left, right, fixed, setprecision)
+#include <string>           // Xử lý chuỗi string
+#include <vector>           // Chứa danh sách dữ liệu trong Repository
+#include <sstream>          // Tách/ghép chuỗi qua stringstream (toString, fromString)
 #include <stdexcept>
-#include "Customer.h"
-#include "Contract.h"
-#include "InputHelper.h"
-#include "Date.h"
 
 using namespace std;
 
@@ -348,7 +345,13 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
 // PHẦN 3: MENU CONSOLE ĐIỀU KHIỂN
 // =====================================================================
 
-void PackageMenu::run(Repository<Package>& repo) {
+void PackageMenu::run() {
+    // Tự khởi tạo Repository và đọc dữ liệu từ file khi mở menu
+    Repository<Package> repo("data/packages.txt");
+    try {
+        repo.loadFromFile();
+    } catch (...) {}
+
     int choice;
     do {
         cout << "\n============ QUAN LY GOI CUOC ============\n";
@@ -359,7 +362,7 @@ void PackageMenu::run(Repository<Package>& repo) {
         cout << "  5. Xoa goi cuoc\n";
         cout << "  0. Quay lai menu chinh\n";
         cout << "==========================================\n";
-        choice = InputHelper::getInt("Nhap lua chon: ", 0);
+        choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
 
         switch (choice) {
             case 1: handleCreate(repo);   break;
@@ -371,7 +374,12 @@ void PackageMenu::run(Repository<Package>& repo) {
                 cout << ">> Dang quay lai Menu chinh...\n";
                 break;
             default:
-                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 6!\n";
+                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 5!\n";
         }
     } while (choice != 0);
+}
+
+// Hàm để main.cpp gọi trực tiếp
+void menuGoiCuoc() {
+    PackageMenu::run();
 }
