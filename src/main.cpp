@@ -1,7 +1,5 @@
 #include <iostream>
 #include <limits>
-#include "SubType.h"
-#include "Complaint.h"
 #include "InputHelper.h"
 
 using namespace std;
@@ -18,8 +16,9 @@ void menuKhachHang() {
     cout << "(Chuc nang dang duoc hoan thien...)\n";
 }
 
-// USE CASE 3 (SubType) & USE CASE 4 (Complaint) do Nguyen Van Cuong phu trach
-// Da duoc khai bao trong SubType.h va Complaint.h
+void menuLoaiHinh();
+
+void menuKhieuNai();
 
 void menuThietBi() {
     cout << "\n--- [USE CASE 5: QUAN LY THIET BI] ---\n";
@@ -46,10 +45,7 @@ void menuNapTien() {
     cout << "(Chuc nang dang duoc hoan thien...)\n";
 }
 
-void menuHopDong() {
-    cout << "\n--- [USE CASE 10: QUAN LY HOP DONG] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuHopDong();
 
 void hienThiMenuChinh() {
     cout << "\n======================================================\n";
