@@ -1,13 +1,15 @@
-#include "Package.h"
-#include "Contract.h"
-#include "InputHelper.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <fstream>
-#include <algorithm>
+#include <cctype>
+#include <stdexcept>
+#include "Customer.h"
+#include "Contract.h"
+#include "InputHelper.h"
+#include "Date.h"
 
 using namespace std;
 

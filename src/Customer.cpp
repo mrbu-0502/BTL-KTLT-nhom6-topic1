@@ -7,6 +7,7 @@
 #include <cctype>
 #include <stdexcept>
 #include "Customer.h"
+#include "Contract.h"
 #include "InputHelper.h"
 #include "Date.h"
 
