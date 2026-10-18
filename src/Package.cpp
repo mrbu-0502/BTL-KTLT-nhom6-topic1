@@ -1,4 +1,5 @@
 #include "Package.h"
+#include "Contract.h"
 #include "InputHelper.h"
 #include <iostream>
 #include <iomanip>
@@ -153,38 +154,6 @@ void Package::setDays(int d) {
 // PHẦN 2: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA PACKAGEMENU
 // =====================================================================
 
-// Bước 1: Quản lý danh sách và File (đọc dữ liệu từ file văn bản vào bộ nhớ RAM (load) và ghi dữ liệu từ bộ nhớ RAM xuống file văn bản (save))
-
-// 1. loadFile(): Đọc từng dòng từ file và nạp vào vector
-void Repository<Package>::load() {
-    // Thu hồi vùng nhớ cũ nếu có trước khi nạp lại
-    for (auto item : items) delete item;
-    items.clear();
-
-    ifstream file(filePath); // Mở data/packages.txt
-    if (!file.is_open()) return;
-
-    string line;
-    while (getline(file, line)) {
-        if (line.empty() || line[0] == '#') continue; // Bỏ qua dòng trống hoặc chú thích
-        Package* obj = new Package();
-        obj->fromString(line); // Đọc chuỗi ngăn cách bởi dấu | gán vào thuộc tính
-        items.push_back(obj);  // Thêm vào vector trên RAM
-    }
-    file.close();
-}
-
-// 2. saveFile(): Duyệt vector và ghi đè dữ liệu xuống file
-void Repository<Package>::save() const {
-    ofstream file(filePath); // Mở file ở chế độ ghi đè
-    if (!file.is_open()) return;
-
-    for (const auto* item : items) {
-        file << item->toString() << "\n"; // Lấy chuỗi định dạng từ toString()
-    }
-    file.close();
-}
-
 // Bước 2: Cài đặt CRUD
 
 void PackageMenu::printHeader() {
@@ -205,7 +174,7 @@ void PackageMenu::handleCreate(Repository<Package>& repo) {
     
     // 1. Nhập và kiểm tra mã ID
     string id = InputHelper::getString("Nhap ma goi cuoc: ", false);
-    if (repo.getById(id) != nullptr) {
+    if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma goi cuoc da ton tai tren he thong!\n";
         return;
     }
@@ -220,8 +189,7 @@ void PackageMenu::handleCreate(Repository<Package>& repo) {
 
     // 3. Đưa vào RAM và lưu file
     try {
-        repo.add(new Package(id, name, price, data, voice, sms, days));
-        repo.save();
+        repo.add(Package(id, name, price, data, voice, sms, days));;
         cout << ">> [THANH CONG] Da them goi cuoc [" << id << "] vao he thong!\n";
     } 
     catch (const exception& e) {
@@ -244,8 +212,8 @@ void PackageMenu::handleReadAll(Repository<Package>& repo) {
     printHeader();
     
     // 3: Duyệt và gọi display() của từng đối tượng
-    for (const auto* pkg : list) {
-        pkg->display();
+    for (const auto& pkg : list) {
+        pkg.display();  
     }
     cout << string(85, '-') << "\n";
     cout << ">> Tong so luong: " << list.size() << " goi cuoc.\n";
@@ -258,7 +226,7 @@ void PackageMenu::handleSearch(Repository<Package>& repo) {
     string id = InputHelper::getString("Nhap ma goi can tim: ", false);
     
     // 2: Tìm trực tiếp đối tượng mang mã đó trong vector
-    auto* pkg = repo.getById(id);
+    auto* pkg = repo.findById(id);
     
     // 3: Xử lý kết quả
     if (pkg == nullptr) {
@@ -277,7 +245,7 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
     cout << "\n---------------- CAP NHAT THONG TIN GOI CUOC ----------------\n";
     // 1: Nhập Id và kiểm tra có gói cước cần cập nhật không 
     string id = InputHelper::getString("Nhap ma goi cuoc can sua: ", false);
-    auto* pkg = repo.getById(id);
+    auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
         return; 
@@ -318,7 +286,7 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
         if (!daysStr.empty()) {
             pkg->setDays(stoi(daysStr));
         }
-        repo.save();
+        repo.saveToFile();
         cout << "\n>> [THANH CONG] Da cap nhat thong tin goi cuoc [" << id << "] thanh cong!\n";
     }
     catch (const exception& e) {
@@ -331,7 +299,7 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
     cout << "\n---------------- XOA GOI CUOC ----------------\n";
     // 1: Nhập Id và kiểm tra có gói cước xóa không
     string id = InputHelper::getString("Nhap ma goi cuoc can xoa: ", false);
-    auto* pkg = repo.getById(id);
+    auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
         return; 
@@ -344,25 +312,30 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
     cout << string(85, '-') << "\n";
     
     // 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại trước khi xóa (liên quan tới contracts.txt)
+    Repository<Contract> contractRepo("data/contracts.txt"); // Đường dẫn đến file hợp đồng của nhóm
+    try {
+        contractRepo.loadFromFile();
+    } catch (...) {
+        // Nếu file hợp đồng chưa có dữ liệu hoặc chưa tạo thì bỏ qua
+    }
+
     bool isLinked = false;
-    for (const auto* contract : contractRepo.getAll()) {
-        if (contract->getPackageId() == id) {
+    for (const auto& contract : contractRepo.getAll()) {
+        if (contract.getPhonePlan() == id) { // Dùng getPhonePlan() theo đúng Contract.h
             isLinked = true;
             break;
         }
     }
 
-    if(isLinked){
+    if (isLinked) {
         cout << ">> [Tu choi xoa]: Goi cuoc [" << id 
              << "] dang ton tai trong hop dong khach hang, khong duoc phep xoa!\n";
         return;
     }
-    
     // 4: Hỏi xác nhận có cần xóa không và lưu file
     string confirm = InputHelper::getString("Ban co chac chan muon xoa? (y/n): ", false);
     if (confirm == "y" || confirm == "Y") {
         repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector
-        repo.save();     // Đồng bộ cập nhật lại file packages.txt
         cout << ">> [THANH CONG] Xoa thanh cong goi cuoc [" << id << "]!\n";
     } else {
         cout << ">> [THONG BAO] Thao tac xoa da duoc huy bo an toan.\n";

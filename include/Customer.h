@@ -18,7 +18,7 @@ class Customer : public Entity {
 
     public:
     Customer();
-    Customer(string FullName, string CCCD, string Address, string Date);
+    Customer(string ID, string FullName, string CCCD, string Address, string Date);
 
     string getID() const override;
     string toString() const override;
@@ -32,7 +32,7 @@ class Customer : public Entity {
     string getDateOfBirth() const;
 
     void setFullName(const string& n);
-    void setCCCD(const string& c);;
+    void setCCCD(const string& c);
     void setAddress(const string& a);
     void setDateOfBirth(const string& d);
 };
