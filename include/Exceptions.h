@@ -2,6 +2,7 @@
 #define EXCEPTIONS_H
 
 #include <exception>
+#include <iostream>
 #include <string>
 
 // Lop co so: moi loi cua du an deu ke thua lop nay
@@ -60,5 +61,23 @@ public:
         : BaseException("Khong the xoa " + entity + " " + id +
                         " vi dang duoc " + usedBy + " tham chieu") {}
 };
+
+// Tien ich nhap lieu: goi lai ham nhap cho den khi khong con nem loi du lieu.
+// Dung: nhapLaiDenKhiHopLe([&] { setX(InputHelper::getString("Nhap X: ")); });
+// - Loi du lieu / trung ma / khoa ngoai (BaseException): in thong bao, cho nhap lai.
+// - FileException: nem tiep ra ngoai (nhap lai cung khong giai quyet duoc).
+template <class HamNhap>
+void nhapLaiDenKhiHopLe(HamNhap nhap) {
+    while (true) {
+        try {
+            nhap();
+            return;
+        } catch (const FileException&) {
+            throw;
+        } catch (const BaseException& e) {
+            std::cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+}
 
 #endif
