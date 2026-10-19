@@ -1,9 +1,11 @@
 #pragma once 
 #include <iostream>
 #include <string>
-#include <sstream>
+#include <sstream> 
+
 using namespace std;
-/*
+
+/**
  * ============================================================================
  * MODULE BASE - DATE (TIEN ICH XU LY VA CHUAN HOA NGAY THANG)
  * Nguoi phu trach: Kieu Duc Hiep
@@ -117,5 +119,14 @@ public:
 
         // B4: Neu Ngay, Thang, Nam deu bang nhau
         return 0;
+    }
+
+    // ========================================================================
+    // 7. NHAP NGAY THANG TU CHUOI STRING CO SAN 
+    // ========================================================================
+    void input_string(const string& s) {
+        stringstream ss(s);
+        char c1, c2;
+        ss >> Ngay >> c1 >> Thang >> c2 >> Nam;
     }
 };

@@ -38,8 +38,3 @@ public:
     void setTrangThai(const string& tt);
 };
 
-// ============================================================================
-// HAM DIEU KHIEN MENU CON QUAN LY KHIEU NAI
-// ============================================================================
-void menuKhieuNai();
-

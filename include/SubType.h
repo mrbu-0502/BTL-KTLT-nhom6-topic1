@@ -35,8 +35,4 @@ public:
     void setCuocThang(long long cuoc);
 };
 
-// ============================================================================
-// HAM DIEU KHIEN MENU CON QUAN LY LOAI HINH THUE BAO
-// ============================================================================
-void menuLoaiHinh();
 

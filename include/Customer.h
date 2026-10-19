@@ -18,7 +18,7 @@ class Customer : public Entity {
 
     public:
     Customer();
-    Customer(string FullName, string CCCD, string Address, string Date);
+    Customer(string ID, string FullName, string CCCD, string Address, string Date);
 
     string getID() const override;
     string toString() const override;
@@ -32,7 +32,7 @@ class Customer : public Entity {
     string getDateOfBirth() const;
 
     void setFullName(const string& n);
-    void setCCCD(const string& c);;
+    void setCCCD(const string& c);
     void setAddress(const string& a);
     void setDateOfBirth(const string& d);
 };
@@ -41,14 +41,18 @@ class Customer : public Entity {
 // 2. GIAO DIỆN ĐIỀU KHIỂN (Menu / Controller)
 // ===========================================
 
-class CustomerMenu{
+class CustomerMenu {
 public:
-    static void run(Repository<Customer>& Repo);
+    static void run();
+
 private:
-    static void handleCreate(Repository<Customer>& Repo);
-    static void handleReadAll(Repository<Customer>& Repo);
-    static void handleSearch(Repository<Customer>& Repo);
-    static void handleUpdate(Repository<Customer>& Repo);
-    static void handleDelete(Repository<Customer>& Repo);
+    static void handleCreate(Repository<Customer>& repo);
+    static void handleReadAll(Repository<Customer>& repo);
+    static void handleSearch(Repository<Customer>& repo);
+    static void handleUpdate(Repository<Customer>& repo);
+    static void handleDelete(Repository<Customer>& repo);
     static void printHeader();
 };
+
+// Khai báo hàm để main.cpp gọi trực tiếp:
+void menuKhachHang();
