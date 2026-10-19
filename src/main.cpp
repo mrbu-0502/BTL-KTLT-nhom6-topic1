@@ -6,44 +6,23 @@ using namespace std;
 
 // Khai báo trước các hàm menu con của 10 use case
 // Sau này khi từng bạn làm xong thì chỉ cần nối code vào đây
-void menuGoiCuoc() {
-    cout << "\n--- [USE CASE 1: QUAN LY GOI CUOC] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuGoiCuoc();
 
-void menuKhachHang() {
-    cout << "\n--- [USE CASE 2: QUAN LY KHACH HANG] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuKhachHang();
 
 void menuLoaiHinh();
 
 void menuKhieuNai();
 
-void menuThietBi() {
-    cout << "\n--- [USE CASE 5: QUAN LY THIET BI] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuThietBi();
 
-void menuCuocGoi() {
-    cout << "\n--- [USE CASE 6: QUAN LY CUOC GOI (CDR)] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuCuocGoi();
 
-void menuSim() {
-    cout << "\n--- [USE CASE 7: QUAN LY SIM] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuSim();
 
-void menuHoaDon() {
-    cout << "\n--- [USE CASE 8: QUAN LY HOA DON] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuHoaDon();
 
-void menuNapTien() {
-    cout << "\n--- [USE CASE 9: QUAN LY NAP TIEN] ---\n";
-    cout << "(Chuc nang dang duoc hoan thien...)\n";
-}
+void menuNapTien();
 
 void menuHopDong();
 
