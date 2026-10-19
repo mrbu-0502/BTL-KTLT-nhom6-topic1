@@ -166,8 +166,7 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     }
 
     Date ngaygui, ngayhopdong;
-    string str_ngayhopdong = repo_contract.findById(maHD)->getRDate();
-    ngayhopdong.input_string(str_ngayhopdong);
+    ngayhopdong.input_string(repo_contract.findById(maHD)->getRDate());
     while(true){
         ngaygui.input("nhap ngay gui (DD/MM/YYYY): ");
         if(ngaygui.compare(ngayhopdong) >= 0) break;
@@ -248,10 +247,9 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
         }
         cout << "[Canh bao] Ma hop dong '" << maHDMoi << "' chua ton tai trong he thong! Vui long nhap lai.\n";
     }
+
     Date ngayguimoi, ngayHDmoi;
-    string str_ngayHDmoi;
-    str_ngayHDmoi = repo_contract.findById(maHDMoi)->getRDate();
-    ngayHDmoi.input(str_ngayHDmoi);
+    ngayHDmoi.input(repo_contract.findById(maHDMoi)->getRDate());
     while(true) {
         ngayguimoi.input("nhap ngay gui moi (DD/MM/YYYY): ");
         if(ngayguimoi.compare(ngayHDmoi) >= 0) break;
@@ -259,6 +257,7 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     }
     
     string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
+    
     string trangThaimoi;
     while(true){
         trangThaimoi = InputHelper::getString("Nhap trang thai moi (TiepNhan / DangXuLy / DaXuLy): ", false);
