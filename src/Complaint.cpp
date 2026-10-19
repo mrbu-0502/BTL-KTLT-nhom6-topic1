@@ -177,7 +177,13 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     }
 
     string noiDung = InputHelper::getString("Nhap noi dung khieu nai: ", false);
-    string trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false);
+
+    string trangThai;
+    while(true){
+        trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false);
+        if(trangThai == "TiepNhan" || trangThai == "DangXuLy" || trangThai == "DaXuLy") break;
+        else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
+    }
 
     Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
@@ -253,9 +259,13 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     }
     
     string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
-    string trangThaiMoi = InputHelper::getStringOrDefault("Trang thai moi: ", p->getTrangThai());
-
-    Complaint updated(id, maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaiMoi);
+    string trangThaimoi;
+    while(true){
+        trangThaimoi = InputHelper::getString("Nhap trang thai moi (TiepNhan / DangXuLy / DaXuLy): ", false);
+        if(trangThaimoi == "TiepNhan" || trangThaimoi == "DangXuLy" || trangThaimoi == "DaXuLy") break;
+        else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
+    }
+    Complaint updated(id, maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaimoi);
     repo_complaint.update(id, updated);
     cout << "Cap nhat phieu khieu nai thanh cong!\n";
 }
