@@ -10,14 +10,13 @@
 #include <sstream>
 #include <vector>
 using namespace std;
-
-// Hang so nghiep vu: Moi khach hang toi da 5 hop dong dang Hieu luc
-static const int MAX_CONTRACT_CUSTOMER = 3;
-
 // ============================================================================
 // HAM BO TRO
 // ============================================================================
 // Sinh ma ID Hop dong
+static bool cmp(const Contract& a, const Contract& b) {
+    return a.getContractID() < b.getContractID();
+}
 static string generateNextContractID(Repository<Contract>& repo) {
     int count = 1;
     while (true) {
@@ -46,10 +45,6 @@ static bool checkID(const string& filename, const string& value) {
         }
     }
     return false;
-}
-//So sanh 2 ma hop dong
-static bool cmp(const Contract& a, const Contract& b) {
-    return a.getContractID() < b.getContractID();
 }
 // Kiem tra trang thai cua Sim
 static bool getSimStatus(const string& PhoneNumber) {
@@ -135,27 +130,9 @@ void Contract::setPhonePlan(const string& value) {
     PhonePlan = value;
 }
 void Contract::setRDate(const string& value) {
-    int day, month, year;
-    char slash1, slash2;
-    stringstream ss(value);
-
-    if (!(ss >> day >> slash1 >> month >> slash2 >> year) ||
-        slash1 != '/' || slash2 != '/') {
-        throw InvalidDataException("Ngay dang ky phai co dang DD/MM/YYYY!");
-    }
-    ss >> ws;
-    if (!ss.eof()) {
-        throw InvalidDataException("Ngay dang ky co ky tu thua!");
-    }
-    Date regDate(day, month, year);
-    if (!regDate.valid()) {
-        throw InvalidDataException("Ngay dang ky khong hop le!");
-    }
-    if (year < 2000 || year > 2026) {
-        throw InvalidDataException("Nam dang ky phai nam trong khoang tu 2000 den 2026!");
-    }
-
-    RDate = regDate.output();
+    Date contractDate;
+    contractDate.input(value);
+    RDate = contractDate.output();
 }
 void Contract::setStatus(const string& value) {
     if (value != "Hieu luc" && value != "Het han" && value != "Da huy")
@@ -234,7 +211,7 @@ static void addContract(Repository<Contract>& repo) {
     // 1. Ma Hop dong tu sinh
     cout << "Ma HD (tu dong sinh): " << ID << '\n';
     item.setContractID(ID);
-    // 2. Nhap Ma Khach Hang (Kiem tra ton tai & Gioi han toi da 3 hop dong Hieu luc)
+    // 2. Nhap Ma Khach Hang
     while (true) {
         try {
             string text = InputHelper::getString("Nhap ma khach hang (KH + so | 0 de quay lai): ", false);
@@ -243,17 +220,6 @@ static void addContract(Repository<Contract>& repo) {
             item.setCustomerID(text);
             if (!checkID("data/customers.txt", text))
                 throw InvalidDataException("Ma " + text + " khong ton tai!");
-
-            // Kiem tra so luong hop dong dang Hieu luc cua khach hang nay
-            int activeCount = 0;
-            for (const auto& temp : repo.getAll()) {
-                if (temp.getCustomerID() == text && temp.getStatus() == "Hieu luc") {
-                    activeCount++;
-                }
-            }
-            if (activeCount >= MAX_CONTRACT_CUSTOMER) {
-                throw InvalidDataException("Khach hang " + text + " da dat gioi han toi da (" + to_string(MAX_CONTRACT_CUSTOMER) + ") hop dong Hieu luc!");
-            }
             break;
         } catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
@@ -333,7 +299,6 @@ static void findContract(Repository<Contract>& repo) {
             cout << "Khong tim thay hop dong nao khop voi '" << keyword << "'. Vui long thu lai.\n";
             continue;
         }
-        sort(results.begin(), results.end(), cmp);
         printTitleContract();
         for (const auto& item : results) {
             item.display();
@@ -380,18 +345,6 @@ static void updateContract(Repository<Contract>& repo) {
             update.setCustomerID(text);
             if (!checkID("data/customers.txt", text))
                 throw InvalidDataException("Ma " + text + " khong ton tai!");
-            // Neu chuyen sang KH khac, kiem tra xem KH do da qua 3 hop dong chua
-            if (text != found->getCustomerID()) {
-                int activeCount = 0;
-                for (const auto& temp : repo.getAll()) {
-                    if (temp.getCustomerID() == text && temp.getStatus() == "Hieu luc") {
-                        activeCount++;
-                    }
-                }
-                if (activeCount >= MAX_CONTRACT_CUSTOMER) {
-                    throw InvalidDataException("Khach hang " + text + " da dat gioi han toi da hop dong Hieu luc!");
-                }
-            }
             break;
         } catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
