@@ -50,8 +50,15 @@ public:
 // Trong class PackageMenu:
 class PackageMenu {
 public:
-    static void run(); // Bỏ tham số Repository<Package>& repo
-    // ... các hàm handleCreate, handleReadAll... giữ nguyên
+    static void run();
+
+private:
+    static void handleCreate(Repository<Package>& repo);
+    static void handleReadAll(Repository<Package>& repo);
+    static void handleSearch(Repository<Package>& repo);
+    static void handleUpdate(Repository<Package>& repo);
+    static void handleDelete(Repository<Package>& repo);
+    static void printHeader();
 };
 
 // Hoặc khai báo hàm độc lập để main.cpp gọi trực tiếp:
