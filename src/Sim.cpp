@@ -1,4 +1,3 @@
-
 #include "Sim.h"
 #include "Date.h"
 #include "Exceptions.h"
@@ -59,15 +58,14 @@ static string chuThuong(string s) {
     return s;
 }
 
-// Doi "dd/mm/yyyy" thanh Date, dung Date::valid() cua Hiep. Sai dinh dang/khong hop le -> false
+// Su dung phuong thuc input() co san cua lop Date (Kieu Duc Hiep) de phan tich & kiem tra hop le
 static bool phanTichNgay(const string& s, Date& ketQua) {
-    if (s.size() != 10 || s[2] != '/' || s[5] != '/') return false;
-    string ds = s.substr(0, 2), ms = s.substr(3, 2), ys = s.substr(6, 4);
-    if (!laChuSo(ds) || !laChuSo(ms) || !laChuSo(ys)) return false;
-    Date d(stoi(ds), stoi(ms), stoi(ys));
-    if (!d.valid()) return false;
-    ketQua = d;
-    return true;
+    try {
+        ketQua.input(s);
+        return true;
+    } catch (...) {
+        return false;
+    }
 }
 
 static Date homNay() {
@@ -82,7 +80,8 @@ static void kiemTraRangBuocXoa(const string& soSim) {
     const Rang dsRang[] = {
         {"data/bills.txt", 1, "Bill"},
         {"data/contracts.txt", 2, "Contract"},
-        {"data/cdrs.txt", 1, "CDR"},
+        {"data/cdrs.txt", 1, "CDR (So goi)"},
+        {"data/cdrs.txt", 2, "CDR (So nhan)"},
         {"data/recharges.txt", 1, "Recharge"},
     };
     for (const Rang& r : dsRang)
@@ -127,20 +126,22 @@ string Sim::getNgayKichHoat() const { return ngayKichHoat; }
 string Sim::getTrangThai() const { return trangThai; }
 
 void Sim::setSoSim(const string& v) {
-    if (v.empty() || !InputHelper::checkPhoneNumber(v))
+    string phone = v;
+    InputHelper::xuly_84(phone); // Chuan hoa +84 thanh 0 dung ham co san trong InputHelper
+    if (phone.empty() || !InputHelper::checkPhoneNumber(phone))
         throw InvalidDataException("So SIM phai gom 10 chu so va bat dau bang 0");
-    ID = v;
+    ID = phone;
 }
 
-void Sim::setMaIMSI(const string& v) { // international mobile subcriver identity - mã ở trên phôi sim
+void Sim::setMaIMSI(const string& v) { // international mobile subscriber identity - mã ở trên phôi sim
     if (v.size() != 15 || !laChuSo(v))
         throw InvalidDataException("Ma IMSI phai gom dung 15 chu so");
     maIMSI = v;
 }
 
 void Sim::setMaLoai(const string& v) { // loai sim
-    if (v.empty() || v.find('|') != string::npos)
-        throw InvalidDataException("Ma loai hinh khong duoc rong hoac chua ky tu '|'");
+    if (v.empty() || !InputHelper::checkidvalid(v, "SUB") || v.find('|') != string::npos)
+        throw InvalidDataException("Ma loai hinh phai bat dau bang 'SUB' (vd SUB01) va khong chua '|'");
     maLoai = v;
 }
 
@@ -152,11 +153,10 @@ void Sim::setMaIMEI(const string& v) { // mã cái điện thoại
 
 void Sim::setNgayKichHoat(const string& v) {
     Date d;
-    if (!phanTichNgay(v, d))
-        throw InvalidDataException("Ngay kich hoat phai dung dang dd/mm/yyyy va hop le: " + v);
+    d.input(v); // Dung ham input() co san cua lop Date (nem InvalidDataException neu sai)
     if (d.compare(homNay()) > 0)
         throw InvalidDataException("Ngay kich hoat khong duoc sau ngay hien tai");
-    ngayKichHoat = v;
+    ngayKichHoat = d.output(); // Chuan hoa ve dang DD/MM/YYYY
 }
 
 void Sim::setTrangThai(const string& v) {
@@ -171,7 +171,7 @@ void Sim::getInformation() {
     nhapLaiDenKhiHopLe([&] {
         string so = InputHelper::getString("So SIM (10 so, bat dau bang 0): ");
         setSoSim(so);
-        if (tonTai(so)) throw DuplicateIdException(so);
+        if (tonTai(ID)) throw DuplicateIdException(ID);
     });
     nhapLaiDenKhiHopLe([&] { setMaIMSI(InputHelper::getString("Ma IMSI (15 so): ")); });
     nhapLaiDenKhiHopLe([&] {
@@ -296,6 +296,7 @@ static void timKiem(Repository<Sim>& repo) {
 
     if (chon == 1) {
         string so = InputHelper::getString("Nhap so SIM: ");
+        InputHelper::xuly_84(so);
         Sim* p = repo.findById(so);
         if (p == nullptr) throw NotFoundException(so);
         inChiTiet(*p);
@@ -310,8 +311,14 @@ static void timKiem(Repository<Sim>& repo) {
             if (chuThuong(tenLoai(s.getMaLoai())).find(q) != string::npos) ketQua.push_back(s);
     } else if (chon == 4) {
         Date tu, den;
-        tu.input("Tu ngay (dd/mm/yyyy): ");
-        den.input("Den ngay (dd/mm/yyyy): ");
+        nhapLaiDenKhiHopLe([&] {
+            string s = InputHelper::getString("Tu ngay (dd/mm/yyyy): ");
+            tu.input(s);
+        });
+        nhapLaiDenKhiHopLe([&] {
+            string s = InputHelper::getString("Den ngay (dd/mm/yyyy): ");
+            den.input(s);
+        });
         for (const Sim& s : repo.getAll()) {
             Date d;
             if (phanTichNgay(s.getNgayKichHoat(), d) && d.compare(tu) >= 0 && d.compare(den) <= 0)
@@ -349,6 +356,7 @@ static void sapXep(Repository<Sim>& repo) {
 
 static void capNhatSim(Repository<Sim>& repo) {
     string so = InputHelper::getString("Nhap so SIM can sua: ");
+    InputHelper::xuly_84(so);
     Sim* p = repo.findById(so);
     if (p == nullptr) throw NotFoundException(so);
     inChiTiet(*p);
@@ -360,6 +368,7 @@ static void capNhatSim(Repository<Sim>& repo) {
 
 static void xoaSim(Repository<Sim>& repo) {
     string so = InputHelper::getString("Nhap so SIM can xoa: ");
+    InputHelper::xuly_84(so);
     Sim* p = repo.findById(so);
     if (p == nullptr) throw NotFoundException(so);
     inChiTiet(*p);
