@@ -165,7 +165,7 @@ void menuThietBi() {
                 Device moi;
                 moi.getInformation();
                 moi.setID(ma); // Giu nguyen ma IMEI cu
-                repo.update(moi);
+                repo.update(ma, moi);
                 repo.saveToFile();
                 cout << "Cap nhat thanh cong!\n";
             }
@@ -183,4 +183,5 @@ void menuThietBi() {
             }
         }
     }
+}
 

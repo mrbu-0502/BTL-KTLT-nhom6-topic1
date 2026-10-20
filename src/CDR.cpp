@@ -171,7 +171,7 @@ void menuCuocGoi() {
                 CDR moi;
                 moi.getInformation();
                 moi.setID(ma); // Giu nguyen ma CDR cu
-                repo.update(moi);
+                repo.update(ma, moi);
                 repo.saveToFile();
                 cout << "Cap nhat thanh cong!\n";
             }
