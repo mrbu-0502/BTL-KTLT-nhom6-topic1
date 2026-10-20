@@ -14,9 +14,9 @@ void menuLoaiHinh();
 
 void menuKhieuNai();
 
-void menuThietBi();
+// void menuThietBi();
 
-void menuCuocGoi();
+// void menuCuocGoi();
 
 void menuSim();
 
@@ -56,8 +56,8 @@ int main() {
             case 2:  menuKhachHang(); break;
             case 3:  menuLoaiHinh();  break;
             case 4:  menuKhieuNai();  break;
-            case 5:  menuThietBi();   break;
-            case 6:  menuCuocGoi();   break;
+            // case 5:  menuThietBi();   break;
+            // case 6:  menuCuocGoi();   break;
             case 7:  menuSim();       break;
             case 8:  menuHoaDon();    break;
             case 9:  menuNapTien();   break;

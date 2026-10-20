@@ -1,18 +1,21 @@
-#include "Complaint.h"
-#include "Date.h"
-#include "Repository.h"
-#include "InputHelper.h"
 #include "Contract.h"
-#include <iostream>
-#include <sstream>
+#include "Date.h"
+#include "InputHelper.h"
+#include "Exceptions.h"
+#include "Repository.h"
+#include "Complaint.h"
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <vector>
-#include <string>
+#include<string>
+
 
 using namespace std;
 
-
+// ============================================================================
 // CONSTRUCTOR
 // ============================================================================
 Complaint::Complaint()
@@ -166,12 +169,19 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     }
 
     Date ngaygui, ngayhopdong;
-    ngayhopdong.input_string(repo_contract.findById(maHD)->getRDate());
+    ngayhopdong.input(repo_contract.findById(maHD)->getRDate());
     while(true){
-        ngaygui.input("nhap ngay gui (DD/MM/YYYY): ");
-        if(ngaygui.compare(ngayhopdong) >= 0) break;
-        else {
-            cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!";
+        try{
+            string ngay = InputHelper::getString("nhap ngay (DD/MM/YYYY):", false);
+        
+            ngaygui.input(ngay);
+            if(ngaygui.compare(ngayhopdong) >= 0) break;
+            else {
+                cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!";
+            }
+        }
+        catch(const exception& error){
+            cout << "Loi: " << error.what() << endl;
         }
     }
 
@@ -251,9 +261,16 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     Date ngayguimoi, ngayHDmoi;
     ngayHDmoi.input(repo_contract.findById(maHDMoi)->getRDate());
     while(true) {
-        ngayguimoi.input("nhap ngay gui moi (DD/MM/YYYY): ");
-        if(ngayguimoi.compare(ngayHDmoi) >= 0) break;
-        else cout << "ngay nhap khieu nai khong the som hon ngay tao hop dong!";
+        try{
+            string text = InputHelper::getString("Nhap ngay gui moi (DD/MM/YYYY): ", false);
+            ngayguimoi.input(text);
+            if(ngayguimoi.compare(ngayHDmoi) >= 0) break;
+            else
+                throw InvalidDataException("Ngay nhap khieu nai khong the som hon ngay tao hop dong!");
+        }
+        catch(const exception& error){
+            cout << "Loi: " << error.what() << endl;
+        }
     }
     
     string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
