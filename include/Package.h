@@ -9,7 +9,7 @@ using namespace std;
 // 1: Khai báo thực thể gói cước (Entity / Model)
 // ==============================================
 
-class Package : public Entity{
+class Package : public Entity {
 private:
     string PackageName;
     double Price;
@@ -20,7 +20,7 @@ private:
 
 public:
     Package();
-    Package(string PackageID, string PackageName, double Price, int DataMB, int VoiceMinutes, int SMS, int Days);
+    Package(string ID, string name, double price, int data, int voice, int sms, int days);
     
     string getID() const override;
     string toString() const override;
@@ -47,15 +47,19 @@ public:
 // 2: Giao diện điều khiển menu console
 // =====================================
 
-class PackageMenu{
+// Trong class PackageMenu:
+class PackageMenu {
 public:
-    static void run(Repository<Package>& Repo);
+    static void run();
+
 private:
-    static void handleCreate(Repository<Package>& Repo);
-    static void handleReadALL(Repository<Package>& Repo);
-    static void handleSearch(Repository<Package>& Repo);
-    static void handleSort(Repository<Package>& Repo);
-    static void handleUpdate(Repository<Package>& Repo);
-    static void handleDelete(Repository<Package>& Repo);
+    static void handleCreate(Repository<Package>& repo);
+    static void handleReadAll(Repository<Package>& repo);
+    static void handleSearch(Repository<Package>& repo);
+    static void handleUpdate(Repository<Package>& repo);
+    static void handleDelete(Repository<Package>& repo);
     static void printHeader();
 };
+
+// Hoặc khai báo hàm độc lập để main.cpp gọi trực tiếp:
+void menuGoiCuoc();

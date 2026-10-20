@@ -1,0 +1,17 @@
+[DESCRIPTION]
+Them moi khieu nai voi ma HD sai prefix (khong bat dau bang HD) va nhap lai dung
+
+[EXPECTED]
+[Loi] Ma hop dong phai bat dau bang 'HD'! Vui long nhap lai.
+Them phieu khieu nai thanh cong!
+
+[INPUT]
+4
+2
+SAI01
+HD02
+15/10/2026
+Loi khong dang ky duoc goi cuoc
+TiepNhan
+0
+0

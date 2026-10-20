@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <sstream> 
-
+#include "Exceptions.h"
 using namespace std;
 
 /**
@@ -94,7 +94,6 @@ void input(string sm) {
         return; 
     }
 }
-
     // ========================================================================
     // 5. XUAT RA CHUOI CHUAN DINH DANG DD/MM/YYYY
     // Neu ngay hoac thang nho hon 10 thi tu dong cong them so "0" o dang truoc (VD: 5 -> "05")

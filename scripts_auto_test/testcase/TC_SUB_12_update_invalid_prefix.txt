@@ -1,0 +1,12 @@
+[DESCRIPTION]
+Cap nhat loai hinh voi ma sai dinh dang prefix (VD: KH01)
+
+[EXPECTED]
+[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!
+
+[INPUT]
+3
+4
+KH01
+0
+0

@@ -1,0 +1,13 @@
+[DESCRIPTION]
+Huy thao tac tim kiem khieu nai bang cach nhap 0
+
+[EXPECTED]
+=== TIM KIEM KHIEU NAI THEO MA ===
+QUAN LY PHIEU KHIEU NAI
+
+[INPUT]
+4
+3
+0
+0
+0

@@ -1,0 +1,12 @@
+[DESCRIPTION]
+Xoa loai hinh khong ton tai trong he thong (SUB77)
+
+[EXPECTED]
+[Loi] Khong tim thay loai hinh co ma: SUB77
+
+[INPUT]
+3
+5
+SUB77
+0
+0

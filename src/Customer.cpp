@@ -1,195 +1,325 @@
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <cctype>
-#include <stdexcept>
-#include "Customer.h"
-#include "InputHelper.h"
-#include "Date.h"
+#include "Customer.h"       // Header khai báo lớp Customer và CustomerMenu
+#include "Contract.h"       // Khai báo lớp Contract (để kiểm tra khóa ngoại trước khi xóa khách)
+#include "Date.h"           // Xử lý và kiểm tra ngày sinh hợp lệ (leap, valid, output)
+#include "InputHelper.h"    // Tiện ích nhập xuất an toàn trên console
+#include <iostream>         // Luồng xuất nhập cout, cin
+#include <iomanip>          // Định dạng căn lề cột in bảng khách hàng
+#include <string>           // Xử lý chuỗi string
+#include <vector>           // Chứa danh sách dữ liệu trong Repository
+#include <sstream>          // Tách/ghép chuỗi qua dấu '|'
+#include <cctype>           // Dùng hàm isdigit() kiểm tra 12 số CCCD
+#include <stdexcept>        // Bắt và ném ngoại lệ
+
+using namespace std; 
 
 using namespace std;
 
 // =====================================================================
-// PHẦN 1: CÀI ĐẶT THỰC THỂ PACKAGE
+// PHẦN 1: CÀI ĐẶT THỰC THỂ CUSTOMER
 // =====================================================================
 
-Customer :: Customer()
-         : Entity(""), CCCD(""), Address(""), Phone(""), Date("") {}
+Customer::Customer()
+    : Entity(""), FullName(""), CCCD(""), Address(""), DateOfBirth("") {}
 
-Customer :: Customer(string ID, string name, string cccd, string address, string phone, string date)
-         : Entity(ID), FullName(name), CCCD(cccd), Address(address), Phone(phone), Date(date) {}
+Customer::Customer(string ID, string name, string cccd, string address, string date)
+    : Entity(ID), FullName(name), CCCD(cccd), Address(address), DateOfBirth(date) {}
 
-
-string Customer :: getID() const{
+string Customer::getID() const {
     return ID;
 }
 
-string Customer :: toString() const{
+string Customer::toString() const {
     stringstream ss;
     ss << ID << "|" << FullName << "|" << CCCD << "|" 
-       << Address << "|" << Phone << "|" << Date;
+       << Address << "|" << DateOfBirth;
     return ss.str();
 }
 
-void Customer :: fromString(const string& line){
+void Customer::fromString(const string& line) {
     stringstream ss(line);
     getline(ss, ID, '|');
     getline(ss, FullName, '|');
     getline(ss, CCCD, '|');
     getline(ss, Address, '|');
-    getline(ss, Phone, '|');
-    getline(ss, Date, '|');
+    getline(ss, DateOfBirth, '|');
 }
 
-void Customer :: getInformation(){
-    FullName  = InputHelper :: getString("Nhập tên khách hàng: ", false);
-    CCCD      = InputHelper :: getString("Nhập căn cước công dân của khách hàng: ", false);
-    Address   = InputHelper :: getString("Nhập địa chỉ khách hàng: ", 0);
-    Phone     = InputHelper :: getString("Nhập số điện thoại khách hàng: ", 0);
-    Date      = InputHelper :: getString("Nhập ngày sinh của khách hàng: ", 0);
+void Customer::getInformation() {
+    ID          = InputHelper::getString("Nhập mã khách hàng: ", false);
+    FullName    = InputHelper::getString("Nhập tên khách hàng: ", false);
+    CCCD        = InputHelper::getString("Nhập căn cước công dân của khách hàng: ", false);
+    Address     = InputHelper::getString("Nhập địa chỉ khách hàng: ", false);
+    DateOfBirth = InputHelper::getString("Nhập ngày sinh của khách hàng: ", false);
 }
 
-void Customer :: display() const{
-    cout << left << setw(10) << CustomerID 
-         << setw(30) << FullName << right
-         << setw(12) << CCCD <<
-         << setw(15) << Address <<
-         << setw(10) << Phone <<
-         << setw(10) << Date << "\n";
+void Customer::display() const {
+    cout << left << setw(10) << ID 
+         << setw(22) << FullName 
+         << setw(14) << CCCD 
+         << setw(18) << Address 
+         << setw(14) << DateOfBirth << "\n";
 }
 
-string Customer :: getFullName() const{
-    return FullName;
-}
-string Customer :: getCCCD() const{
-    return CCCD;
-}
-string Customer :: getAddress() const{
-    return Address;
-}
-string Customer :: getPhone() const{
-    return Phone;
-}
-string Customer :: getDate() const{
-    return Date;
-}
+string Customer::getFullName() const { return FullName; }
+string Customer::getCCCD() const { return CCCD; }
+string Customer::getAddress() const { return Address; }
+string Customer::getDateOfBirth() const { return DateOfBirth; }
 
-void Customer :: setFullName(const string& n){
-    if(n.empty()){
+void Customer::setFullName(const string& n) {
+    if (n.empty()) {
         throw invalid_argument("Tên khách hàng không được để trống !");
     }
-    this -> FullName = n;
+    this->FullName = n;
 }
-void Customer :: setCCCD(const string& c){
+
+void Customer::setCCCD(const string& c) {
     if (c.empty()) {
         throw invalid_argument("CCCD khong duoc de trong!");
     }
     if (c.length() != 12) {
         throw invalid_argument("CCCD phai dung 12 chu so!");
     }
-    for(int i = 0; i < c.length(); i++){
-        if(!isdigit(c[i])){
+    for (int i = 0; i < c.length(); i++) {
+        if (!isdigit(c[i])) {
             throw invalid_argument("Căn cước công dân không hợp lệ !");
         }
-    
-    this -> CCCD = c;
+    }
+    this->CCCD = c;
 }
 
-void Customer :: setAddress(const string& a){
-    if(a.empty()){
+void Customer::setAddress(const string& a) {
+    if (a.empty()) {
         throw invalid_argument("Dia chi khong duoc de trong !");
     }
-    if(a.find('|') != string :: npos){
+    if (a.find('|') != string::npos) {
         throw invalid_argument("Dia chi khong duoc chua ky tu dac biet '|' !");
     }
-    this -> Address = a;
+    this->Address = a;
 }
 
-void Customer :: setPhone(const string& p){
-    if(p.empty()){
-        throw invalid_argument("Số điện thoại không được để trống !");
-    }
-    if(p.length() != 10){
-        throw invalid_argument("So dien thoai phai co dung 10 chu so!");
-    }
-    if (p[0] != '0') {
-        throw invalid_argument("So dien thoai phai bat dau bang so 0!");
-    }
-    for(int i = 0; i < p.length(); i++){
-        if(!isdigit(p[i])){
-            throw invalid_argument("Căn cước công dân không hợp lệ !");
-        }
-    }
-    this -> Phone = p;
-}
-
-void Customer::setDate(const string& d) {
-    if (d.empty()) {
+void Customer::setDateOfBirth(const string& dStr) {
+    if (dStr.empty()) {
         throw invalid_argument("Ngay sinh khong duoc de trong!");
     }
     int ngay, thang, nam;
     char c1 = 0, c2 = 0;
-    stringstream ss(d)
+    stringstream ss(dStr);
     if (!(ss >> ngay >> c1 >> thang >> c2 >> nam) || c1 != '/' || c2 != '/') {
         throw invalid_argument("Ngay sinh phai dung dinh dang dd/mm/yyyy!");
     }
-    date d(ngay, thang, nam);
+    Date d(ngay, thang, nam);
     if (!d.valid()) {
         throw invalid_argument("Ngay sinh khong hop le hoac vuot qua nam 2026!");
     }
-    this->Date = d.output();
+    this->DateOfBirth = d.output();
 }
 
 // =====================================================================
-// PHẦN 2: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA PACKAGEMENU
+// PHẦN 3: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA CUSTOMERMENU
 // =====================================================================
-
-// Bước 1: Quản lý danh sách và File (đọc dữ liệu từ file văn bản vào bộ nhớ RAM (load) và ghi dữ liệu từ bộ nhớ RAM xuống file văn bản (save))
-
-// 1. loadFile(): Đọc từng dòng từ file và nạp vào vector
-
-void Repository<Customer> :: load(){
-    items.clear();
-    ifstream file(filePath);
-    if(!file.is_open()){
-        return;
-    }
-    string line;
-    while(getline(file, line)){
-        if(line.empty() || line[0] == "#"){
-            continue;
-        }
-        Customer ctr;
-        ctr.fromString(line);
-        items.push_back(ctr);
-    }
-    file.close();
-}
-
-void Repository<Customer> :: save() const{
-    ofstream file(filePath);
-    if(!file.is_open){
-        return;
-    }
-    for(const auto& ctr : items){
-        file << ctr.toString() << "\n";
-    }
-    file.close();
-}
-
-// Bước 2: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA CUSTOMERMENU
 
 void CustomerMenu::printHeader() {
-    cout << string(88, '-') << "\n";
+    cout << string(78, '-') << "\n";
     cout << left  << setw(10) << "Ma KH"
          << setw(22) << "HO TEN"
          << setw(14) << "CCCD"
          << setw(18) << "DIA CHI"
-         << setw(12) << "SDT"
-         << setw(12) << "NGAY SINH" << "\n";
-    cout << string(88, '-') << "\n";
+         << setw(14) << "NGAY SINH" << "\n";
+    cout << string(78, '-') << "\n";
 }
 
+void CustomerMenu :: handleCreate(Repository<Customer>& repo){
+    cout << "\n---------------- THEM KHACH HANG MOI ----------------\n";
+
+    // 1. Nhập và kiểm tra mã ID
+    string id = InputHelper :: getString("Nhap ma khach hang: ", false);
+    if(repo.findById(id) != nullptr){
+        cout << ">> [LOI] Ma khach hang da ton tai tren he thong!\n";
+        return;
+    }
+
+    // 2. Nhập dữ liệu mới
+    string name         = InputHelper :: getString("Nhap ten khach hang moi: ", false);
+    string CCCD         = InputHelper :: getString("Nhap CCCD cua khach hang moi: ", false);
+    string Address      = InputHelper :: getString("Nhap dia chi cua khach hang moi: ", false);
+    string DateOfBirth  = InputHelper :: getString("Nhap ngay sinh cua khach hang moi: ", false);
+
+    // 3. Đưa vào RAM và lưu file
+    try{
+        repo.add(Customer(id, name, CCCD, Address, DateOfBirth));
+        cout << ">> [THANH CONG] Da them khach hang [" << id << "] vao he thong!\n";
+    }
+    catch(const exception& e){
+        cout << ">> [THAT BAI] " << e.what() << "\n";
+    }
+}
+
+void CustomerMenu :: handleReadAll(Repository<Customer>& repo){
+    cout << "\n---------------- DANH SACH KHACH HANG ----------------\n";
+    const auto& list = repo.getAll();
+
+    // 1: Kiểm tra rỗng
+    if(list.empty()){
+        cout << ">> Danh sach khach hang hien dang trong!\n";
+        return;
+    }
+
+    // 2: In tiêu đề
+    printHeader();
+
+    // 3: Duyệt và gọi display() của từng đối tượng
+    for(const auto& cus : list){
+        cus.display();
+    }
+    cout << string(78, '-') << "\n";
+    cout << ">> Tong so luong: " << list.size() << " khach hang.\n";
+}
+
+void CustomerMenu :: handleSearch(Repository<Customer>& repo){
+    cout << "\n---------------- TIM KIEM KHACH HANG ----------------\n";
+    // 1: Nhập mã cần xem
+    string id = InputHelper :: getString("Nhap ma khach hang can xem: ", false);
+
+    // 2: Tìm trực tiếp đối tượng mang mã đó trong vector
+    auto* cus = repo.findById(id);
+
+    // 3: Xử lý kết quả
+    if(cus == nullptr){
+        cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << "\n";
+        return;
+    }
+    else{
+        cout << "\n>> THONG TIN CHI TIET KHACH HANG:\n";
+        printHeader();
+        cus -> display();
+        cout << string(78, '-') << "\n";
+    }
+}
+
+void CustomerMenu :: handleUpdate(Repository<Customer>& repo){
+    cout << "\n---------------- CAP NHAT KHACH HANG ----------------\n";
+    // 1: Nhập Id và kiểm tra có khách hàng cần cập nhật không 
+    string id = InputHelper::getString("Nhap ma khach hang can sua: ", false);
+    auto* cus = repo.findById(id);
+    if (cus == nullptr) {
+        cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << "\n";
+        return; 
+    }
+    
+    // 2: In để hiện thị thông tin hiện tại
+    cout << "\n>> Thong tin hien tai cua khach hang:\n";
+    printHeader();
+    cus->display();
+    cout << string(78, '-') << "\n";
+    cout << "(Luu y: Nhan Enter de trong neu muon GIU NGUYEN thong tin cu. Ma khach hang khong duoc sua)\n\n";
+    
+    // 3: Nhập dữ liệu mới dưới dạng chuỗi để kiểm tra rỗng
+    string newName        = InputHelper::getString("Nhap ten khach hang moi: ", true);
+    string newCCCD        = InputHelper::getString("Nhap CCCD cua khach hang moi: ", true);
+    string newAddress     = InputHelper::getString("Nhap dia chi cua khach hang moi: ", true);
+    string newDateOfBirth = InputHelper::getString("Nhap ngay sinh moi: ", true);
+
+    // 4 & 5: Kiểm tra qua Setter và Ghi lại file
+    try {
+        if (!newName.empty())        cus->setFullName(newName);
+        if (!newCCCD.empty())        cus->setCCCD(newCCCD);
+        if (!newAddress.empty())     cus->setAddress(newAddress);
+        if (!newDateOfBirth.empty()) cus->setDateOfBirth(newDateOfBirth);
+
+        repo.saveToFile();
+        cout << "\n>> [THANH CONG] Da cap nhat thong tin khach hang [" << id << "] thanh cong!\n";
+    }
+    catch (const exception& e) {
+        cout << "\n>> [THAT BAI] Khong the cap nhat: " << e.what() << "\n";
+    }
+}
+
+void CustomerMenu::handleDelete(Repository<Customer>& repo) {
+    cout << "\n---------------- XOA KHACH HANG ----------------\n";
+    
+    // Bước 1: Nhập mã và tìm kiếm khách hàng trong RAM
+    string id = InputHelper::getString("Nhap ma khach hang can xoa: ", false);
+    Customer* cus = repo.findById(id);
+    
+    if (cus == nullptr) {
+        cout << ">> [Loi]: Khong tim thay khach hang co ma: " << id << "\n";
+        return;
+    }
+
+    // Bước 2: Hiển thị thông tin khách hàng để người dùng kiểm tra lại
+    cout << "\n>> Thong tin khach hang duoc chon de xoa:\n";
+    printHeader();
+    cus->display();
+    cout << string(78, '-') << "\n";
+
+    // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (đọc từ contracts.txt)
+    Repository<Contract> contractRepo("data/contracts.txt");
+    try {
+    contractRepo.loadFromFile();
+    } catch (...) {}
+
+    bool isLinked = false;
+    for (const auto& contract : contractRepo.getAll()){
+    if (contract.getCustomerID() == id) { // Dùng getCustomerID() theo Contract.h
+        isLinked = true;
+        break;
+    }
+    } 
+    if (isLinked) {
+    cout << ">> [Tu choi xoa]: Khach hang [" << id 
+         << "] dang dung ten trong hop dong, khong duoc phep xoa!\n";
+    return;
+    }
+    
+    // 4: Hỏi xác nhận có cần xóa không và lưu file
+    string confirm = InputHelper::getString("Ban co chac chan muon xoa? (y/n): ", false);
+    if (confirm == "y" || confirm == "Y") {
+        repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector
+        cout << ">> [THANH CONG] Xoa thanh cong khach hang [" << id << "]!\n";
+    } else {
+        cout << ">> [THONG BAO] Thao tac xoa da duoc huy bo an toan.\n";
+    }
+}
+
+// =====================================================================
+// PHẦN 4: MENU CONSOLE ĐIỀU KHIỂN
+// =====================================================================
+
+void CustomerMenu::run() {
+    // Tự khởi tạo Repository và nạp dữ liệu từ file khi mở menu
+    Repository<Customer> repo("data/customers.txt");
+    try {
+        repo.loadFromFile();
+    } catch (...) {}
+
+    int choice;
+    do {
+        cout << "\n============ QUAN LY KHACH HANG ============\n";
+        cout << "  1. Them khach hang moi\n";
+        cout << "  2. Xem danh sach khach hang\n";
+        cout << "  3. Tim kiem khach hang\n";
+        cout << "  4. Cap nhat thong tin khach hang\n";
+        cout << "  5. Xoa khach hang\n";
+        cout << "  0. Quay lai menu chinh\n";
+        cout << "==========================================\n";
+        choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
+
+        switch (choice) {
+            case 1: handleCreate(repo);   break;
+            case 2: handleReadAll(repo);  break;
+            case 3: handleSearch(repo);   break;
+            case 4: handleUpdate(repo);   break;
+            case 5: handleDelete(repo);   break;
+            case 0:
+                cout << ">> Dang quay lai Menu chinh...\n";
+                break;
+            default:
+                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 5!\n";
+        }
+    } while (choice != 0);
+}
+
+// Hàm để main.cpp gọi trực tiếp
+void menuKhachHang() {
+    CustomerMenu::run();
+}

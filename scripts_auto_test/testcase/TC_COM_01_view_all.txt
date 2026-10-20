@@ -1,0 +1,15 @@
+[DESCRIPTION]
+Xem toan bo danh sach phieu khieu nai trong he thong
+
+[EXPECTED]
+DANH SACH PHIEU KHIEU NAI
+KN01
+HD01
+KN10
+HD10
+
+[INPUT]
+4
+1
+0
+0

@@ -100,3 +100,5 @@ cmake-build-*/
 Thumbs.db
 desktop.ini
 
+.vscode/tasks.json
+/.vscode

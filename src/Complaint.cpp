@@ -1,4 +1,5 @@
 #include "Complaint.h"
+#include "Date.h"
 #include "Repository.h"
 #include "InputHelper.h"
 #include "Contract.h"
@@ -30,7 +31,9 @@ string Complaint::getID() const {
 void Complaint::getInformation() {
     setID(InputHelper::getString("Nhap ma khieu nai (vi du: KN11): ", false));
     setMaHD(InputHelper::getString("Nhap ma hop dong (vi du: HD01): ", false));
-    setNgayGui(InputHelper::getString("Nhap ngay gui (dd/mm/yyyy): ", false));
+    Date d;
+    d.input("Nhap ngay gui (dd/mm/yyyy): ");
+    setNgayGui(d.output());
     setNoiDung(InputHelper::getString("Nhap noi dung khieu nai: ", false));
     setTrangThai(InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false));
 }
@@ -106,9 +109,13 @@ static void inTieuDeBangComplaint() {
 }
 
 //tu dong sinh ma KN;
-string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
+//lay phan tu cuoi cung lam max roi ma KN moi = KN max + 1;
+static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
     int max = 0;
     vector<Complaint> list = repo_complaint.getAll();
+    if (list.empty()) {
+        return "KN01";
+    }
 
     string maKNmax = list[list.size() - 1].getID();
     max =stoi(maKNmax.substr(2));
@@ -122,7 +129,7 @@ string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
-static void xemDanhSachComplaint(Repository<Complaint> repo) {
+static void xemDanhSachComplaint(Repository<Complaint>& repo) {
     vector<Complaint> list = repo.getAll();
     if (list.empty()) {
         cout << "Danh sach khieu nai hien dang trong!\n";
@@ -141,27 +148,57 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
 
     string maKN = sinhmaKNmoi(repo_complaint);
 
-    string maHD = InputHelper::getString("Nhap ma hop dong (vi du: HD01): ", false);
-    while(repo_contract.findById(maHD) == nullptr) {
-        cout << "[Canh bao] Ma hop dong " << maHD << " chua ton tai trong he thong!\n";
-        maHD = InputHelper::getString("Nhap lai ma hop dong (nhap 0 de thoat): ", false);
-        if(maHD == "0") {
+    string maHD;
+    while (true) {
+        maHD = InputHelper::getString("Nhap ma hop dong (vi du: HD01, nhap 0 de thoat): ", false);
+        if (maHD == "0") {
             return;
+        }
+        if (!InputHelper::checkidvalid(maHD, "HD")) {
+            cout << "[Loi] Ma hop dong phai bat dau bang 'HD'! Vui long nhap lai.\n";
+            continue;
+        }
+        if (repo_contract.findById(maHD) == nullptr) {
+            cout << "[Canh bao] Ma hop dong " << maHD << " chua ton tai trong he thong!\n";
+            continue;
+        }
+        break;
+    }
+
+    Date ngaygui, ngayhopdong;
+    ngayhopdong.input_string(repo_contract.findById(maHD)->getRDate());
+    while(true){
+        ngaygui.input("nhap ngay gui (DD/MM/YYYY): ");
+        if(ngaygui.compare(ngayhopdong) >= 0) break;
+        else {
+            cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!";
         }
     }
 
-    string ngayGui = InputHelper::getString("Nhap ngay gui (dd/mm/yyyy): ", false);
     string noiDung = InputHelper::getString("Nhap noi dung khieu nai: ", false);
-    string trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false);
 
-    Complaint kn(maKN, maHD, ngayGui, noiDung, trangThai);
+    string trangThai;
+    while(true){
+        trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy): ", false);
+        if(trangThai == "TiepNhan" || trangThai == "DangXuLy" || trangThai == "DaXuLy") break;
+        else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
+    }
+
+    Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
     cout << "Them phieu khieu nai thanh cong!\n";
 }
 
 static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\n=== TIM KIEM KHIEU NAI THEO MA ===\n";
-    string id = InputHelper::getString("Nhap ma khieu nai can tim: ", false);
+    string id = InputHelper::getString("Nhap ma khieu nai can tim (nhap 0 de thoat): ", false);
+    if (id == "0") return;
+
+    if (!InputHelper::checkidvalid(id, "KN")) {
+        cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
+        return;
+    }
+
     Complaint* p = repo_complaint.findById(id);
     if (p == nullptr) {
         cout << "[Thong bao] Khong tim thay khieu nai co ma: " << id << endl;
@@ -178,6 +215,11 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     string id = InputHelper::getString("Nhap ma khieu nai can sua (nhap 0 de thoat): ", false);
     if(id == "0") return;
 
+    if (!InputHelper::checkidvalid(id, "KN")) {
+        cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
+        return;
+    }
+
     Complaint* p = repo_complaint.findById(id);
     if (p == nullptr) {
         cout << "[Loi] Khong tim thay khieu nai co ma: " << id << endl;
@@ -192,20 +234,37 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     cout << "(Luu y: Nhan Enter de giu nguyen gia tri cu)\n";
     string maHDMoi;
     while (true) {
-        maHDMoi = InputHelper::getStringOrDefault("Ma HD moi: ", p->getMaHD());
+        maHDMoi = InputHelper::getStringOrDefault("Ma HD moi(de trong se giu nguyen): ", p->getMaHD());
         if (maHDMoi == p->getMaHD()) {
             break; // Giu nguyen ma hop dong cu
+        }
+        if (!InputHelper::checkidvalid(maHDMoi, "HD")) {
+            cout << "[Loi] Ma hop dong phai bat dau bang 'HD'! Vui long nhap lai.\n";
+            continue;
         }
         if (repo_contract.findById(maHDMoi) != nullptr) {
             break; // Ma hop dong moi hop le
         }
         cout << "[Canh bao] Ma hop dong '" << maHDMoi << "' chua ton tai trong he thong! Vui long nhap lai.\n";
     }
-    string ngayGuiMoi = InputHelper::getStringOrDefault("Ngay gui moi: ", p->getNgayGui());
-    string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
-    string trangThaiMoi = InputHelper::getStringOrDefault("Trang thai moi: ", p->getTrangThai());
 
-    Complaint updated(id, maHDMoi, ngayGuiMoi, noiDungMoi, trangThaiMoi);
+    Date ngayguimoi, ngayHDmoi;
+    ngayHDmoi.input(repo_contract.findById(maHDMoi)->getRDate());
+    while(true) {
+        ngayguimoi.input("nhap ngay gui moi (DD/MM/YYYY): ");
+        if(ngayguimoi.compare(ngayHDmoi) >= 0) break;
+        else cout << "ngay nhap khieu nai khong the som hon ngay tao hop dong!";
+    }
+    
+    string noiDungMoi = InputHelper::getStringOrDefault("Noi dung moi: ", p->getNoiDung());
+    
+    string trangThaimoi;
+    while(true){
+        trangThaimoi = InputHelper::getString("Nhap trang thai moi (TiepNhan / DangXuLy / DaXuLy): ", false);
+        if(trangThaimoi == "TiepNhan" || trangThaimoi == "DangXuLy" || trangThaimoi == "DaXuLy") break;
+        else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
+    }
+    Complaint updated(id, maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaimoi);
     repo_complaint.update(id, updated);
     cout << "Cap nhat phieu khieu nai thanh cong!\n";
 }
@@ -215,6 +274,11 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
     string id = InputHelper::getString("Nhap ma khieu nai can dong (nhap 0 de thoat): ", false);
     if(id == "0") return;
     
+    if (!InputHelper::checkidvalid(id, "KN")) {
+        cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
+        return;
+    }
+
     Complaint* p = repo_complaint.findById(id);
     if (p == nullptr) {
         cout << "[Loi] Khong tim thay khieu nai co ma: " << id << endl;
@@ -227,7 +291,7 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
     cout << string(98, '-') << endl;
 
     if (InputHelper::getConfirm("Ban co chac chan muon dong phieu khieu nai nay khong (y/n)? ")) {
-        p -> setTrangThai("Dong");
+        p->setTrangThai("Dong");
         repo_complaint.update(id, *p);
         cout << "dong phieu khieu nai thanh cong!\n";
     } else {

@@ -1,0 +1,15 @@
+[DESCRIPTION]
+Xem toan bo danh sach loai hinh thue bao hien co trong he thong
+
+[EXPECTED]
+DANH SACH LOAI HINH THUE BAO
+SUB01
+Tra Truoc Economy
+SUB10
+eSIM IoT
+
+[INPUT]
+3
+1
+0
+0

@@ -14,12 +14,11 @@ class Customer : public Entity {
     string FullName;
     string CCCD;
     string Address;
-    string Phone;
-    string Date;
+    string DateOfBirth;
 
     public:
     Customer();
-    Customer(string FullName, string CCCD, string Address, string Phone, string Date);
+    Customer(string ID, string FullName, string CCCD, string Address, string Date);
 
     string getID() const override;
     string toString() const override;
@@ -30,29 +29,30 @@ class Customer : public Entity {
     string getFullName() const;
     string getCCCD() const;
     string getAddress() const;
-    string getPhone() const;
-    string getDate() const;
+    string getDateOfBirth() const;
 
     void setFullName(const string& n);
-    void setCCCD(const string& c);;
+    void setCCCD(const string& c);
     void setAddress(const string& a);
-    void setPhone(const string& p);
-    void setDate(const string& d);
+    void setDateOfBirth(const string& d);
 };
 
 // ===========================================
 // 2. GIAO DIỆN ĐIỀU KHIỂN (Menu / Controller)
 // ===========================================
 
-class CustomerMenu{
+class CustomerMenu {
 public:
-    static void run(Repository<Customer>& Repo);
+    static void run();
+
 private:
-    static void handleCreate(Repository<Customer>& Repo);
-    static void handleReadALL(Repository<Customer>& Repo);
-    static void handleSearch(Repository<Customer>& Repo);
-    static void handleSort(Repository<Customer>& Repo);
-    static void handleUpdate(Repository<Customer>& Repo);
-    static void handleDelete(Repository<Customer>& Repo);
+    static void handleCreate(Repository<Customer>& repo);
+    static void handleReadAll(Repository<Customer>& repo);
+    static void handleSearch(Repository<Customer>& repo);
+    static void handleUpdate(Repository<Customer>& repo);
+    static void handleDelete(Repository<Customer>& repo);
     static void printHeader();
 };
+
+// Khai báo hàm để main.cpp gọi trực tiếp:
+void menuKhachHang();

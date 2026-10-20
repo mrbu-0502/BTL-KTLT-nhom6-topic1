@@ -1,0 +1,15 @@
+[DESCRIPTION]
+Tim kiem phieu khieu nai ton tai theo ma KN01
+
+[EXPECTED]
+Ket qua tim thay:
+KN01
+HD01
+Toc do 4G cham tai khu vuc Cau Giay
+
+[INPUT]
+4
+3
+KN01
+0
+0
