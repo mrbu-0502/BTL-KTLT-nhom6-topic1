@@ -32,9 +32,9 @@ void SubType::getInformation() {
 
 void SubType::display() const {
     cout << left << setw(10) << ID
-         << setw(25) << tenLoai
-         << setw(45) << moTa
-         << right << setw(12) << cuocThang << endl;
+         << setw(35) << tenLoai
+         << setw(50) << moTa
+         << right << setw(15) << cuocThang << endl;
 }
 
 string SubType::toString() const {
@@ -92,12 +92,12 @@ void SubType::setCuocThang(long long cuoc) {
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
 // ============================================================================
 static void inTieuDeBangSubType() {
-    cout << string(95, '-') << endl;
+    cout << string(110, '-') << endl;
     cout << left << setw(10) << "Ma Loai"
-         << setw(25) << "Ten Loai Hinh"
-         << setw(45) << "Mo Ta"
-         << right << setw(12) << "Cuoc Thang (d)" << endl;
-    cout << string(95, '-') << endl;
+         << setw(35) << "Ten Loai Hinh"
+         << setw(50) << "Mo Ta"
+         << right << setw(15) << "Cuoc Thang (d)" << endl;
+    cout << string(110, '-') << endl;
 }
 
 static string sinhMaLoaimoi(Repository<SubType>& repo) {

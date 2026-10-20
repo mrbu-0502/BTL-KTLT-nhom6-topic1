@@ -143,7 +143,7 @@ static void xemDanhSachComplaint(Repository<Complaint>& repo) {
     for (size_t i = 0; i < list.size(); i++) {
         list[i].display();
     }
-    cout << string(110, '-') << endl;
+    cout << string(100, '-') << endl;
 }
 
 static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract ) {
