@@ -167,56 +167,135 @@ void Sim::setTrangThai(const string& v) {
 
 // ----- Ham thuan ao tu Entity -----
 void Sim::getInformation() {
-    // So SIM: dung dinh dang va chua ton tai trong file
-    nhapLaiDenKhiHopLe([&] {
-        string so = InputHelper::getString("So SIM (10 so, bat dau bang 0): ");
-        setSoSim(so);
-        if (tonTai(ID)) throw DuplicateIdException(ID);
-    });
-    nhapLaiDenKhiHopLe([&] { setMaIMSI(InputHelper::getString("Ma IMSI (15 so): ")); });
-    nhapLaiDenKhiHopLe([&] {
-        string v = InputHelper::getString("Ma loai hinh (vd SUB01): ");
-        setMaLoai(v);
-        if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
-    });
-    nhapLaiDenKhiHopLe([&] {
-        string v = InputHelper::getString("Ma IMEI (15 so, hoac NONE neu chua gan may): ");
-        setMaIMEI(v);
-        if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
-            throw ForeignKeyException("MaIMEI", v);
-    });
-    nhapLaiDenKhiHopLe([&] {
-        setNgayKichHoat(InputHelper::getString("Ngay kich hoat (dd/mm/yyyy): "));
-    });
-    nhapLaiDenKhiHopLe([&] {
-        setTrangThai(InputHelper::getString("Trang thai (HoatDong/BiKhoa): "));
-    });
+    // 1. Nhap So SIM: 10 so, bat dau bang 0, chua ton tai tren he thong
+    while (true) {
+        try {
+            string so = InputHelper::getString("So SIM (10 so, bat dau bang 0): ");
+            setSoSim(so);
+            if (tonTai(ID)) throw DuplicateIdException(ID);
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 2. Nhap Ma IMSI: 15 chu so
+    while (true) {
+        try {
+            setMaIMSI(InputHelper::getString("Ma IMSI (15 so): "));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 3. Nhap Ma loai hinh: ton tai trong sub_types.txt
+    while (true) {
+        try {
+            string v = InputHelper::getString("Ma loai hinh (vd SUB01): ");
+            setMaLoai(v);
+            if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 4. Nhap Ma IMEI: 15 chu so hoac NONE, ton tai trong devices.txt
+    while (true) {
+        try {
+            string v = InputHelper::getString("Ma IMEI (15 so, hoac NONE neu chua gan may): ");
+            setMaIMEI(v);
+            if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
+                throw ForeignKeyException("MaIMEI", v);
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 5. Nhap Ngay kich hoat: dd/mm/yyyy hop le, khong sau ngay hien tai
+    while (true) {
+        try {
+            setNgayKichHoat(InputHelper::getString("Ngay kich hoat (dd/mm/yyyy): "));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 6. Nhap Trang thai: HoatDong hoac BiKhoa
+    while (true) {
+        try {
+            setTrangThai(InputHelper::getString("Trang thai (HoatDong/BiKhoa): "));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
 }
 
 void Sim::capNhatThongTin() {
     cout << "(Nhan Enter de giu nguyen gia tri hien tai. Khong duoc sua So SIM)\n";
-    nhapLaiDenKhiHopLe([&] {
-        setMaIMSI(InputHelper::getStringOrDefault("Ma IMSI ", maIMSI));
-    });
-    nhapLaiDenKhiHopLe([&] {
-        string v = InputHelper::getStringOrDefault("Ma loai hinh ", maLoai);
-        Sim().setMaLoai(v);   // kiem tra truoc, chua doi gia tri hien tai
-        if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
-        setMaLoai(v);
-    });
-    nhapLaiDenKhiHopLe([&] {
-        string v = InputHelper::getStringOrDefault("Ma IMEI ", maIMEI);
-        Sim().setMaIMEI(v);   // kiem tra truoc, chua doi gia tri hien tai
-        if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
-            throw ForeignKeyException("MaIMEI", v);
-        setMaIMEI(v);
-    });
-    nhapLaiDenKhiHopLe([&] {
-        setNgayKichHoat(InputHelper::getStringOrDefault("Ngay kich hoat ", ngayKichHoat));
-    });
-    nhapLaiDenKhiHopLe([&] {
-        setTrangThai(InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", trangThai));
-    });
+
+    // 1. Sua Ma IMSI
+    while (true) {
+        try {
+            setMaIMSI(InputHelper::getStringOrDefault("Ma IMSI ", maIMSI));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 2. Sua Ma loai hinh
+    while (true) {
+        try {
+            string v = InputHelper::getStringOrDefault("Ma loai hinh ", maLoai);
+            Sim temp;
+            temp.setMaLoai(v);   // kiem tra truoc, chua doi gia tri hien tai
+            if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
+            setMaLoai(v);
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 3. Sua Ma IMEI
+    while (true) {
+        try {
+            string v = InputHelper::getStringOrDefault("Ma IMEI ", maIMEI);
+            Sim temp;
+            temp.setMaIMEI(v);   // kiem tra truoc, chua doi gia tri hien tai
+            if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
+                throw ForeignKeyException("MaIMEI", v);
+            setMaIMEI(v);
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 4. Sua Ngay kich hoat
+    while (true) {
+        try {
+            setNgayKichHoat(InputHelper::getStringOrDefault("Ngay kich hoat ", ngayKichHoat));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
+
+    // 5. Sua Trang thai
+    while (true) {
+        try {
+            setTrangThai(InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", trangThai));
+            break;
+        } catch (const BaseException& e) {
+            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+        }
+    }
 }
 
 void Sim::display() const { cout << *this << '\n'; }
@@ -311,14 +390,24 @@ static void timKiem(Repository<Sim>& repo) {
             if (chuThuong(tenLoai(s.getMaLoai())).find(q) != string::npos) ketQua.push_back(s);
     } else if (chon == 4) {
         Date tu, den;
-        nhapLaiDenKhiHopLe([&] {
-            string s = InputHelper::getString("Tu ngay (dd/mm/yyyy): ");
-            tu.input(s);
-        });
-        nhapLaiDenKhiHopLe([&] {
-            string s = InputHelper::getString("Den ngay (dd/mm/yyyy): ");
-            den.input(s);
-        });
+        while (true) {
+            try {
+                string s = InputHelper::getString("Tu ngay (dd/mm/yyyy): ");
+                tu.input(s);
+                break;
+            } catch (const BaseException& e) {
+                cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+            }
+        }
+        while (true) {
+            try {
+                string s = InputHelper::getString("Den ngay (dd/mm/yyyy): ");
+                den.input(s);
+                break;
+            } catch (const BaseException& e) {
+                cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
+            }
+        }
         for (const Sim& s : repo.getAll()) {
             Date d;
             if (phanTichNgay(s.getNgayKichHoat(), d) && d.compare(tu) >= 0 && d.compare(den) <= 0)
