@@ -1,12 +1,23 @@
+/**
+ * ==============================================================================
+ * BÀI TẬP LỚN: HỆ THỐNG QUẢN LÝ THUÊ BAO DI ĐỘNG (NHÓM 06 - ĐỀ TÀI 01)
+ * Học phần: Kỹ thuật lập trình
+ * Người thực hiện: Bùi Gia Khánh
+ * MSSV: B24DCVT191
+ * Module phụ trách: Entity.h (Lớp cơ sở trừu tượng)
+ * Use Case: Quản lý Gói cước (Package)
+ * ==============================================================================
+ */
+
 #include "Package.h"        // Header khai báo lớp Package và PackageMenu
 #include "Contract.h"       // Khai báo lớp Contract (để kiểm tra khóa ngoại trước khi xóa gói)
 #include "InputHelper.h"    // Tiện ích nhập xuất an toàn trên console
+#include "Exceptions.h"     // Các lớp ngoại lệ tự định nghĩa
 #include <iostream>         // Luồng xuất nhập cout, cin
 #include <iomanip>          // Định dạng bảng (setw, left, right, fixed, setprecision)
 #include <string>           // Xử lý chuỗi string
 #include <vector>           // Chứa danh sách dữ liệu trong Repository
 #include <sstream>          // Tách/ghép chuỗi qua stringstream (toString, fromString)
-#include <stdexcept>
 
 using namespace std;
 
@@ -19,7 +30,14 @@ Package::Package()
     : Entity(""), Price(0), DataMB(0), VoiceMinutes(0), SMS(0), Days(30) {}
 
 Package::Package(string ID, string name, double price, int data, int voice, int sms, int days)
-    : Entity(ID), PackageName(name), Price(price), DataMB(data), VoiceMinutes(voice), SMS(sms), Days(days) {}
+    : Entity(ID) {
+    setName(name);
+    setPrice(price);
+    setDataMB(data);
+    setVoiceMinutes(voice);
+    setSMS(sms);
+    setDays(days);
+}
 
 // Cài đặt các hàm thuần ảo 
 string Package::getID() const {
@@ -35,6 +53,7 @@ string Package::toString() const {
 }
 
 void Package::fromString(const string& line) {
+    if (line.empty()) return;
     stringstream ss(line);
     string PriceStr;
     string DataMBStr;
@@ -42,7 +61,13 @@ void Package::fromString(const string& line) {
     string SMSStr;
     string DaysStr;
 
-    getline(ss, ID, '|');
+    string tempID;
+    getline(ss, tempID, '|');
+    if (tempID == "MaGoi" || tempID.empty()) {
+        ID = "";
+        return;
+    }
+    ID = tempID;
     getline(ss, PackageName, '|');
     getline(ss, PriceStr, '|');
     getline(ss, DataMBStr, '|');
@@ -50,30 +75,25 @@ void Package::fromString(const string& line) {
     getline(ss, SMSStr, '|');
     getline(ss, DaysStr, '|');
 
-    if (!PriceStr.empty()) {
-        Price = stod(PriceStr);
-    }
-    if (!DataMBStr.empty()) {
-        DataMB = stoi(DataMBStr);
-    }
-    if (!VoiceMinutesStr.empty()) {
-        VoiceMinutes = stoi(VoiceMinutesStr);
-    } 
-    if (!SMSStr.empty()) {
-        SMS = stoi(SMSStr);
-    }
-    if (!DaysStr.empty()) {
-        Days = stoi(DaysStr);
+    try {
+        if (!PriceStr.empty())        Price = stod(PriceStr);
+        if (!DataMBStr.empty())       DataMB = stoi(DataMBStr);
+        if (!VoiceMinutesStr.empty())  VoiceMinutes = stoi(VoiceMinutesStr);
+        if (!SMSStr.empty())          SMS = stoi(SMSStr);
+        if (!DaysStr.empty())         Days = stoi(DaysStr);
+    } catch (...) {
+        // Phòng thủ bỏ qua nếu parse dữ liệu số thất bại
     }
 }
 
 void Package::getInformation() {
-    PackageName  = InputHelper::getString("Nhap ten goi cuoc: ", false);
-    Price        = InputHelper::getDouble("Nhap gia cuoc VND: ", 0.0);
-    DataMB       = InputHelper::getInt("Nhap dung luong DataMB (MB): ", 0);
-    VoiceMinutes = InputHelper::getInt("Nhap thoi luong cuoc goi (phut): ", 0);
-    SMS          = InputHelper::getInt("Nhap so luong SMS: ", 0);
-    Days         = InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1);
+    ID = InputHelper::getString("Nhap ma goi cuoc: ", false);
+    setName(InputHelper::getString("Nhap ten goi cuoc: ", false));
+    setPrice(InputHelper::getDouble("Nhap gia cuoc VND: ", 0.0));
+    setDataMB(InputHelper::getInt("Nhap dung luong DataMB (MB): ", 0));
+    setVoiceMinutes(InputHelper::getInt("Nhap thoi luong cuoc goi (phut): ", 0));
+    setSMS(InputHelper::getInt("Nhap so luong SMS: ", 0));
+    setDays(InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1));
 }
 
 void Package::display() const {
@@ -106,45 +126,45 @@ int Package::getDays() const {
     return Days;
 }
 
-// Cài đặt setter
+// Cài đặt setter có kiểm tra tính hợp lệ dữ liệu
 void Package::setName(const string& n) {
     if (n.empty()) {
-        throw invalid_argument("Ten goi cuoc khong duoc de trong!");
+        throw InvalidDataException("Ten goi cuoc khong duoc de trong!");
     }
     PackageName = n;
 }
 
 void Package::setPrice(double p) {
     if (p < 0.0) {
-        throw invalid_argument("Gia cuoc khong thể am!");
+        throw InvalidDataException("Gia cuoc khong the am!");
     }
-    Price = p; // Đã sửa lỗi dấu trừ thành dấu gán
+    Price = p;
 }
 
 void Package::setDataMB(int d) {
     if (d < 0) {
-        throw invalid_argument("Dung luong Data khong the am!");
+        throw InvalidDataException("Dung luong Data khong the am!");
     }
     DataMB = d;
 }
 
 void Package::setVoiceMinutes(int v) {
     if (v < 0) {
-        throw invalid_argument("Thoi luong thoai khong the am!");
+        throw InvalidDataException("Thoi luong thoai khong the am!");
     }
-    VoiceMinutes = v; // Đã sửa lỗi dấu trừ thành dấu gán
+    VoiceMinutes = v;
 }
 
 void Package::setSMS(int s) {
     if (s < 0) {
-        throw invalid_argument("So luong SMS khong the am!");
+        throw InvalidDataException("So luong SMS khong the am!");
     }
     SMS = s;
 }
 
 void Package::setDays(int d) {
     if (d <= 0) {
-        throw invalid_argument("Chu ky ngay phai lon hon 0!");
+        throw InvalidDataException("Chu ky ngay phai lon hon 0!");
     }
     Days = d;
 }
@@ -152,8 +172,6 @@ void Package::setDays(int d) {
 // =====================================================================
 // PHẦN 2: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA PACKAGEMENU
 // =====================================================================
-
-// Bước 2: Cài đặt CRUD
 
 void PackageMenu::printHeader() {
     cout << string(85, '-') << "\n";
@@ -186,9 +204,10 @@ void PackageMenu::handleCreate(Repository<Package>& repo) {
     int sms      = InputHelper::getInt("Nhap so luong SMS: ", 0);
     int days     = InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1);
 
-    // 3. Đưa vào RAM và lưu file
+    // 3. Đưa vào RAM và lưu file (kiểm tra hợp lệ qua setter trong constructor)
     try {
-        repo.add(Package(id, name, price, data, voice, sms, days));;
+        Package newPkg(id, name, price, data, voice, sms, days);
+        repo.add(newPkg);
         cout << ">> [THANH CONG] Da them goi cuoc [" << id << "] vao he thong!\n";
     } 
     catch (const exception& e) {
@@ -382,4 +401,6 @@ void PackageMenu::run() {
 // Hàm để main.cpp gọi trực tiếp
 void menuGoiCuoc() {
     PackageMenu::run();
+}
+
 }

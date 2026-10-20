@@ -1,6 +1,18 @@
+/**
+ * ==============================================================================
+ * BÀI TẬP LỚN: HỆ THỐNG QUẢN LÝ THUÊ BAO DI ĐỘNG (NHÓM 06 - ĐỀ TÀI 01)
+ * Học phần: Kỹ thuật lập trình
+ * Người thực hiện: Bùi Gia Khánh
+ * MSSV: B24DCVT191
+ * Module phụ trách: Entity.h (Lớp cơ sở trừu tượng)
+ * Use Case: Quản lý Khách hàng (Customer)
+ * ==============================================================================
+ */
+
 #pragma once
 #include "Entity.h"
 #include "Repository.h"
+#include "Exceptions.h"
 #include <string>
 
 using namespace std;
@@ -10,13 +22,13 @@ using namespace std;
 // ==========================================
 
 class Customer : public Entity {
-    private:
+private:
     string FullName;
     string CCCD;
     string Address;
     string DateOfBirth;
 
-    public:
+public:
     Customer();
     Customer(string ID, string FullName, string CCCD, string Address, string Date);
 
@@ -55,4 +67,6 @@ private:
 };
 
 // Khai báo hàm để main.cpp gọi trực tiếp:
+void menuKhachHang();
+
 void menuKhachHang();
