@@ -33,7 +33,7 @@ void SubType::getInformation() {
 void SubType::display() const {
     cout << left << setw(10) << ID
          << setw(35) << tenLoai
-         << setw(50) << moTa
+         << setw(70) << moTa
          << right << setw(15) << cuocThang << endl;
 }
 
