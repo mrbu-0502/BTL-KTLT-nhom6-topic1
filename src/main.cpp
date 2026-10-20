@@ -14,9 +14,9 @@ void menuLoaiHinh();
 
 void menuKhieuNai();
 
-// void menuThietBi();
+void menuThietBi();
 
-// void menuCuocGoi();
+void menuCuocGoi();
 
 void menuSim();
 

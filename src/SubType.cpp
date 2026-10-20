@@ -92,12 +92,12 @@ void SubType::setCuocThang(long long cuoc) {
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
 // ============================================================================
 static void inTieuDeBangSubType() {
-    cout << string(110, '-') << endl;
+    cout << string(130, '-') << endl;
     cout << left << setw(10) << "Ma Loai"
          << setw(35) << "Ten Loai Hinh"
-         << setw(50) << "Mo Ta"
+         << setw(70) << "Mo Ta"
          << right << setw(15) << "Cuoc Thang (d)" << endl;
-    cout << string(110, '-') << endl;
+    cout << string(130, '-') << endl;
 }
 
 static string sinhMaLoaimoi(Repository<SubType>& repo) {
@@ -113,10 +113,16 @@ static string sinhMaLoaimoi(Repository<SubType>& repo) {
 
     return Maloaimoi.str();
 }
+
+static bool cmp(const SubType& a, const SubType& b) {
+    return a.getID() < b.getID();
+}
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
+//sap xep danh sach va xem danh sach dang co;
 static void xemDanhSachSubType(Repository<SubType>& repo) {
+    repo.sortRecords(cmp);
     vector<SubType> list = repo.getAll();
     if (list.empty()) {
         cout << "Danh sach hien dang trong!\n";
@@ -127,9 +133,10 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
     for (size_t i = 0; i < list.size(); i++) {
         list[i].display();  
     }
-    cout << string(110, '-') << endl;
+    cout << string(130, '-') << endl;
 }
 
+//them moi subtype;
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
     string id = sinhMaLoaimoi(repo);
@@ -146,6 +153,7 @@ static void themMoiSubType(Repository<SubType>& repo) {
     cout << "Them loai hinh thue bao thanh cong!\n";
 }
 
+//tim kiem subtype;
 static void timKiemSubType(Repository<SubType>& repo) {
     cout << "\n=== TIM KIEM LOAI HINH THEO MA ===\n";
     string id = InputHelper::getString("Nhap ma loai hinh can tim (nhap 0 de thoat): ", false);
@@ -167,6 +175,7 @@ static void timKiemSubType(Repository<SubType>& repo) {
     cout << string(95, '-') << endl;
 }
 
+//sua subtype
 static void suaSubType(Repository<SubType>& repo) {
     cout << "\n=== CAP NHAT LOAI HINH THUE BAO ===\n";
     string id = InputHelper::getString("Nhap ma loai hinh can sua (nhap 0 de thoat): ", false);
@@ -198,6 +207,8 @@ static void suaSubType(Repository<SubType>& repo) {
     cout << "Cap nhat loai hinh thue bao thanh cong!\n";
 }
 
+
+//xoa subtype
 static void xoaSubType(Repository<SubType>& repo) {
     cout << "\n=== XOA LOAI HINH THUE BAO ===\n";
     string id = InputHelper::getString("Nhap ma loai hinh can xoa (nhap 0 de thoat): ", false);

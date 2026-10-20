@@ -129,10 +129,18 @@ static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
     return ss.str();
 }
 
+//ham so sanh;
+static bool cmp(const Complaint& a, const Complaint& b) {
+    return a.getID() < b.getID();
+}
+
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
+
+//sap xep va hien thi danh sach;
 static void xemDanhSachComplaint(Repository<Complaint>& repo) {
+    repo.sortRecords(cmp);
     vector<Complaint> list = repo.getAll();
     if (list.empty()) {
         cout << "Danh sach khieu nai hien dang trong!\n";
@@ -146,6 +154,7 @@ static void xemDanhSachComplaint(Repository<Complaint>& repo) {
     cout << string(100, '-') << endl;
 }
 
+//them moi khieu nai;
 static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract ) {
     cout << "\n=== THEM MOI PHIEU KHIEU NAI ===\n";
 
@@ -199,6 +208,8 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     cout << "Them phieu khieu nai thanh cong!\n";
 }
 
+
+//tim kiem ma khieu nai;
 static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\n=== TIM KIEM KHIEU NAI THEO MA ===\n";
     string id = InputHelper::getString("Nhap ma khieu nai can tim (nhap 0 de thoat): ", false);
@@ -220,6 +231,8 @@ static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
     cout << string(98, '-') << endl;
 }
 
+
+//sua ma khieu nai;
 static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract) {
     cout << "\n=== CAP NHAT PHIEU KHIEU NAI ===\n";
     string id = InputHelper::getString("Nhap ma khieu nai can sua (nhap 0 de thoat): ", false);
@@ -286,6 +299,7 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     cout << "Cap nhat phieu khieu nai thanh cong!\n";
 }
 
+//dong ma khieu nai
 static void dongComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\n=== DONG PHIEU KHIEU NAI ===\n";
     string id = InputHelper::getString("Nhap ma khieu nai can dong (nhap 0 de thoat): ", false);
