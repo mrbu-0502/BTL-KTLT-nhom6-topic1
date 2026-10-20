@@ -159,7 +159,7 @@ static bool checkRechargeDate(Repository<Contract>& contractRepo,const string& P
             break;
         }
     }
-    if (rechargeDate.compare(temp) > 0) {
+    if (rechargeDate.compare(temp) >= 0) {
         return true;
     }
     throw InvalidDataException("Ngay nap tien phai lon hon ngay tao hop dong!");
@@ -387,9 +387,14 @@ static void removeRecharge(Repository<Recharge>& repo) {
 }
 void menuNapTien(){
     Repository<Recharge> repo("data/recharges.txt");
-    repo.loadFromFile();
     Repository<Contract> contractRepo("data/contracts.txt");
-    contractRepo.loadFromFile();
+     try {
+        repo.loadFromFile();
+        contractRepo.loadFromFile();
+    } 
+    catch (const exception& e) {
+        cout << "Canh bao: " << e.what() << '\n';
+    }
     int choice = -1;
     do {
         cout << "\n========================================\n";
