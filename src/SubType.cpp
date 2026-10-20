@@ -127,7 +127,7 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
     for (size_t i = 0; i < list.size(); i++) {
         list[i].display();  
     }
-    cout << string(95, '-') << endl;
+    cout << string(110, '-') << endl;
 }
 
 static void themMoiSubType(Repository<SubType>& repo) {
