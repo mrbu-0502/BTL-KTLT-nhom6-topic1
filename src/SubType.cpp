@@ -1,6 +1,7 @@
 #include "SubType.h"
 #include "Repository.h"
 #include "InputHelper.h"
+#include "Sim.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -112,15 +113,12 @@ static string sinhMaLoaimoi(Repository<SubType>& repo) {
     return Maloaimoi.str();
 }
 
-static bool cmp(const SubType& a, const SubType& b) {
-    return a.getID() < b.getID();
-}
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
-//sap xep danh sach va xem danh sach dang co;
+
+//xem danh sach dang co;
 static void xemDanhSachSubType(Repository<SubType>& repo) {
-    repo.sortRecords(cmp);
     vector<SubType> list = repo.getAll();
     if (list.empty()) {
         cout << "Danh sach hien dang trong!\n";
@@ -138,12 +136,20 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
     string id = sinhMaLoaimoi(repo);
-    cout << "Ma loai hinh (tu dong sinh): " << id << endl;
+    cout << "Ma loai hinh: " << id << endl;
 
     string ten = InputHelper::getString("Nhap ten loai hinh (nhap 0 de thoat): ", false);
-    if (ten == "0") return;
+    if (ten == "0"){
+        cout << "Da huy thao tac them moi.\n";
+        return;
+    }
 
-    string moTa = InputHelper::getString("Nhap mo ta: ", false);
+    string moTa = InputHelper::getString("Nhap mo ta(nhap 0 de thoat): ", false);
+    if (moTa == "0"){
+        cout << "Da huy thao tac them moi.\n";
+        return;
+    }
+
     long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
 
     SubType subtypenew(id, ten, moTa, cuoc);
@@ -154,19 +160,25 @@ static void themMoiSubType(Repository<SubType>& repo) {
 //tim kiem subtype;
 static void timKiemSubType(Repository<SubType>& repo) {
     cout << "\n=== TIM KIEM LOAI HINH THEO MA ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can tim (nhap 0 de thoat): ", false);
-    if(id == "0") return;
 
-    if (!InputHelper::checkidvalid(id, "SUB")) {
-        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
-        return;
-    }
+    string id;
+    SubType* p;
+    while(true){
+        id = InputHelper::getString("Nhap ma loai hinh can tim (nhap 0 de thoat): ", false);
+        if(id == "0") return;
 
-    SubType* p = repo.findById(id);
-    if (p == nullptr) {
-        cout << "[Thong bao] Khong tim thay loai hinh co ma: " << id << endl;
-        return;
+        if (!InputHelper::checkidvalid(id, "SUB")) {
+            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            continue;
+        }
+        
+        p = repo.findById(id);
+        if (p == nullptr) {
+            cout << "[Thong bao] Khong tim thay loai hinh co ma: " << id << endl;
+            continue;
+        }
     }
+    
     cout << "\nKet qua tim thay:\n";
     inTieuDeBangSubType();
     p->display();
@@ -176,18 +188,21 @@ static void timKiemSubType(Repository<SubType>& repo) {
 //sua subtype
 static void suaSubType(Repository<SubType>& repo) {
     cout << "\n=== CAP NHAT LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can sua (nhap 0 de thoat): ", false);
-    if (id == "0") return;
+    string id;
+    SubType* p;
+    while(true){
+        id = InputHelper::getString("Nhap ma loai hinh can sua (nhap 0 de thoat): ", false);
+        if (id == "0") return;
 
-    if (!InputHelper::checkidvalid(id, "SUB")) {
-        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
-        return;
-    }
-
-    SubType* p = repo.findById(id);
-    if (p == nullptr) {
-        cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
-        return;
+        if (!InputHelper::checkidvalid(id, "SUB")) {
+            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            continue;
+        }
+        p = repo.findById(id);
+        if (p == nullptr) {
+            cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
+            continue;
+        }
     }
 
     cout << "\nThong tin hien tai:\n";
@@ -202,25 +217,36 @@ static void suaSubType(Repository<SubType>& repo) {
 
     SubType updated(id, tenMoi, moTaMoi, cuocMoi);
     repo.update(id, updated);
-    cout << "Cap nhat loai hinh thue bao thanh cong!\n";
+    cout << "Cap nhat loai hinh thue bao " << id << " thanh cong!\n";
 }
 
 
 //xoa subtype
-static void xoaSubType(Repository<SubType>& repo) {
+static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
     cout << "\n=== XOA LOAI HINH THUE BAO ===\n";
-    string id = InputHelper::getString("Nhap ma loai hinh can xoa (nhap 0 de thoat): ", false);
-    if (id == "0") return;
+    string id;
+    SubType* p;
+    while(true){
+        id = InputHelper::getString("Nhap ma loai hinh can xoa (nhap 0 de thoat): ", false);
+        if (id == "0") return;
+        
+        if (!InputHelper::checkidvalid(id, "SUB")) {
+            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            continue;
+        }
+        p = repo.findById(id);
+        if (p == nullptr) {
+            cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
+            continue;
+        }
 
-    if (!InputHelper::checkidvalid(id, "SUB")) {
-        cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
-        return;
-    }
-
-    SubType* p = repo.findById(id);
-    if (p == nullptr) {
-        cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
-        return;
+        vector<Sim> listSim = repo_sim.getAll();
+        for (size_t i = 0; i < listSim.size(); i++) {
+            if (listSim[i].getMaLoai() == id) {
+                cout << "[Loi] Loai hinh " << id << " khong the xoa vi van con sim dang dung!\n";
+                continue;
+            }
+        }
     }
 
     cout << "\nThong tin can xoa:\n";
@@ -241,7 +267,10 @@ static void xoaSubType(Repository<SubType>& repo) {
 // ============================================================================
 void menuLoaiHinh() {
     Repository<SubType> repo("data/sub_types.txt");
+    Repository<Sim> repo_sim("data/sims.txt");
     repo.loadFromFile();
+    repo_sim.loadFromFile();
+
 
     int chon = -1;
     do {
@@ -262,7 +291,7 @@ void menuLoaiHinh() {
             case 2: themMoiSubType(repo);     break;
             case 3: timKiemSubType(repo);     break;
             case 4: suaSubType(repo);         break;
-            case 5: xoaSubType(repo);         break;
+            case 5: xoaSubType(repo, repo_sim);         break;
             case 0: break;
         }
     } while (chon != 0);
