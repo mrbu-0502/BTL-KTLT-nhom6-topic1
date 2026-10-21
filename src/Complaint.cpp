@@ -244,6 +244,8 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
             cout << "[Loi] Khong tim thay khieu nai co ma: " << id << endl;
             continue;
         }
+
+        break;
     }
     
     //kiem tra xem phieu khieu nai da dong chua;

@@ -177,6 +177,8 @@ static void timKiemSubType(Repository<SubType>& repo) {
             cout << "[Thong bao] Khong tim thay loai hinh co ma: " << id << endl;
             continue;
         }
+
+        break;
     }
     
     cout << "\nKet qua tim thay:\n";
@@ -203,6 +205,8 @@ static void suaSubType(Repository<SubType>& repo) {
             cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
             continue;
         }
+
+        break;
     }
 
     cout << "\nThong tin hien tai:\n";
@@ -247,6 +251,8 @@ static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
                 continue;
             }
         }
+        
+        break;
     }
 
     cout << "\nThong tin can xoa:\n";
