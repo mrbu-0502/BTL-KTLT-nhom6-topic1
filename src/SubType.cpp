@@ -243,18 +243,18 @@ static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
             cout << "[Loi] Khong tim thay loai hinh co ma: " << id << endl;
             continue;
         }
-
-        vector<Sim> listSim = repo_sim.getAll();
-        for (size_t i = 0; i < listSim.size(); i++) {
-            if (listSim[i].getMaLoai() == id) {
-                cout << "[Loi] Loai hinh " << id << " khong the xoa vi van con sim dang dung!\n";
-                continue;
-            }
-        }
         
         break;
     }
 
+    vector<Sim> listSim = repo_sim.getAll();
+    for (size_t i = 0; i < listSim.size(); i++) {
+        if (listSim[i].getMaLoai() == id) {
+            cout << "[Loi] Loai hinh " << id << " khong the xoa vi van con sim dang dung!\n";
+            return;
+        }
+    }
+    
     cout << "\nThong tin can xoa:\n";
     inTieuDeBangSubType();
     p->display();

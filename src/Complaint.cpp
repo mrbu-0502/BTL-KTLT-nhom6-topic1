@@ -206,19 +206,25 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
 //tim kiem ma khieu nai;
 static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\n=== TIM KIEM KHIEU NAI THEO MA ===\n";
-    string id = InputHelper::getString("Nhap ma khieu nai can tim (nhap 0 de thoat): ", false);
-    if (id == "0") return;
+    string id;
+    Complaint* p;
+    while (true) {
+        id = InputHelper::getString("Nhap ma khieu nai can tim (nhap 0 de thoat): ", false);
+        if (id == "0") return;
 
-    if (!InputHelper::checkidvalid(id, "KN")) {
-        cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
-        return;
-    }
+        if (!InputHelper::checkidvalid(id, "KN")) {
+            cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
+            continue;
+        }
+        p = repo_complaint.findById(id);
+        if (p == nullptr) {
+            cout << "[Thong bao] Khong tim thay khieu nai co ma: " << id << endl;
+            continue;
+        }
 
-    Complaint* p = repo_complaint.findById(id);
-    if (p == nullptr) {
-        cout << "[Thong bao] Khong tim thay khieu nai co ma: " << id << endl;
-        return;
+        break;
     }
+    
     cout << "\nKet qua tim thay:\n";
     inTieuDeBangComplaint();
     p->display();
@@ -230,9 +236,9 @@ static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
 static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract) {
     cout << "\n=== CAP NHAT PHIEU KHIEU NAI ===\n";
     Complaint* p;
-
+    string id;
     while(true){
-        string id = InputHelper::getString("Nhap ma khieu nai can sua (nhap 0 de thoat): ", false);
+        id = InputHelper::getString("Nhap ma khieu nai can sua (nhap 0 de thoat): ", false);
         if(id == "0") return;
 
         if (!InputHelper::checkidvalid(id, "KN")) {
@@ -295,31 +301,44 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     
     string trangThaimoi;
     while(true){
-        trangThaimoi = InputHelper::getString("Nhap trang thai moi (TiepNhan / DangXuLy / DaXuLy): ", false);
+        trangThaimoi = InputHelper::getStringOrDefault("Nhap trang thai moi (TiepNhan / DangXuLy / DaXuLy) (enter de giu nguyen): ", p->getTrangThai());
         if(trangThaimoi == "TiepNhan" || trangThaimoi == "DangXuLy" || trangThaimoi == "DaXuLy") break;
         else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
     }
-    Complaint updated(p->getID(), maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaimoi);
-    repo_complaint.update(p->getID(), updated);
-    cout << "Cap nhat phieu khieu nai id: " << p->getID() << " thanh cong!\n";
+    Complaint updated(id, maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaimoi);
+    repo_complaint.update(id, updated);
+    cout << "Cap nhat phieu khieu nai id: " << id << " thanh cong!\n";
 }
 
 //dong ma khieu nai
 static void dongComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\n=== DONG PHIEU KHIEU NAI ===\n";
-    string id = InputHelper::getString("Nhap ma khieu nai can dong (nhap 0 de thoat): ", false);
-    if(id == "0") return;
-    
-    if (!InputHelper::checkidvalid(id, "KN")) {
-        cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
-        return;
-    }
+    string id;
+    Complaint* p;
+    while(true){
+        id = InputHelper::getString("Nhap ma khieu nai can dong (nhap 0 de thoat): ", false);
+        if (id == "0") return;
 
-    Complaint* p = repo_complaint.findById(id);
-    if (p == nullptr) {
-        cout << "[Loi] Khong tim thay khieu nai co ma: " << id << endl;
-        return;
+        if (!InputHelper::checkidvalid(id, "KN")) {
+            cout << "[Loi] Ma khieu nai khong hop le (phai bat dau bang 'KN')!\n";
+            continue;
+        }
+
+        p = repo_complaint.findById(id);
+
+        if (p == nullptr) {
+            cout << "[Thong bao] Khong tim thay khieu nai co ma: " << id << endl;
+            continue;
+        }
+
+        if(p->getTrangThai() == "Dong"){
+            cout << "[Loi] Khieu nai da dong, khong the dong lai!\n";
+            return;
+        }
+            
+        break;
     }
+   
 
     cout << "\nThong tin:\n";
     inTieuDeBangComplaint();
