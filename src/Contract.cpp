@@ -13,10 +13,10 @@ using namespace std;
 // ============================================================================
 // HAM BO TRO
 // ============================================================================
-// Sinh ma ID Hop dong
 static bool cmp(const Contract& a, const Contract& b) {
     return a.getContractID() < b.getContractID();
 }
+// Sinh ma ID Hop dong
 static string generateNextContractID(Repository<Contract>& repo) {
     int count = 1;
     while (true) {

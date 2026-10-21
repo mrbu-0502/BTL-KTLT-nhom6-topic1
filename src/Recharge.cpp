@@ -260,6 +260,7 @@ static void findIDRecharge(Repository<Recharge>& repo){
         if (text == "0") return;
         try {
             Recharge candidate;
+            
             candidate.setRefID(text);
             Recharge* item = repo.findById(text);
             if (item == nullptr) {
