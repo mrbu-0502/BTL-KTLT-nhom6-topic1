@@ -20,7 +20,7 @@ public:
     Complaint(string maKN, string maHD, string ngayGui, string noiDung, string trangThai);
 
     // Cac phuong thuc thuan ao ke thua tu Entity
-    string getID() const override;
+    // Khong override getID(): ma khieu nai da duoc luu trong thuoc tinh ID cua Entity
     void getInformation() override;
     void display() const override;
     string toString() const override;

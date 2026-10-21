@@ -19,9 +19,7 @@ SubType::SubType(string maLoai, string tenLoai, string moTa, long long cuocThang
 // ============================================================================
 // PHUONG THUC KE THUA TU ENTITY
 // ============================================================================
-string SubType::getID() const {
-    return ID;
-}
+// khong override vi da dung id cua entity lam ma loai hinh
 
 void SubType::getInformation() {
     setID(InputHelper::getString("Nhap ma loai hinh (vi du: SUB01): ", false));

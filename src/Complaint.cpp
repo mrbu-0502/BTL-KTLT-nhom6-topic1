@@ -27,10 +27,8 @@ Complaint::Complaint(string maKN, string maHD, string ngayGui, string noiDung, s
 // ============================================================================
 // PHUONG THUC KE THUA TU ENTITY
 // ============================================================================
-string Complaint::getID() const {
-    return ID;
-}
-    
+// Khong override getID(): ma khieu nai chinh la ID cua Entity, getID() cua
+// lop co so da du tra ve dung gia tri nay.
 void Complaint::getInformation() {
     setID(InputHelper::getString("Nhap ma khieu nai (vi du: KN11): ", false));
     setMaHD(InputHelper::getString("Nhap ma hop dong (vi du: HD01): ", false));

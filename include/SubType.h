@@ -19,7 +19,7 @@ public:
     SubType(string maLoai, string tenLoai, string moTa, long long cuocThang);
 
     // Cac phuong thuc thuan ao ke thua tu Entity
-    string getID() const override;
+    // Khong override getID(): ma loai hinh da duoc luu trong thuoc tinh ID cua Entity
     void getInformation() override;
     void display() const override;
     string toString() const override;
