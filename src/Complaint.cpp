@@ -292,8 +292,9 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
             string text = InputHelper::getString("Nhap ngay gui moi (DD/MM/YYYY): ", false);
             ngayguimoi.input(text);
             if(ngayguimoi.compare(ngayHDmoi) >= 0) break;
-            else
-                throw InvalidDataException("Ngay nhap khieu nai khong the som hon ngay tao hop dong!");
+            else {
+                cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!" << endl;
+            }
         }
         catch(const exception& error){
             cout << "Loi: " << error.what() << endl;
