@@ -18,9 +18,9 @@ void menuThietBi();
 
 void menuCuocGoi();
 
-// void menuSim();
+void menuSim();
 
-// void menuHoaDon();
+void menuHoaDon();
 
 void menuNapTien();
 
