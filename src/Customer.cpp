@@ -150,47 +150,70 @@ void CustomerMenu::printHeader() {
     cout << string(78, '-') << "\n";
 }
 
+// ============================================================================
+// CHỨC NĂNG 1: THÊM MỚI KHÁCH HÀNG (CREATE)
+// - Mục đích: Cho phép người dùng nhập thông tin và thêm một khách hàng mới vào hệ thống.
+// - Kỹ thuật áp dụng:
+//   + Kiểm tra trùng lặp Mã khách hàng (Primary Key) qua repo.findById(id).
+//   + Sử dụng InputHelper để nhập dữ liệu an toàn và chống trôi lệnh.
+//   + Áp dụng tính bao gói dữ liệu: Khởi tạo đối tượng Customer, constructor sẽ gọi
+//     các Setter để tự động kiểm tra định dạng CCCD (12 số) và Ngày sinh (dd/mm/yyyy).
+//   + Xử lý ngoại lệ (Exception Handling): Bắt InvalidDataException nếu dữ liệu sai quy cách.
+//   + repo.add() lưu đối tượng vào vector trong bộ nhớ và tự động đồng bộ xuống file text.
+// ============================================================================
 void CustomerMenu::handleCreate(Repository<Customer>& repo) {
     cout << "\n---------------- THEM KHACH HANG MOI ----------------\n";
 
-    // 1. Nhập và kiểm tra mã ID
+    // Bước 1: Nhập mã khách hàng và kiểm tra tính duy nhất (không được trùng)
     string id = InputHelper::getString("Nhap ma khach hang: ", false);
     if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma khach hang da ton tai tren he thong!\n";
         return;
     }
 
-    // 2. Nhập dữ liệu mới
+    // Bước 2: Nhập các thông tin cá nhân của khách hàng
     string name        = InputHelper::getString("Nhap ten khach hang moi: ", false);
     string CCCD        = InputHelper::getString("Nhap CCCD cua khach hang moi (12 chu so): ", false);
     string Address     = InputHelper::getString("Nhap dia chi cua khach hang moi: ", false);
     string DateOfBirth = InputHelper::getString("Nhap ngay sinh cua khach hang moi (dd/mm/yyyy): ", false);
 
-    // 3. Đưa vào RAM và lưu file (kiểm tra tính hợp lệ qua setter trong constructor)
+    // Bước 3: Khởi tạo đối tượng Customer và kiểm tra hợp lệ qua Setter trong Constructor
     try {
         Customer newCus(id, name, CCCD, Address, DateOfBirth);
-        repo.add(newCus);
+        repo.add(newCus); // Thêm vào danh sách bộ nhớ và tự động ghi ra file customers.txt
         cout << ">> [THANH CONG] Da them khach hang [" << id << "] vao he thong!\n";
     }
     catch (const exception& e) {
+        // Bắt lỗi nếu CCCD không đủ 12 số hoặc Ngày sinh không đúng chuẩn dd/mm/yyyy
         cout << ">> [THAT BAI] " << e.what() << "\n";
     }
 }
 
+// ============================================================================
+// CHỨC NĂNG 2: XEM TẤT CẢ KHÁCH HÀNG (READ ALL)
+// - Mục đích: Hiển thị danh sách tất cả khách hàng dưới dạng bảng có căn lề cột.
+// - Kỹ thuật áp dụng:
+//   + Sử dụng tham chiếu const auto& list = repo.getAll() để tối ưu bộ nhớ.
+//   + Kiểm tra danh sách rỗng (list.empty()).
+//   + In tiêu đề bảng bằng printHeader() sử dụng std::setw.
+//   + Duyệt danh sách bằng Range-based for loop C++11 và gọi hàm display().
+// ============================================================================
 void CustomerMenu::handleReadAll(Repository<Customer>& repo) {
     cout << "\n---------------- DANH SACH KHACH HANG ----------------\n";
+    
+    // Bước 1: Lấy danh sách khách hàng từ Repository
     const auto& list = repo.getAll();
 
-    // 1: Kiểm tra rỗng
+    // Bước 2: Kiểm tra danh sách rỗng
     if (list.empty()) {
         cout << ">> Danh sach khach hang hien dang trong!\n";
         return;
     }
 
-    // 2: In tiêu đề
+    // Bước 3: In tiêu đề bảng các cột
     printHeader();
 
-    // 3: Duyệt và gọi display() của từng đối tượng
+    // Bước 4: Duyệt qua từng đối tượng và gọi phương thức display() để hiển thị
     for (const auto& cus : list) {
         cus.display();
     }
@@ -198,15 +221,23 @@ void CustomerMenu::handleReadAll(Repository<Customer>& repo) {
     cout << ">> Tong so luong: " << list.size() << " khach hang.\n";
 }
 
+// ============================================================================
+// CHỨC NĂNG 3: TÌM KIẾM KHÁCH HÀNG THEO MÃ (READ / SEARCH)
+// - Mục đích: Tra cứu thông tin hồ sơ của khách hàng theo Mã khách hàng.
+// - Kỹ thuật áp dụng:
+//   + Tra cứu nhanh trên RAM thông qua repo.findById(id).
+//   + Kiểm tra con trỏ nullptr để thông báo kết quả chính xác, tránh truy cập vùng nhớ rác.
+// ============================================================================
 void CustomerMenu::handleSearch(Repository<Customer>& repo) {
     cout << "\n---------------- TIM KIEM KHACH HANG ----------------\n";
-    // 1: Nhập mã cần xem
+    
+    // Bước 1: Nhập mã khách hàng cần tìm
     string id = InputHelper::getString("Nhap ma khach hang can xem: ", false);
 
-    // 2: Tìm trực tiếp đối tượng mang mã đó trong vector
+    // Bước 2: Tìm kiếm đối tượng mang mã tương ứng trong vector
     auto* cus = repo.findById(id);
 
-    // 3: Xử lý kết quả
+    // Bước 3: Hiển thị thông tin chi tiết nếu tìm thấy hoặc thông báo không tồn tại
     if (cus == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << "\n";
         return;
@@ -325,9 +356,20 @@ void CustomerMenu::handleSort(Repository<Customer>& repo) {
     cout << ">> Tong so luong: " << list.size() << " khach hang.\n";
 }
 
+// ============================================================================
+// CHỨC NĂNG 5: CẬP NHẬT THÔNG TIN KHÁCH HÀNG (UPDATE)
+// - Mục đích: Cập nhật thông tin cá nhân (Họ tên, CCCD, Địa chỉ, Ngày sinh).
+// - Quy tắc nghiệp vụ & Kỹ thuật:
+//   + Mã khách hàng (ID) giữ vai trò định danh duy nhất, KHÔNG được sửa đổi.
+//   + Hỗ trợ phím ENTER để giữ nguyên thông tin cũ (chỉ cập nhật trường có dữ liệu mới).
+//   + Xác thực chặt chẽ qua các hàm Setter (setCCCD, setDateOfBirth,...).
+//   + Cơ chế Exception Handling: Thông báo lỗi và không làm biến đổi dữ liệu cũ nếu sai.
+//   + Gọi repo.saveToFile() để lưu thay đổi xuống file customers.txt.
+// ============================================================================
 void CustomerMenu::handleUpdate(Repository<Customer>& repo) {
     cout << "\n---------------- CAP NHAT KHACH HANG ----------------\n";
-    // 1: Nhập Id và kiểm tra có khách hàng cần cập nhật không 
+    
+    // Bước 1: Nhập mã khách hàng cần sửa và kiểm tra tồn tại
     string id = InputHelper::getString("Nhap ma khach hang can sua: ", false);
     auto* cus = repo.findById(id);
     if (cus == nullptr) {
@@ -335,27 +377,27 @@ void CustomerMenu::handleUpdate(Repository<Customer>& repo) {
         return; 
     }
     
-    // 2: In để hiện thị thông tin hiện tại
+    // Bước 2: Hiển thị thông tin hiện tại của khách hàng để người dùng đối chiếu
     cout << "\n>> Thong tin hien tai cua khach hang:\n";
     printHeader();
     cus->display();
     cout << string(78, '-') << "\n";
     cout << "(Luu y: Nhan Enter de trong neu muon GIU NGUYEN thong tin cu. Ma khach hang khong duoc sua)\n\n";
     
-    // 3: Nhập dữ liệu mới dưới dạng chuỗi để kiểm tra rỗng
+    // Bước 3: Nhập dữ liệu mới (cho phép bỏ trống: allowEmpty = true)
     string newName        = InputHelper::getString("Nhap ten khach hang moi: ", true);
     string newCCCD        = InputHelper::getString("Nhap CCCD cua khach hang moi: ", true);
     string newAddress     = InputHelper::getString("Nhap dia chi cua khach hang moi: ", true);
     string newDateOfBirth = InputHelper::getString("Nhap ngay sinh moi: ", true);
 
-    // 4 & 5: Kiểm tra qua Setter và Ghi lại file
+    // Bước 4 & 5: Kiểm tra tính hợp lệ qua Setter và ghi lại vào file
     try {
         if (!newName.empty())        cus->setFullName(newName);
-        if (!newCCCD.empty())        cus->setCCCD(newCCCD);
+        if (!newCCCD.empty())        cus->setCCCD(newCCCD); // Kiểm tra đúng 12 chữ số
         if (!newAddress.empty())     cus->setAddress(newAddress);
-        if (!newDateOfBirth.empty()) cus->setDateOfBirth(newDateOfBirth);
+        if (!newDateOfBirth.empty()) cus->setDateOfBirth(newDateOfBirth); // Kiểm tra dd/mm/yyyy
 
-        repo.saveToFile();
+        repo.saveToFile(); // Lưu danh sách từ RAM xuống file customers.txt
         cout << "\n>> [THANH CONG] Da cap nhat thong tin khach hang [" << id << "] thanh cong!\n";
     }
     catch (const exception& e) {
@@ -363,10 +405,19 @@ void CustomerMenu::handleUpdate(Repository<Customer>& repo) {
     }
 }
 
+// ============================================================================
+// CHỨC NĂNG 6: XÓA KHÁCH HÀNG (DELETE)
+// - Mục đích: Xóa hồ sơ khách hàng khỏi hệ thống nếu không còn hợp đồng sử dụng.
+// - Kỹ thuật & Ràng buộc toàn vẹn khóa ngoại (Foreign Key):
+//   + Quét file hợp đồng (contracts.txt).
+//   + Nếu khách hàng đang đứng tên hợp đồng thuê bao -> TUYỆT ĐỐI KHÔNG XÓA.
+//   + Xác nhận 2 bước (y/n) trước khi thực thi lệnh xóa.
+//   + Gọi repo.remove(id) để giải phóng vùng nhớ và lưu lại file.
+// ============================================================================
 void CustomerMenu::handleDelete(Repository<Customer>& repo) {
     cout << "\n---------------- XOA KHACH HANG ----------------\n";
     
-    // Bước 1: Nhập mã và tìm kiếm khách hàng trong RAM
+    // Bước 1: Nhập mã và kiểm tra khách hàng có tồn tại trong hệ thống không
     string id = InputHelper::getString("Nhap ma khach hang can xoa: ", false);
     Customer* cus = repo.findById(id);
     
@@ -375,13 +426,13 @@ void CustomerMenu::handleDelete(Repository<Customer>& repo) {
         return;
     }
 
-    // Bước 2: Hiển thị thông tin khách hàng để người dùng kiểm tra lại
+    // Bước 2: Hiển thị lại thông tin khách hàng chuẩn bị xóa
     cout << "\n>> Thong tin khach hang duoc chon de xoa:\n";
     printHeader();
     cus->display();
     cout << string(78, '-') << "\n";
 
-    // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (đọc từ contracts.txt)
+    // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (liên kết với hợp đồng)
     Repository<Contract> contractRepo("data/contracts.txt");
     try {
         contractRepo.loadFromFile();
@@ -389,21 +440,22 @@ void CustomerMenu::handleDelete(Repository<Customer>& repo) {
 
     bool isLinked = false;
     for (const auto& contract : contractRepo.getAll()) {
-        if (contract.getCustomerID() == id) { // Dùng getCustomerID() theo Contract.h
+        if (contract.getCustomerID() == id) { // getCustomerID() lưu mã khách hàng trong hợp đồng
             isLinked = true;
             break;
         }
     } 
+    // Nếu khách hàng đang có hợp đồng -> Từ chối xóa để đảm bảo toàn vẹn dữ liệu
     if (isLinked) {
         cout << ">> [Tu choi xoa]: Khach hang [" << id 
              << "] dang dung ten trong hop dong, khong duoc phep xoa!\n";
         return;
     }
     
-    // 4: Hỏi xác nhận có cần xóa không và lưu file
+    // Bước 4: Hỏi xác nhận an toàn từ người dùng
     string confirm = InputHelper::getString("Ban co chac chan muon xoa? (y/n): ", false);
     if (confirm == "y" || confirm == "Y") {
-        repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector
+        repo.remove(id); // Xóa phần tử khỏi vector và cập nhật lại file customers.txt
         cout << ">> [THANH CONG] Xoa thanh cong khach hang [" << id << "]!\n";
     } else {
         cout << ">> [THONG BAO] Thao tac xoa da duoc huy bo an toan.\n";
@@ -411,11 +463,11 @@ void CustomerMenu::handleDelete(Repository<Customer>& repo) {
 }
 
 // =====================================================================
-// PHẦN 4: MENU CONSOLE ĐIỀU KHIỂN
+// PHẦN 4: MENU CONSOLE ĐIỀU KHIỂN CHÍNH CỦA KHÁCH HÀNG
 // =====================================================================
 
 void CustomerMenu::run() {
-    // Tự khởi tạo Repository và nạp dữ liệu từ file khi mở menu
+    // Tự khởi tạo Repository và nạp dữ liệu từ file customers.txt vào RAM khi mở menu
     Repository<Customer> repo("data/customers.txt");
     try {
         repo.loadFromFile();

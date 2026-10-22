@@ -186,18 +186,27 @@ void PackageMenu::printHeader() {
     cout << string(85, '-') << "\n";
 }
 
-// 1: CREATE (Thêm mới gói cước)
+// ============================================================================
+// CHỨC NĂNG 1: THÊM MỚI GÓI CƯỚC (CREATE)
+// - Mục đích: Cho phép người dùng nhập thông tin và thêm một gói cước mới vào hệ thống.
+// - Kỹ thuật áp dụng:
+//   + Kiểm tra tính duy nhất của Mã gói cước (Primary Key không được trùng).
+//   + Sử dụng InputHelper để bắt lỗi nhập liệu (chống tràn bộ đệm, ép kiểu an toàn).
+//   + Áp dụng tính đóng gói: Constructor gọi các Setter để validate dữ liệu đầu vào.
+//   + Cơ chế Exception Handling: Bắt InvalidDataException nếu thông số vi phạm nghiệp vụ.
+//   + Đồng bộ hóa: repo.add() vừa nạp vào vector trong RAM, vừa ghi tự động ra file text.
+// ============================================================================
 void PackageMenu::handleCreate(Repository<Package>& repo) {
     cout << "\n---------------- THEM GOI CUOC MOI ----------------\n";
     
-    // 1. Nhập và kiểm tra mã ID
+    // Bước 1: Nhập mã gói cước và kiểm tra trùng lặp khóa chính
     string id = InputHelper::getString("Nhap ma goi cuoc: ", false);
     if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma goi cuoc da ton tai tren he thong!\n";
-        return;
+        return; // Dừng thao tác thêm nếu mã đã tồn tại
     }
 
-    // 2. Nhập dữ liệu mới
+    // Bước 2: Nhập các thông tin chi tiết của gói cước mới
     string name  = InputHelper::getString("Nhap ten goi cuoc: ", false);
     double price = InputHelper::getDouble("Nhap gia cuoc VND: ", 0.0);
     int data     = InputHelper::getInt("Nhap dung luong DataMB (MB): ", 0);
@@ -205,32 +214,45 @@ void PackageMenu::handleCreate(Repository<Package>& repo) {
     int sms      = InputHelper::getInt("Nhap so luong SMS: ", 0);
     int days     = InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1);
 
-    // 3. Đưa vào RAM và lưu file (kiểm tra hợp lệ qua setter trong constructor)
+    // Bước 3: Khởi tạo đối tượng Package và thêm vào Repository
+    // Toàn bộ logic kiểm tra tính hợp lệ dữ liệu (giá > 0, chu kỳ > 0, ...)
+    // được kiểm tra thông qua các Setter bên trong constructor của Package.
     try {
         Package newPkg(id, name, price, data, voice, sms, days);
-        repo.add(newPkg);
+        repo.add(newPkg); // Thêm vào std::vector và tự động đồng bộ ghi ra file text
         cout << ">> [THANH CONG] Da them goi cuoc [" << id << "] vao he thong!\n";
     } 
     catch (const exception& e) {
+        // Bắt ngoại lệ InvalidDataException ném ra từ các Setter nếu dữ liệu vi phạm
         cout << ">> [THAT BAI] " << e.what() << "\n";
     }
 }
 
-// 2: READ ALL (Hiển thị tất cả)
+// ============================================================================
+// CHỨC NĂNG 2: XEM TẤT CẢ GÓI CƯỚC (READ ALL)
+// - Mục đích: Hiển thị toàn bộ danh sách gói cước hiện có theo định dạng bảng ngay ngắn.
+// - Kỹ thuật áp dụng:
+//   + Lấy tham chiếu hằng (const auto& list) để tránh sao chép dữ liệu, tối ưu hiệu năng.
+//   + Kiểm tra danh sách rỗng trước khi hiển thị.
+//   + Sử dụng hàm printHeader() kết hợp std::setw để căn chỉnh cột ngay thẳng.
+//   + Range-based for loop (C++11) duyệt qua từng phần tử và gọi phương thức display().
+// ============================================================================
 void PackageMenu::handleReadAll(Repository<Package>& repo) { 
     cout << "\n---------------- DANH SACH GOI CUOC ----------------\n";
+    
+    // Bước 1: Lấy tham chiếu danh sách gói cước từ Repository
     const auto& list = repo.getAll();
     
-    // 1: Kiểm tra rỗng
+    // Bước 2: Kiểm tra nếu danh sách rỗng thì thông báo và thoát
     if (list.empty()) {
         cout << ">> [THONG BAO] Danh sach goi cuoc hien tai dang trong!\n";
         return;
     }
     
-    // 2: In tiêu đề
+    // Bước 3: In dòng tiêu đề bảng với các cột được định dạng cố định
     printHeader();
     
-    // 3: Duyệt và gọi display() của từng đối tượng
+    // Bước 4: Duyệt toàn bộ danh sách và gọi phương thức display() của từng đối tượng
     for (const auto& pkg : list) {
         pkg.display();  
     }
@@ -238,16 +260,24 @@ void PackageMenu::handleReadAll(Repository<Package>& repo) {
     cout << ">> Tong so luong: " << list.size() << " goi cuoc.\n";
 }
 
-// 3: SEARCH (Tìm kiếm)
+// ============================================================================
+// CHỨC NĂNG 3: TÌM KIẾM GÓI CƯỚC THEO MÃ (READ / SEARCH)
+// - Mục đích: Tra cứu và xem chi tiết thông tin của một gói cước theo mã ID.
+// - Kỹ thuật áp dụng:
+//   + Tìm kiếm trực tiếp trên bộ nhớ RAM qua repo.findById(id).
+//   + Xử lý trường hợp con trỏ nullptr an toàn (nếu không tìm thấy đối tượng).
+//   + Tái sử dụng printHeader() và display() để hiển thị thông tin nhất quán.
+// ============================================================================
 void PackageMenu::handleSearch(Repository<Package>& repo) {
     cout << "\n---------------- TIM KIEM GOI CUOC ----------------\n";
-    // 1: Nhập mã cần xem
+    
+    // Bước 1: Nhập mã gói cước cần tra cứu
     string id = InputHelper::getString("Nhap ma goi can tim: ", false);
     
-    // 2: Tìm trực tiếp đối tượng mang mã đó trong vector
+    // Bước 2: Tìm kiếm đối tượng trong vector bộ nhớ
     auto* pkg = repo.findById(id);
     
-    // 3: Xử lý kết quả
+    // Bước 3: Kiểm tra và hiển thị kết quả
     if (pkg == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
         return;
@@ -339,10 +369,20 @@ void PackageMenu::handleSort(Repository<Package>& repo) {
     cout << ">> Tong so luong: " << list.size() << " goi cuoc.\n";
 }
 
-// 5: UPDATE (Cập nhật)
+// ============================================================================
+// CHỨC NĂNG 5: CẬP NHẬT THÔNG TIN GÓI CƯỚC (UPDATE)
+// - Mục đích: Cập nhật thông tin gói cước (Tên, Giá, Data, Thoại, SMS, Chu kỳ).
+// - Quy tắc nghiệp vụ:
+//   + Mã gói cước (ID) là khóa chính cố định, KHÔNG được phép thay đổi.
+//   + Cho phép người dùng nhấn phím ENTER (để chuỗi rỗng) để GIỮ NGUYÊN giá trị cũ,
+//     chỉ cập nhật những thông tin mà người dùng nhập giá trị mới.
+//   + Sử dụng các hàm Setter để validate toàn bộ dữ liệu cập nhật.
+//   + Sau khi cập nhật thành công trong RAM, gọi repo.saveToFile() để lưu xuống file.
+// ============================================================================
 void PackageMenu::handleUpdate(Repository<Package>& repo) {
     cout << "\n---------------- CAP NHAT THONG TIN GOI CUOC ----------------\n";
-    // 1: Nhập Id và kiểm tra có gói cước cần cập nhật không 
+    
+    // Bước 1: Nhập mã gói cước cần sửa và kiểm tra tồn tại
     string id = InputHelper::getString("Nhap ma goi cuoc can sua: ", false);
     auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
@@ -350,14 +390,14 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
         return; 
     }
     
-    // 2: In để hiện thị thông tin hiện tại
+    // Bước 2: Hiển thị thông tin hiện tại của gói cước để người dùng dễ quan sát
     cout << "\n>> Thong tin hien tai cua goi cuoc:\n";
     printHeader();
     pkg->display();
     cout << string(85, '-') << "\n";
     cout << "(Luu y: Nhan Enter de trong neu muon GIU NGUYEN thong tin cu. Ma goi cuoc khong duoc sua)\n\n";
     
-    // 3: Nhập dữ liệu mới dưới dạng chuỗi để kiểm tra rỗng
+    // Bước 3: Nhập dữ liệu mới dưới dạng chuỗi (cho phép rỗng: allowEmpty = true)
     string newName  = InputHelper::getString("Nhap ten goi cuoc moi: ", true);
     string priceStr = InputHelper::getString("Nhap gia cuoc moi (VND): ", true);
     string dataStr  = InputHelper::getString("Nhap dung luong DataMB moi (MB): ", true);
@@ -365,38 +405,51 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
     string smsStr   = InputHelper::getString("Nhap so luong SMS moi: ", true);
     string daysStr  = InputHelper::getString("Nhap chu ky goi cuoc moi (ngay): ", true);
     
-    // 4 & 5: Kiểm tra qua Setter và Ghi lại file
+    // Bước 4 & 5: Kiểm tra tính hợp lệ qua Setter và ghi đồng bộ ra file
     try {
+        // Chỉ cập nhật nếu người dùng nhập dữ liệu mới (chuỗi không rỗng)
         if (!newName.empty()) {
             pkg->setName(newName);
         }
         if (!priceStr.empty()) {
-            pkg->setPrice(stod(priceStr));
+            pkg->setPrice(stod(priceStr)); // Ép kiểu string sang double và kiểm tra > 0 qua setPrice
         }
         if (!dataStr.empty()) {
-            pkg->setDataMB(stoi(dataStr));
+            pkg->setDataMB(stoi(dataStr));  // Ép kiểu string sang int và kiểm tra >= 0 qua setDataMB
         }
         if (!voiceStr.empty()) {
-            pkg->setVoiceMinutes(stoi(voiceStr));
+            pkg->setVoiceMinutes(stoi(voiceStr)); // Kiểm tra >= 0 qua setVoiceMinutes
         }
         if (!smsStr.empty()) {
-            pkg->setSMS(stoi(smsStr));
+            pkg->setSMS(stoi(smsStr)); // Kiểm tra >= 0 qua setSMS
         }
         if (!daysStr.empty()) {
-            pkg->setDays(stoi(daysStr));
+            pkg->setDays(stoi(daysStr)); // Kiểm tra >= 1 qua setDays
         }
+
+        // Lưu toàn bộ danh sách đã cập nhật từ RAM xuống file database/packages.txt
         repo.saveToFile();
         cout << "\n>> [THANH CONG] Da cap nhat thong tin goi cuoc [" << id << "] thanh cong!\n";
     }
     catch (const exception& e) {
+        // Bắt lỗi nếu người dùng nhập số âm hoặc định dạng không hợp lệ
         cout << "\n>> [THAT BAI] Khong the cap nhat: " << e.what() << "\n";
     }
 }
 
-// 6: DELETE (Xóa)
+// ============================================================================
+// CHỨC NĂNG 6: XÓA GÓI CƯỚC (DELETE)
+// - Mục đích: Xóa một gói cước ra khỏi hệ thống nếu không còn ràng buộc.
+// - Kỹ thuật & Ràng buộc toàn vẹn dữ liệu:
+//   + Kiểm tra xem gói cước có đang được sử dụng trong hợp đồng nào không (Foreign Key).
+//   + Nếu đang có hợp đồng sử dụng (contracts.txt chứa mã gói này) -> TUYỆT ĐỐI KHÔNG XÓA.
+//   + Hỏi xác nhận người dùng (y/n) trước khi thực hiện hành động xóa.
+//   + repo.remove() sẽ xóa khỏi vector và ghi đồng bộ lại file dữ liệu.
+// ============================================================================
 void PackageMenu::handleDelete(Repository<Package>& repo) {
     cout << "\n---------------- XOA GOI CUOC ----------------\n";
-    // 1: Nhập Id và kiểm tra có gói cước xóa không
+    
+    // Bước 1: Nhập mã gói cước và kiểm tra xem có tồn tại trong hệ thống không
     string id = InputHelper::getString("Nhap ma goi cuoc can xoa: ", false);
     auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
@@ -404,37 +457,40 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
         return; 
     }
     
-    // 2: In để hiển thị thông tin hiện tại
+    // Bước 2: Hiển thị lại thông tin gói cước chuẩn bị xóa
     cout << "\n>> Thong tin hien tai cua goi cuoc:\n";
     printHeader();
     pkg->display();
     cout << string(85, '-') << "\n";
     
-    // 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại trước khi xóa (liên quan tới contracts.txt)
-    Repository<Contract> contractRepo("data/contracts.txt"); // Đường dẫn đến file hợp đồng của nhóm
+    // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (Foreign Key Integrity)
+    // Một gói cước chỉ được xóa khi không có hợp đồng nào đang đăng ký gói đó.
+    Repository<Contract> contractRepo("data/contracts.txt"); // Nạp danh sách hợp đồng
     try {
         contractRepo.loadFromFile();
     } catch (...) {
-        // Nếu file hợp đồng chưa có dữ liệu hoặc chưa tạo thì bỏ qua
+        // Nếu file hợp đồng chưa có dữ liệu hoặc chưa tạo thì bỏ qua lỗi đọc file
     }
 
     bool isLinked = false;
     for (const auto& contract : contractRepo.getAll()) {
-        if (contract.getPhonePlan() == id) { // Dùng getPhonePlan() theo đúng Contract.h
+        if (contract.getPhonePlan() == id) { // getPhonePlan() lưu mã gói cước đăng ký
             isLinked = true;
             break;
         }
     }
 
+    // Nếu tìm thấy gói cước này đang liên kết với hợp đồng -> Từ chối xóa
     if (isLinked) {
         cout << ">> [Tu choi xoa]: Goi cuoc [" << id 
              << "] dang ton tai trong hop dong khach hang, khong duoc phep xoa!\n";
         return;
     }
-    // 4: Hỏi xác nhận có cần xóa không và lưu file
+
+    // Bước 4: Hỏi xác nhận người dùng (xác nhận 2 bước an toàn)
     string confirm = InputHelper::getString("Ban co chac chan muon xoa? (y/n): ", false);
     if (confirm == "y" || confirm == "Y") {
-        repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector
+        repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector, đồng thời cập nhật file
         cout << ">> [THANH CONG] Xoa thanh cong goi cuoc [" << id << "]!\n";
     } else {
         cout << ">> [THONG BAO] Thao tac xoa da duoc huy bo an toan.\n";
@@ -442,11 +498,11 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
 }
 
 // =====================================================================
-// PHẦN 3: MENU CONSOLE ĐIỀU KHIỂN
+// PHẦN 3: MENU CONSOLE ĐIỀU KHIỂN CHÍNH CỦA GÓI CƯỚC
 // =====================================================================
 
 void PackageMenu::run() {
-    // Tự khởi tạo Repository và đọc dữ liệu từ file khi mở menu
+    // Khởi tạo Repository và nạp dữ liệu từ file packages.txt vào RAM khi mở menu
     Repository<Package> repo("data/packages.txt");
     try {
         repo.loadFromFile();
@@ -481,7 +537,7 @@ void PackageMenu::run() {
     } while (choice != 0);
 }
 
-// Hàm để main.cpp gọi trực tiếp
+// Hàm bao ngoài để main.cpp có thể gọi trực tiếp
 void menuGoiCuoc() {
     PackageMenu::run();
 }
