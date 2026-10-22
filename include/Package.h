@@ -67,6 +67,7 @@ private:
     static void handleCreate(Repository<Package>& repo);
     static void handleReadAll(Repository<Package>& repo);
     static void handleSearch(Repository<Package>& repo);
+    static void handleSort(Repository<Package>& repo);
     static void handleUpdate(Repository<Package>& repo);
     static void handleDelete(Repository<Package>& repo);
     static void printHeader();

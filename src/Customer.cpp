@@ -20,6 +20,7 @@
 #include <vector>           // Chứa danh sách dữ liệu trong Repository
 #include <sstream>          // Tách/ghép chuỗi qua dấu '|'
 #include <cctype>           // Dùng hàm isdigit() kiểm tra 12 số CCCD
+#include <algorithm>        // Thuật toán sort và biểu thức lambda
 
 using namespace std; 
 
@@ -218,6 +219,78 @@ void CustomerMenu::handleSearch(Repository<Customer>& repo) {
     }
 }
 
+void CustomerMenu::handleSort(Repository<Customer>& repo) {
+    cout << "\n---------------- SAP XEP KHACH HANG ----------------\n";
+    vector<Customer> list = repo.getAll();
+    if (list.empty()) {
+        cout << ">> Danh sach khach hang hien dang trong!\n";
+        return;
+    }
+
+    cout << "  1. Ho ten (A -> Z)\n";
+    cout << "  2. Ho ten (Z -> A)\n";
+    cout << "  3. Ma khach hang tang dan\n";
+    cout << "  4. Ngay sinh (Cu -> Moi nhat)\n";
+    cout << "  0. Quay lai\n";
+    int subChoice = InputHelper::getInt("Nhap tieu chi sap xep (0-4): ", 0, 4);
+
+    if (subChoice == 0) return;
+
+    auto layTen = [](const string& hoTen) {
+        size_t pos = hoTen.rfind(' ');
+        if (pos != string::npos) return hoTen.substr(pos + 1);
+        return hoTen;
+    };
+
+    switch (subChoice) {
+        case 1:
+            sort(list.begin(), list.end(), [&](const Customer& a, const Customer& b) {
+                string tenA = layTen(a.getFullName());
+                string tenB = layTen(b.getFullName());
+                if (tenA != tenB) return tenA < tenB;
+                return a.getFullName() < b.getFullName();
+            });
+            cout << "\n>> DANH SACH KHACH HANG (HO TEN A -> Z):\n";
+            break;
+        case 2:
+            sort(list.begin(), list.end(), [&](const Customer& a, const Customer& b) {
+                string tenA = layTen(a.getFullName());
+                string tenB = layTen(b.getFullName());
+                if (tenA != tenB) return tenA > tenB;
+                return a.getFullName() > b.getFullName();
+            });
+            cout << "\n>> DANH SACH KHACH HANG (HO TEN Z -> A):\n";
+            break;
+        case 3:
+            sort(list.begin(), list.end(), [](const Customer& a, const Customer& b) {
+                return a.getID() < b.getID();
+            });
+            cout << "\n>> DANH SACH KHACH HANG (MA KH TANG DAN):\n";
+            break;
+        case 4:
+            sort(list.begin(), list.end(), [](const Customer& a, const Customer& b) {
+                string dA = a.getDateOfBirth();
+                string dB = b.getDateOfBirth();
+                auto convertDate = [](const string& d) {
+                    if (d.length() >= 10) {
+                        return d.substr(6, 4) + d.substr(3, 2) + d.substr(0, 2);
+                    }
+                    return d;
+                };
+                return convertDate(dA) < convertDate(dB);
+            });
+            cout << "\n>> DANH SACH KHACH HANG (NGAY SINH CU -> MOI):\n";
+            break;
+    }
+
+    printHeader();
+    for (const auto& cus : list) {
+        cus.display();
+    }
+    cout << string(78, '-') << "\n";
+    cout << ">> Tong so luong: " << list.size() << " khach hang.\n";
+}
+
 void CustomerMenu::handleUpdate(Repository<Customer>& repo) {
     cout << "\n---------------- CAP NHAT KHACH HANG ----------------\n";
     // 1: Nhập Id và kiểm tra có khách hàng cần cập nhật không 
@@ -320,23 +393,25 @@ void CustomerMenu::run() {
         cout << "  1. Them khach hang moi\n";
         cout << "  2. Xem danh sach khach hang\n";
         cout << "  3. Tim kiem khach hang\n";
-        cout << "  4. Cap nhat thong tin khach hang\n";
-        cout << "  5. Xoa khach hang\n";
+        cout << "  4. Sap xep danh sach khach hang\n";
+        cout << "  5. Cap nhat thong tin khach hang\n";
+        cout << "  6. Xoa khach hang\n";
         cout << "  0. Quay lai menu chinh\n";
         cout << "==========================================\n";
-        choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
+        choice = InputHelper::getInt("Nhap lua chon: ", 0, 6);
 
         switch (choice) {
             case 1: handleCreate(repo);   break;
             case 2: handleReadAll(repo);  break;
             case 3: handleSearch(repo);   break;
-            case 4: handleUpdate(repo);   break;
-            case 5: handleDelete(repo);   break;
+            case 4: handleSort(repo);     break;
+            case 5: handleUpdate(repo);   break;
+            case 6: handleDelete(repo);   break;
             case 0:
                 cout << ">> Dang quay lai Menu chinh...\n";
                 break;
             default:
-                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 5!\n";
+                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 6!\n";
         }
     } while (choice != 0);
 }

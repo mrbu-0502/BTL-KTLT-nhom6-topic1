@@ -18,6 +18,7 @@
 #include <string>           // Xử lý chuỗi string
 #include <vector>           // Chứa danh sách dữ liệu trong Repository
 #include <sstream>          // Tách/ghép chuỗi qua stringstream (toString, fromString)
+#include <algorithm>        // Thuật toán sort và biểu thức lambda
 
 using namespace std;
 
@@ -258,7 +259,60 @@ void PackageMenu::handleSearch(Repository<Package>& repo) {
     }
 }
 
-// 4: UPDATE (Cập nhật)
+// 4: SORT (Sắp xếp danh sách gói cước)
+void PackageMenu::handleSort(Repository<Package>& repo) {
+    cout << "\n---------------- SAP XEP GOI CUOC ----------------\n";
+    vector<Package> list = repo.getAll();
+    if (list.empty()) {
+        cout << ">> [THONG BAO] Danh sach goi cuoc hien tai dang trong!\n";
+        return;
+    }
+
+    cout << "  1. Gia cuoc tang dan\n";
+    cout << "  2. Gia cuoc giam dan\n";
+    cout << "  3. Dung luong Data (MB) tang dan\n";
+    cout << "  4. Ten goi cuoc (A -> Z)\n";
+    cout << "  0. Quay lai\n";
+    int subChoice = InputHelper::getInt("Nhap tieu chi sap xep (0-4): ", 0, 4);
+
+    if (subChoice == 0) return;
+
+    switch (subChoice) {
+        case 1:
+            sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
+                return a.getPrice() < b.getPrice();
+            });
+            cout << "\n>> DANH SACH GOI CUOC (GIA CUOC TANG DAN):\n";
+            break;
+        case 2:
+            sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
+                return a.getPrice() > b.getPrice();
+            });
+            cout << "\n>> DANH SACH GOI CUOC (GIA CUOC GIAM DAN):\n";
+            break;
+        case 3:
+            sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
+                return a.getDataMB() < b.getDataMB();
+            });
+            cout << "\n>> DANH SACH GOI CUOC (DATA MB TANG DAN):\n";
+            break;
+        case 4:
+            sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
+                return a.getName() < b.getName();
+            });
+            cout << "\n>> DANH SACH GOI CUOC (TEN GOI A -> Z):\n";
+            break;
+    }
+
+    printHeader();
+    for (const auto& pkg : list) {
+        pkg.display();
+    }
+    cout << string(85, '-') << "\n";
+    cout << ">> Tong so luong: " << list.size() << " goi cuoc.\n";
+}
+
+// 5: UPDATE (Cập nhật)
 void PackageMenu::handleUpdate(Repository<Package>& repo) {
     cout << "\n---------------- CAP NHAT THONG TIN GOI CUOC ----------------\n";
     // 1: Nhập Id và kiểm tra có gói cước cần cập nhật không 
@@ -312,7 +366,7 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
     }
 }
 
-// 5: DELETE (Xóa)
+// 6: DELETE (Xóa)
 void PackageMenu::handleDelete(Repository<Package>& repo) {
     cout << "\n---------------- XOA GOI CUOC ----------------\n";
     // 1: Nhập Id và kiểm tra có gói cước xóa không
@@ -377,23 +431,25 @@ void PackageMenu::run() {
         cout << "  1. Them goi cuoc moi\n";
         cout << "  2. Xem danh sach goi cuoc\n";
         cout << "  3. Tim kiem goi cuoc\n";
-        cout << "  4. Cap nhat thong tin goi cuoc\n";
-        cout << "  5. Xoa goi cuoc\n";
+        cout << "  4. Sap xep danh sach goi cuoc\n";
+        cout << "  5. Cap nhat thong tin goi cuoc\n";
+        cout << "  6. Xoa goi cuoc\n";
         cout << "  0. Quay lai menu chinh\n";
         cout << "==========================================\n";
-        choice = InputHelper::getInt("Nhap lua chon: ", 0, 5);
+        choice = InputHelper::getInt("Nhap lua chon: ", 0, 6);
 
         switch (choice) {
             case 1: handleCreate(repo);   break;
             case 2: handleReadAll(repo);  break;
             case 3: handleSearch(repo);   break;
-            case 4: handleUpdate(repo);   break;
-            case 5: handleDelete(repo);   break;
+            case 4: handleSort(repo);     break;
+            case 5: handleUpdate(repo);   break;
+            case 6: handleDelete(repo);   break;
             case 0:
                 cout << ">> Dang quay lai Menu chinh...\n";
                 break;
             default:
-                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 5!\n";
+                cout << "[!] Lua chon khong hop le, vui long nhap tu 0 den 6!\n";
         }
     } while (choice != 0);
 }

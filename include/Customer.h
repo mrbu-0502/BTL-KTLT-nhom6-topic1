@@ -61,12 +61,11 @@ private:
     static void handleCreate(Repository<Customer>& repo);
     static void handleReadAll(Repository<Customer>& repo);
     static void handleSearch(Repository<Customer>& repo);
+    static void handleSort(Repository<Customer>& repo);
     static void handleUpdate(Repository<Customer>& repo);
     static void handleDelete(Repository<Customer>& repo);
     static void printHeader();
 };
 
 // Khai báo hàm để main.cpp gọi trực tiếp:
-void menuKhachHang();
-
 void menuKhachHang();
