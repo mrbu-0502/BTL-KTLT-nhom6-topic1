@@ -1,3 +1,6 @@
+// Nguyễn Văn Cường - B24DCVT053
+// menu loại hình thuê bao
+
 #include "SubType.h"
 #include "Repository.h"
 #include "InputHelper.h"
