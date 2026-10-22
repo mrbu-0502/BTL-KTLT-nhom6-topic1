@@ -18,8 +18,8 @@ Mỗi thành viên phụ trách **1 module base dùng chung** và **2 Use Case**
 | :---: | :--- | :---: | :--- | :--- | :--- |
 | 1 | Bùi Gia Khánh | B24DCVT191 | `Entity.h` (Lớp trừu tượng) | Gói cước | Khách hàng |
 | 2 | Nguyễn Văn Cường | B24DCVT053 | `InputHelper.h` (Nhập an toàn) | Loại hình thuê bao | Phiếu khiếu nại |
-| 3 | Kiều Đức Hiệp | *(Bổ sung)* | `Date.h` (Xử lý ngày tháng) | Thiết bị (IMEI) | Bản ghi cuộc gọi (CDR) |
-| 4 | Vũ Quang Anh | *(Bổ sung)* | `Exceptions.h` (Lớp ngoại lệ) | SIM số thuê bao | Hóa đơn cước |
+| 3 | Kiều Đức Hiệp | B24DCVT127 | `Date.h` (Xử lý ngày tháng) | Thiết bị (IMEI) | Bản ghi cuộc gọi (CDR) |
+| 4 | Vũ Quang Anh | B24DCVT027 | `Exceptions.h` (Lớp ngoại lệ) | SIM số thuê bao | Hóa đơn cước |
 | 5 | Lương Đức Anh | B24DCVT006 | `Repository.h` (Template Repo) | Phiếu nạp tiền | Hợp đồng đăng ký |
 
 ### Chi tiết file phụ trách
