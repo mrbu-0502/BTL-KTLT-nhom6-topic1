@@ -364,8 +364,13 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
 void menuKhieuNai() {
     Repository<Complaint> repo_complaint("data/complaints.txt");
     Repository<Contract> repo_contract("data/contracts.txt"); 
-    repo_complaint.loadFromFile();
-    repo_contract.loadFromFile();
+    try {
+        repo_complaint.loadFromFile();
+        repo_contract.loadFromFile();
+    } catch (const exception& e) {
+        cout << "[Loi] Khong nap duoc du lieu khieu nai: " << e.what() << endl;
+        return;
+    }
     int chon = -1;
     do {
         cout << "\n========================================\n";

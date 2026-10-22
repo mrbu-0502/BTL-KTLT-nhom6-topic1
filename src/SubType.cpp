@@ -277,8 +277,13 @@ static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
 void menuLoaiHinh() {
     Repository<SubType> repo("data/sub_types.txt");
     Repository<Sim> repo_sim("data/sims.txt");
-    repo.loadFromFile();
-    repo_sim.loadFromFile();
+    try {
+        repo.loadFromFile();
+        repo_sim.loadFromFile();
+    } catch (const exception& e) {
+        cout << "[Loi] Khong nap duoc du lieu loai hinh thue bao: " << e.what() << endl;
+        return;
+    }
 
 
     int chon = -1;
