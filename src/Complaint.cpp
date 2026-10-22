@@ -103,13 +103,13 @@ void Complaint::setTrangThai(const string& tt){
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
 // ============================================================================
 static void inTieuDeBangComplaint() {
-    cout << string(100, '-') << endl;
+    cout << string(93, '-') << endl;
     cout << left << setw(8)  << "Ma KN"
          << setw(10) << "Ma HD"
          << setw(13) << "Ngay Gui"
          << setw(50) << "Noi Dung"
-         << setw(15) << "Trang Thai" << endl;
-    cout << string(100, '-') << endl;
+         << setw(12) << "Trang Thai" << endl;
+    cout << string(93, '-') << endl;
 }
 
 //tu dong sinh ma KN;
@@ -148,7 +148,7 @@ static void xemDanhSachComplaint(Repository<Complaint>& repo) {
     for (size_t i = 0; i < list.size(); i++) {
         list[i].display();
     }
-    cout << string(100, '-') << endl;
+    cout << string(93, '-') << endl;
 }
 
 //them moi khieu nai;
@@ -231,7 +231,7 @@ static void timKiemComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\nKet qua tim thay:\n";
     inTieuDeBangComplaint();
     p->display();
-    cout << string(98, '-') << endl;
+    cout << string(93, '-') << endl;
 }
 
 
@@ -266,7 +266,7 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     cout << "\nThong tin hien tai:\n";
     inTieuDeBangComplaint();
     p->display();
-    cout << string(98, '-') << endl;
+    cout << string(93, '-') << endl;
 
     cout << "(Luu y: Nhan Enter de giu nguyen gia tri cu)\n";
     string maHDMoi;
@@ -347,7 +347,7 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
     cout << "\nThong tin:\n";
     inTieuDeBangComplaint();
     p->display();
-    cout << string(98, '-') << endl;
+    cout << string(93, '-') << endl;
 
     if (InputHelper::getConfirm("Ban co chac chan muon dong phieu khieu nai nay khong (y/n)? ")) {
         p->setTrangThai("Dong");

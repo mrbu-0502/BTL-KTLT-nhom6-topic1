@@ -34,8 +34,8 @@ void SubType::getInformation() {
 
 void SubType::display() const {
     cout << left << setw(10) << ID
-         << setw(35) << tenLoai
-         << setw(70) << moTa
+         << setw(32) << tenLoai
+         << setw(58) << moTa
          << right << setw(15) << cuocThang << endl;
 }
 
@@ -94,12 +94,12 @@ void SubType::setCuocThang(long long cuoc) {
 // CAC HAM HO TRO GIAO DIEN CONSOLE (IN TIEU DE BANG)
 // ============================================================================
 static void inTieuDeBangSubType() {
-    cout << string(130, '-') << endl;
+    cout << string(115, '-') << endl;
     cout << left << setw(10) << "Ma Loai"
-         << setw(35) << "Ten Loai Hinh"
-         << setw(70) << "Mo Ta"
+         << setw(32) << "Ten Loai Hinh"
+         << setw(58) << "Mo Ta"
          << right << setw(15) << "Cuoc Thang (d)" << endl;
-    cout << string(130, '-') << endl;
+    cout << string(115, '-') << endl;
 }
 
 static string sinhMaLoaimoi(Repository<SubType>& repo) {
@@ -132,7 +132,7 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
     for (size_t i = 0; i < list.size(); i++) {
         list[i].display();  
     }
-    cout << string(130, '-') << endl;
+    cout << string(115, '-') << endl;
 }
 
 //them moi subtype;
@@ -187,7 +187,7 @@ static void timKiemSubType(Repository<SubType>& repo) {
     cout << "\nKet qua tim thay:\n";
     inTieuDeBangSubType();
     p->display();
-    cout << string(95, '-') << endl;
+    cout << string(115, '-') << endl;
 }
 
 //sua subtype
@@ -215,7 +215,7 @@ static void suaSubType(Repository<SubType>& repo) {
     cout << "\nThong tin hien tai:\n";
     inTieuDeBangSubType();
     p->display();
-    cout << string(95, '-') << endl;
+    cout << string(115, '-') << endl;
 
     cout << "(Luu y: Nhan Enter de giu nguyen gia tri cu)\n";
     string tenMoi = InputHelper::getStringOrDefault("Ten loai hinh moi: ", p->getTenLoai());
@@ -261,7 +261,7 @@ static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
     cout << "\nThong tin can xoa:\n";
     inTieuDeBangSubType();
     p->display();
-    cout << string(95, '-') << endl;
+    cout << string(115, '-') << endl;
 
     if (InputHelper::getConfirm("Ban co chac chan muon xoa loai hinh nay (y/n)? ")) {
         repo.remove(id);
