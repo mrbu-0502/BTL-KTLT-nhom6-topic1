@@ -56,18 +56,20 @@ BTL-KTLT-nhom6-topic1/
 
 Dữ liệu lưu trong file `.txt`, các trường phân tách bằng dấu `|`. Mỗi file có tối thiểu **10 bản ghi mẫu hợp lệ**, đồng bộ khóa ngoại. Ngày tháng thống nhất chuẩn **DD/MM/YYYY**.
 
-| File | Định dạng trường |
-| :--- | :--- |
-| `packages.txt` | `MaGoi\|TenGoi\|GiaCuoc\|DataMB\|ThoaiPhut\|SMS\|ChuKyNgay` |
-| `customers.txt` | `MaKH\|HoTen\|CCCD\|DiaChi\|NgaySinh` |
-| `sub_types.txt` | `MaLoai\|TenLoai\|MoTa\|CuocThang` |
-| `complaints.txt` | `MaKN\|MaKH\|SoSim\|NgayGui\|NoiDung\|TrangThai` |
-| `devices.txt` | `MaIMEI\|TenMay\|HangSX\|NamSX\|TinhTrang` |
-| `cdrs.txt` | `MaCDR\|SoGoi\|SoNhan\|ThoiDiem\|SoGiay\|CuocPhi` |
-| `sims.txt` | `SoSim\|MaIMSI\|MaLoai\|MaIMEI\|NgayKichHoat\|TrangThai` |
-| `bills.txt` | `MaHoaDon\|SoSim\|ThangNam\|TongTien\|TrangThai` |
-| `recharges.txt` | `MaPhieu\|SoSim\|MenhGia\|NgayNap\|HinhThuc` |
-| `contracts.txt` | `MaHopDong\|MaKH\|SoSim\|MaGoi\|NgayDangKy\|TrangThai` |
+| Use Case | File dữ liệu | Định dạng trường |
+| :--- | :--- | :--- |
+| Gói cước (`Package`) | `packages.txt` | `MaGoi\|TenGoi\|GiaCuoc\|DataMB\|ThoaiPhut\|SMS\|ChuKyNgay` |
+| Khách hàng (`Customer`) | `customers.txt` | `MaKH\|HoTen\|CCCD\|DiaChi\|NgaySinh` |
+| Loại hình thuê bao (`SubType`) | `sub_types.txt` | `MaLoai\|TenLoai\|MoTa\|CuocThang` |
+| Phiếu khiếu nại (`Complaint`) | `complaints.txt` | `MaKN\|MaHD\|NgayGui\|NoiDung\|TrangThai` |
+| Thiết bị (`Device`) | `devices.txt` | `MaIMEI\|TenMay\|HangSX\|NamSX\|TinhTrang` |
+| Bản ghi cuộc gọi (`CDR`) | `cdrs.txt` | `MaCDR\|SoGoi\|SoNhan\|ThoiDiem\|SoGiay\|CuocPhi` |
+| SIM (`Sim`) | `sims.txt` | `SoSim\|MaIMSI\|MaLoai\|MaIMEI\|NgayKichHoat\|TrangThai` |
+| Hóa đơn cước (`Bill`) | `bills.txt` | `MaHoaDon\|SoSim\|ThangNam\|TongTien\|TrangThai` |
+| Phiếu nạp tiền (`Recharge`) | `recharges.txt` | `MaPhieu\|SoSim\|MenhGia\|NgayNap\|HinhThuc` |
+| Hợp đồng đăng ký (`Contract`) | `contracts.txt` | `MaHopDong\|MaKH\|SoSim\|MaGoi\|NgayDangKy\|TrangThai` |
+
+> Ghi chú khóa ngoại: `Complaint.MaHD` tham chiếu `contracts.txt`; `Sim.MaLoai` → `sub_types.txt`, `Sim.MaIMEI` → `devices.txt`; `CDR.SoGoi/SoNhan`, `Bill.SoSim`, `Recharge.SoSim` → `sims.txt`; `Contract.MaKH` → `customers.txt`, `Contract.SoSim` → `sims.txt`, `Contract.MaGoi` → `packages.txt`.
 
 ---
 
