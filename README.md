@@ -58,16 +58,16 @@ Dữ liệu lưu trong file `.txt`, các trường phân tách bằng dấu `|`.
 
 | File | Định dạng trường |
 | :--- | :--- |
-| `packages.txt` | `MaGoi|TenGoi|GiaCuoc|DataMB|ThoaiPhut|SMS|ChuKyNgay` |
-| `customers.txt` | `MaKH|HoTen|CCCD|DiaChi|NgaySinh` |
-| `sub_types.txt` | `MaLoai|TenLoai|MoTa|CuocThang` |
-| `complaints.txt` | `MaKN|MaKH|SoSim|NgayGui|NoiDung|TrangThai` |
-| `devices.txt` | `MaIMEI|TenMay|HangSX|NamSX|TinhTrang` |
-| `cdrs.txt` | `MaCDR|SoGoi|SoNhan|ThoiDiem|SoGiay|CuocPhi` |
-| `sims.txt` | `SoSim|MaIMSI|MaLoai|MaIMEI|NgayKichHoat|TrangThai` |
-| `bills.txt` | `MaHoaDon|SoSim|ThangNam|TongTien|TrangThai` |
-| `recharges.txt` | `MaPhieu|SoSim|MenhGia|NgayNap|HinhThuc` |
-| `contracts.txt` | `MaHopDong|MaKH|SoSim|MaGoi|NgayDangKy|TrangThai` |
+| `packages.txt` | `MaGoi\|TenGoi\|GiaCuoc\|DataMB\|ThoaiPhut\|SMS\|ChuKyNgay` |
+| `customers.txt` | `MaKH\|HoTen\|CCCD\|DiaChi\|NgaySinh` |
+| `sub_types.txt` | `MaLoai\|TenLoai\|MoTa\|CuocThang` |
+| `complaints.txt` | `MaKN\|MaKH\|SoSim\|NgayGui\|NoiDung\|TrangThai` |
+| `devices.txt` | `MaIMEI\|TenMay\|HangSX\|NamSX\|TinhTrang` |
+| `cdrs.txt` | `MaCDR\|SoGoi\|SoNhan\|ThoiDiem\|SoGiay\|CuocPhi` |
+| `sims.txt` | `SoSim\|MaIMSI\|MaLoai\|MaIMEI\|NgayKichHoat\|TrangThai` |
+| `bills.txt` | `MaHoaDon\|SoSim\|ThangNam\|TongTien\|TrangThai` |
+| `recharges.txt` | `MaPhieu\|SoSim\|MenhGia\|NgayNap\|HinhThuc` |
+| `contracts.txt` | `MaHopDong\|MaKH\|SoSim\|MaGoi\|NgayDangKy\|TrangThai` |
 
 ---
 
