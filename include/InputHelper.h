@@ -19,17 +19,13 @@ using namespace std;
 
 class InputHelper {
 public:
-    // ==========================================================================
-    // 1. DỌN BỘ NHỚ ĐỆM (CLEAR BUFFER)
-    // ==========================================================================
+
     static void clearBuffer() {
         cin.clear();
         cin.ignore(100000, '\n');
     }
 
-    // ==========================================================================
-    // 2. NHẬP SỐ NGUYÊN AN TOÀN (GET INT)
-    // ==========================================================================
+
     static int getInt(const string& CauThongBao, int minVal = numeric_limits<int>::min(), int maxVal = numeric_limits<int>::max()) {
         while (true) {
             cout << CauThongBao;
@@ -47,9 +43,7 @@ public:
         }
     }
 
-    // ==========================================================================
-    // 3. NHẬP SỐ THỰC AN TOÀN (GET DOUBLE)
-    // ==========================================================================
+
     static double getDouble(const string& CauThongBao, double minVal = 0.0, double maxVal = numeric_limits<double>::max()) {
         while (true) {
             cout << CauThongBao;
@@ -67,9 +61,7 @@ public:
         }
     }
 
-    // ==========================================================================
-    // NHẬP SỐ NGUYÊN DÀI AN TOÀN (GET LONG LONG)
-    // ==========================================================================
+
     static long long getLongLong(const string& CauThongBao, long long minVal = 0, long long maxVal = numeric_limits<long long>::max()) {
         while (true) {
             cout << CauThongBao;
@@ -87,9 +79,7 @@ public:
         }
     }
 
-    // ==========================================================================
-    // 4. NHẬP CHUỖI AN TOÀN - CHỐNG TRÔI LỆNH (GET STRING)
-    // ==========================================================================
+
     static string getString(const string& CauThongBao, bool allowEmpty = false) {
         while (true) {
             cout << CauThongBao;
@@ -104,7 +94,7 @@ public:
     }
 
     // ==========================================================================
-    // 5. NHẬP XÁC NHẬN CÓ / KHÔNG (GET CONFIRM Y/N)
+    // NHẬP XÁC NHẬN CÓ / KHÔNG (GET CONFIRM Y/N)
     // ==========================================================================
     static bool getConfirm(const string& CauThongBao) {
         cout << CauThongBao;
@@ -121,7 +111,7 @@ public:
     }
 
     // ==========================================================================
-    // 6. TIỆN ÍCH HỖ TRỢ CHỨC NĂNG SỬA (UPDATE - GIỮ NGUYÊN GIÁ TRỊ CŨ KHI BỎ TRỐNG)
+    // NHẬP GIÁ TRỊ MỚI HOẶC GIỮ NGUYÊN GIÁ TRỊ CŨ (GET DEFAULT OR NEW)
     // ==========================================================================
     static string getStringOrDefault(const string& CauThongBao, const string& oldValue) {
         cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
@@ -186,7 +176,11 @@ public:
             int newvalue;
             char extra;
             if (ss >> newvalue && !(ss >> extra)) {
-                return newvalue;
+                if (newvalue >= 0) {
+                    return newvalue;
+                } else {
+                    cout << "[Loi] Gia tri khong duoc am! Vui long nhap lai.\n";
+                }
             } else {
                 cout << "[Loi] Vui long nhap so nguyen hop le hoac nhan Enter de giu nguyen!\n";
             }
