@@ -259,15 +259,28 @@ void PackageMenu::handleSearch(Repository<Package>& repo) {
     }
 }
 
-// 4: SORT (Sắp xếp danh sách gói cước)
+// ============================================================================
+// CHỨC NĂNG 4: SẮP XẾP DANH SÁCH GÓI CƯỚC (SORT)
+// - Mục đích: Cho phép người dùng sắp xếp và xem danh sách gói cước theo các tiêu chí khác nhau.
+// - Kỹ thuật áp dụng: 
+//   + Sử dụng hàm std::sort từ thư viện chuẩn <algorithm> (đáp ứng yêu cầu sử dụng STL của BTL).
+//   + Kết hợp biểu thức Lambda (C++11) làm hàm so sánh tuỳ biến (custom comparator).
+//   + Sắp xếp trên bản sao (vector<Package> list = repo.getAll()), đảm bảo KHÔNG làm
+//     thay đổi thứ tự dữ liệu gốc được lưu trong file/repository.
+// ============================================================================
 void PackageMenu::handleSort(Repository<Package>& repo) {
     cout << "\n---------------- SAP XEP GOI CUOC ----------------\n";
+
+    // Bước 1: Lấy bản sao danh sách gói cước hiện có từ Repository
     vector<Package> list = repo.getAll();
+
+    // Kiểm tra danh sách rỗng để tránh xử lý thừa và báo cho người dùng
     if (list.empty()) {
         cout << ">> [THONG BAO] Danh sach goi cuoc hien tai dang trong!\n";
         return;
     }
 
+    // Bước 2: Hiển thị menu phụ các tiêu chí sắp xếp cho người dùng chọn
     cout << "  1. Gia cuoc tang dan\n";
     cout << "  2. Gia cuoc giam dan\n";
     cout << "  3. Dung luong Data (MB) tang dan\n";
@@ -275,28 +288,41 @@ void PackageMenu::handleSort(Repository<Package>& repo) {
     cout << "  0. Quay lai\n";
     int subChoice = InputHelper::getInt("Nhap tieu chi sap xep (0-4): ", 0, 4);
 
+    // Người dùng chọn 0 -> Hủy bỏ thao tác sắp xếp, quay về menu chính
     if (subChoice == 0) return;
 
+    // Bước 3: Thực hiện sắp xếp tương ứng với từng tiêu chí được chọn
     switch (subChoice) {
         case 1:
+            // Tiêu chí 1: Giá cước tăng dần
+            // Lambda so sánh: Trả về true nếu phần tử 'a' có giá nhỏ hơn 'b'
             sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
                 return a.getPrice() < b.getPrice();
             });
             cout << "\n>> DANH SACH GOI CUOC (GIA CUOC TANG DAN):\n";
             break;
+
         case 2:
+            // Tiêu chí 2: Giá cước giảm dần
+            // Lambda so sánh: Trả về true nếu phần tử 'a' có giá lớn hơn 'b'
             sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
                 return a.getPrice() > b.getPrice();
             });
             cout << "\n>> DANH SACH GOI CUOC (GIA CUOC GIAM DAN):\n";
             break;
+
         case 3:
+            // Tiêu chí 3: Dung lượng Data MB tăng dần
+            // Lambda so sánh: Trả về true nếu 'a' có ít dung lượng MB hơn 'b'
             sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
                 return a.getDataMB() < b.getDataMB();
             });
             cout << "\n>> DANH SACH GOI CUOC (DATA MB TANG DAN):\n";
             break;
+
         case 4:
+            // Tiêu chí 4: Tên gói cước theo thứ tự từ điển A -> Z
+            // Lambda so sánh: So sánh chuỗi std::string theo thứ tự lexicographical
             sort(list.begin(), list.end(), [](const Package& a, const Package& b) {
                 return a.getName() < b.getName();
             });
@@ -304,6 +330,7 @@ void PackageMenu::handleSort(Repository<Package>& repo) {
             break;
     }
 
+    // Bước 4: In tiêu đề cột và duyệt toàn bộ danh sách đã sắp xếp để in ra màn hình
     printHeader();
     for (const auto& pkg : list) {
         pkg.display();

@@ -219,14 +219,31 @@ void CustomerMenu::handleSearch(Repository<Customer>& repo) {
     }
 }
 
+// ============================================================================
+// CHỨC NĂNG 4: SẮP XẾP DANH SÁCH KHÁCH HÀNG (SORT)
+// - Mục đích: Cho phép người dùng sắp xếp và hiển thị danh sách khách hàng theo
+//   nhiều tiêu chí thực tế (Tên, Mã KH, Ngày sinh).
+// - Kỹ thuật áp dụng:
+//   + Sử dụng thuật toán std::sort từ thư viện chuẩn <algorithm> (tiêu chuẩn STL).
+//   + Biểu thức Lambda C++11 linh hoạt làm comparator tùy biến:
+//     * Xử lý trích xuất TÊN từ HỌ VÀ TÊN chuẩn theo quy tắc xưng tên tiếng Việt.
+//     * Chuyển đổi định dạng ngày dd/mm/yyyy -> yyyymmdd để so sánh thời gian chính xác.
+//   + Sắp xếp trên bản sao (vector<Customer> list = repo.getAll()), bảo toàn nguyên vẹn
+//     thứ tự lưu trữ trong cơ sở dữ liệu / file text.
+// ============================================================================
 void CustomerMenu::handleSort(Repository<Customer>& repo) {
     cout << "\n---------------- SAP XEP KHACH HANG ----------------\n";
+
+    // Bước 1: Lấy bản sao danh sách khách hàng từ Repository
     vector<Customer> list = repo.getAll();
+
+    // Kiểm tra danh sách rỗng để tránh xử lý thừa và báo cho người dùng
     if (list.empty()) {
         cout << ">> Danh sach khach hang hien dang trong!\n";
         return;
     }
 
+    // Bước 2: Hiển thị các tiêu chí sắp xếp cho người dùng lựa chọn
     cout << "  1. Ho ten (A -> Z)\n";
     cout << "  2. Ho ten (Z -> A)\n";
     cout << "  3. Ma khach hang tang dan\n";
@@ -234,25 +251,34 @@ void CustomerMenu::handleSort(Repository<Customer>& repo) {
     cout << "  0. Quay lai\n";
     int subChoice = InputHelper::getInt("Nhap tieu chi sap xep (0-4): ", 0, 4);
 
+    // Người dùng chọn 0 -> Thoát khỏi chức năng sắp xếp
     if (subChoice == 0) return;
 
+    // Lambda helper: Trích xuất phần "Tên" từ chuỗi "Họ và Tên"
+    // Ví dụ: "Nguyen Van An" -> cắt lấy "An" để sắp xếp theo chữ cái của Tên
     auto layTen = [](const string& hoTen) {
-        size_t pos = hoTen.rfind(' ');
-        if (pos != string::npos) return hoTen.substr(pos + 1);
-        return hoTen;
+        size_t pos = hoTen.rfind(' '); // Tìm vị trí dấu cách cuối cùng
+        if (pos != string::npos) return hoTen.substr(pos + 1); // Lấy chuỗi sau dấu cách
+        return hoTen; // Nếu không có dấu cách, giữ nguyên họ tên
     };
 
+    // Bước 3: Áp dụng thuật toán std::sort tương ứng với tiêu chí được chọn
     switch (subChoice) {
         case 1:
+            // Tiêu chí 1: Họ tên tăng dần từ A -> Z (Ưu tiên so sánh Tên)
             sort(list.begin(), list.end(), [&](const Customer& a, const Customer& b) {
                 string tenA = layTen(a.getFullName());
                 string tenB = layTen(b.getFullName());
+                // Nếu Tên khác nhau -> So sánh theo Tên
                 if (tenA != tenB) return tenA < tenB;
+                // Nếu Tên trùng nhau -> So sánh toàn bộ Họ và Tên để phân định
                 return a.getFullName() < b.getFullName();
             });
             cout << "\n>> DANH SACH KHACH HANG (HO TEN A -> Z):\n";
             break;
+
         case 2:
+            // Tiêu chí 2: Họ tên giảm dần từ Z -> A (Đảo ngược chiều so sánh)
             sort(list.begin(), list.end(), [&](const Customer& a, const Customer& b) {
                 string tenA = layTen(a.getFullName());
                 string tenB = layTen(b.getFullName());
@@ -261,13 +287,20 @@ void CustomerMenu::handleSort(Repository<Customer>& repo) {
             });
             cout << "\n>> DANH SACH KHACH HANG (HO TEN Z -> A):\n";
             break;
+
         case 3:
+            // Tiêu chí 3: Mã khách hàng tăng dần (so sánh chuỗi std::string)
             sort(list.begin(), list.end(), [](const Customer& a, const Customer& b) {
                 return a.getID() < b.getID();
             });
             cout << "\n>> DANH SACH KHACH HANG (MA KH TANG DAN):\n";
             break;
+
         case 4:
+            // Tiêu chí 4: Ngày sinh từ cũ nhất đến mới nhất (Người lớn tuổi xếp trước)
+            // Kỹ thuật: Định dạng ngày gốc là dd/mm/yyyy.
+            // Để so sánh theo đúng thứ tự thời gian, chuyển đổi về định dạng yyyymmdd.
+            // Ví dụ: 25/12/1990 -> 19901225; 01/01/2005 -> 20050101 (19901225 < 20050101).
             sort(list.begin(), list.end(), [](const Customer& a, const Customer& b) {
                 string dA = a.getDateOfBirth();
                 string dB = b.getDateOfBirth();
@@ -283,6 +316,7 @@ void CustomerMenu::handleSort(Repository<Customer>& repo) {
             break;
     }
 
+    // Bước 4: In tiêu đề bảng và duyệt danh sách khách hàng đã sắp xếp để hiển thị
     printHeader();
     for (const auto& cus : list) {
         cus.display();
