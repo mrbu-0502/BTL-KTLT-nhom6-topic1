@@ -27,10 +27,10 @@ using namespace std;
 // =====================================================================
 
 // Cài đặt hàm khởi tạo 
-Package::Package()
+Package :: Package()
     : Entity(""), Price(0), DataMB(0), VoiceMinutes(0), SMS(0), Days(30) {}
 
-Package::Package(string ID, string name, double price, int data, int voice, int sms, int days)
+Package :: Package(string ID, string name, double price, int data, int voice, int sms, int days)
     : Entity(ID) {
     setName(name);
     setPrice(price);
@@ -41,11 +41,11 @@ Package::Package(string ID, string name, double price, int data, int voice, int 
 }
 
 // Cài đặt các hàm thuần ảo 
-string Package::getID() const {
+string Package :: getID() const {
     return ID;
 }
 
-string Package::toString() const {
+string Package :: toString() const {
     stringstream ss;
     ss << ID << "|" << PackageName << "|" 
        << fixed << setprecision(0) << Price << "|" 
@@ -53,7 +53,7 @@ string Package::toString() const {
     return ss.str();
 }
 
-void Package::fromString(const string& line) {
+void Package :: fromString(const string& line) {
     if (line.empty()) return;
     stringstream ss(line);
     string PriceStr;
@@ -77,27 +77,37 @@ void Package::fromString(const string& line) {
     getline(ss, DaysStr, '|');
 
     try {
-        if (!PriceStr.empty())        Price = stod(PriceStr);
-        if (!DataMBStr.empty())       DataMB = stoi(DataMBStr);
-        if (!VoiceMinutesStr.empty())  VoiceMinutes = stoi(VoiceMinutesStr);
-        if (!SMSStr.empty())          SMS = stoi(SMSStr);
-        if (!DaysStr.empty())         Days = stoi(DaysStr);
+        if (!PriceStr.empty()){
+            Price = stod(PriceStr);
+        }       
+        if (!DataMBStr.empty()){
+            DataMB = stoi(DataMBStr);
+        }
+        if (!VoiceMinutesStr.empty()){
+            VoiceMinutes = stoi(VoiceMinutesStr);
+        }
+        if (!SMSStr.empty()){
+            SMS = stoi(SMSStr);
+        }
+        if (!DaysStr.empty()){
+            Days = stoi(DaysStr);
+        }
     } catch (...) {
         // Phòng thủ bỏ qua nếu parse dữ liệu số thất bại
     }
 }
 
-void Package::getInformation() {
-    ID = InputHelper::getString("Nhap ma goi cuoc: ", false);
-    setName(InputHelper::getString("Nhap ten goi cuoc: ", false));
-    setPrice(InputHelper::getDouble("Nhap gia cuoc VND: ", 0.0));
-    setDataMB(InputHelper::getInt("Nhap dung luong DataMB (MB): ", 0));
-    setVoiceMinutes(InputHelper::getInt("Nhap thoi luong cuoc goi (phut): ", 0));
-    setSMS(InputHelper::getInt("Nhap so luong SMS: ", 0));
-    setDays(InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1));
+void Package :: getInformation() {
+    ID = InputHelper :: getString("Nhap ma goi cuoc: ", false);
+    setName(InputHelper :: getString("Nhap ten goi cuoc: ", false));
+    setPrice(InputHelper :: getDouble("Nhap gia cuoc VND: ", 0.0));
+    setDataMB(InputHelper :: getInt("Nhap dung luong DataMB (MB): ", 0));
+    setVoiceMinutes(InputHelper :: getInt("Nhap thoi luong cuoc goi (phut): ", 0));
+    setSMS(InputHelper :: getInt("Nhap so luong SMS: ", 0));
+    setDays(InputHelper :: getInt("Nhap chu ky goi cuoc (ngay): ", 1));
 }
 
-void Package::display() const {
+void Package :: display() const {
     cout << left << setw(10) << ID 
          << setw(30) << PackageName << right
          << setw(10) << (long long)Price << " D"
@@ -108,62 +118,62 @@ void Package::display() const {
 }
 
 // Cài đặt getter
-string Package::getName() const {
+string Package :: getName() const {
     return PackageName;
 } 
-double Package::getPrice() const {
+double Package :: getPrice() const {
     return Price;
 }
-int Package::getDataMB() const {
+int Package :: getDataMB() const {
     return DataMB;
 }
-int Package::getVoiceMinutes() const {
+int Package :: getVoiceMinutes() const {
     return VoiceMinutes;
 }
-int Package::getSMS() const {
+int Package :: getSMS() const {
     return SMS;
 }
-int Package::getDays() const {
+int Package :: getDays() const {
     return Days;
 }
 
 // Cài đặt setter có kiểm tra tính hợp lệ dữ liệu
-void Package::setName(const string& n) {
+void Package :: setName(const string& n) {
     if (n.empty()) {
         throw InvalidDataException("Ten goi cuoc khong duoc de trong!");
     }
     PackageName = n;
 }
 
-void Package::setPrice(double p) {
+void Package :: setPrice(double p) {
     if (p < 0.0) {
         throw InvalidDataException("Gia cuoc khong the am!");
     }
     Price = p;
 }
 
-void Package::setDataMB(int d) {
+void Package :: setDataMB(int d) {
     if (d < 0) {
         throw InvalidDataException("Dung luong Data khong the am!");
     }
     DataMB = d;
 }
 
-void Package::setVoiceMinutes(int v) {
+void Package :: setVoiceMinutes(int v) {
     if (v < 0) {
         throw InvalidDataException("Thoi luong thoai khong the am!");
     }
     VoiceMinutes = v;
 }
 
-void Package::setSMS(int s) {
+void Package :: setSMS(int s) {
     if (s < 0) {
         throw InvalidDataException("So luong SMS khong the am!");
     }
     SMS = s;
 }
 
-void Package::setDays(int d) {
+void Package :: setDays(int d) {
     if (d <= 0) {
         throw InvalidDataException("Chu ky ngay phai lon hon 0!");
     }
@@ -174,7 +184,7 @@ void Package::setDays(int d) {
 // PHẦN 2: CÀI ĐẶT GIAO DIỆN VÀ CRUD CỦA PACKAGEMENU
 // =====================================================================
 
-void PackageMenu::printHeader() {
+void PackageMenu :: printHeader() {
     cout << string(85, '-') << "\n";
     cout << left  << setw(10) << "Ma Goi"
          << setw(26) << "Ten Goi Cuoc"
@@ -196,23 +206,23 @@ void PackageMenu::printHeader() {
 //   + Cơ chế Exception Handling: Bắt InvalidDataException nếu thông số vi phạm nghiệp vụ.
 //   + Đồng bộ hóa: repo.add() vừa nạp vào vector trong RAM, vừa ghi tự động ra file text.
 // ============================================================================
-void PackageMenu::handleCreate(Repository<Package>& repo) {
+void PackageMenu :: handleCreate(Repository<Package>& repo) {
     cout << "\n---------------- THEM GOI CUOC MOI ----------------\n";
     
     // Bước 1: Nhập mã gói cước và kiểm tra trùng lặp khóa chính
-    string id = InputHelper::getString("Nhap ma goi cuoc: ", false);
+    string id = InputHelper :: getString("Nhap ma goi cuoc: ", false);
     if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma goi cuoc da ton tai tren he thong!\n";
         return; // Dừng thao tác thêm nếu mã đã tồn tại
     }
 
     // Bước 2: Nhập các thông tin chi tiết của gói cước mới
-    string name  = InputHelper::getString("Nhap ten goi cuoc: ", false);
-    double price = InputHelper::getDouble("Nhap gia cuoc VND: ", 0.0);
-    int data     = InputHelper::getInt("Nhap dung luong DataMB (MB): ", 0);
-    int voice    = InputHelper::getInt("Nhap thoi luong cuoc goi (phut): ", 0);
-    int sms      = InputHelper::getInt("Nhap so luong SMS: ", 0);
-    int days     = InputHelper::getInt("Nhap chu ky goi cuoc (ngay): ", 1);
+    string name  = InputHelper :: getString("Nhap ten goi cuoc: ", false);
+    double price = InputHelper :: getDouble("Nhap gia cuoc VND: ", 0.0);
+    int data     = InputHelper :: getInt("Nhap dung luong DataMB (MB): ", 0);
+    int voice    = InputHelper :: getInt("Nhap thoi luong cuoc goi (phut): ", 0);
+    int sms      = InputHelper :: getInt("Nhap so luong SMS: ", 0);
+    int days     = InputHelper :: getInt("Nhap chu ky goi cuoc (ngay): ", 1);
 
     // Bước 3: Khởi tạo đối tượng Package và thêm vào Repository
     // Toàn bộ logic kiểm tra tính hợp lệ dữ liệu (giá > 0, chu kỳ > 0, ...)
@@ -237,7 +247,7 @@ void PackageMenu::handleCreate(Repository<Package>& repo) {
 //   + Sử dụng hàm printHeader() kết hợp std::setw để căn chỉnh cột ngay thẳng.
 //   + Range-based for loop (C++11) duyệt qua từng phần tử và gọi phương thức display().
 // ============================================================================
-void PackageMenu::handleReadAll(Repository<Package>& repo) { 
+void PackageMenu :: handleReadAll(Repository<Package>& repo) { 
     cout << "\n---------------- DANH SACH GOI CUOC ----------------\n";
     
     // Bước 1: Lấy tham chiếu danh sách gói cước từ Repository
@@ -268,11 +278,11 @@ void PackageMenu::handleReadAll(Repository<Package>& repo) {
 //   + Xử lý trường hợp con trỏ nullptr an toàn (nếu không tìm thấy đối tượng).
 //   + Tái sử dụng printHeader() và display() để hiển thị thông tin nhất quán.
 // ============================================================================
-void PackageMenu::handleSearch(Repository<Package>& repo) {
+void PackageMenu :: handleSearch(Repository<Package>& repo) {
     cout << "\n---------------- TIM KIEM GOI CUOC ----------------\n";
     
     // Bước 1: Nhập mã gói cước cần tra cứu
-    string id = InputHelper::getString("Nhap ma goi can tim: ", false);
+    string id = InputHelper :: getString("Nhap ma goi can tim: ", false);
     
     // Bước 2: Tìm kiếm đối tượng trong vector bộ nhớ
     auto* pkg = repo.findById(id);
@@ -298,7 +308,7 @@ void PackageMenu::handleSearch(Repository<Package>& repo) {
 //   + Sắp xếp trên bản sao (vector<Package> list = repo.getAll()), đảm bảo KHÔNG làm
 //     thay đổi thứ tự dữ liệu gốc được lưu trong file/repository.
 // ============================================================================
-void PackageMenu::handleSort(Repository<Package>& repo) {
+void PackageMenu :: handleSort(Repository<Package>& repo) {
     cout << "\n---------------- SAP XEP GOI CUOC ----------------\n";
 
     // Bước 1: Lấy bản sao danh sách gói cước hiện có từ Repository
@@ -379,11 +389,11 @@ void PackageMenu::handleSort(Repository<Package>& repo) {
 //   + Sử dụng các hàm Setter để validate toàn bộ dữ liệu cập nhật.
 //   + Sau khi cập nhật thành công trong RAM, gọi repo.saveToFile() để lưu xuống file.
 // ============================================================================
-void PackageMenu::handleUpdate(Repository<Package>& repo) {
+void PackageMenu :: handleUpdate(Repository<Package>& repo) {
     cout << "\n---------------- CAP NHAT THONG TIN GOI CUOC ----------------\n";
     
     // Bước 1: Nhập mã gói cước cần sửa và kiểm tra tồn tại
-    string id = InputHelper::getString("Nhap ma goi cuoc can sua: ", false);
+    string id = InputHelper :: getString("Nhap ma goi cuoc can sua: ", false);
     auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
@@ -398,11 +408,11 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
     cout << "(Luu y: Nhan Enter de trong neu muon GIU NGUYEN thong tin cu. Ma goi cuoc khong duoc sua)\n\n";
     
     // Bước 3: Nhập dữ liệu mới dưới dạng chuỗi (cho phép rỗng: allowEmpty = true)
-    string newName  = InputHelper::getString("Nhap ten goi cuoc moi: ", true);
-    string priceStr = InputHelper::getString("Nhap gia cuoc moi (VND): ", true);
-    string dataStr  = InputHelper::getString("Nhap dung luong DataMB moi (MB): ", true);
-    string voiceStr = InputHelper::getString("Nhap thoi luong cuoc goi moi (phut): ", true);
-    string smsStr   = InputHelper::getString("Nhap so luong SMS moi: ", true);
+    string newName  = InputHelper :: getString("Nhap ten goi cuoc moi: ", true);
+    string priceStr = InputHelper :: getString("Nhap gia cuoc moi (VND): ", true);
+    string dataStr  = InputHelper :: getString("Nhap dung luong DataMB moi (MB): ", true);
+    string voiceStr = InputHelper :: getString("Nhap thoi luong cuoc goi moi (phut): ", true);
+    string smsStr   = InputHelper :: getString("Nhap so luong SMS moi: ", true);
     string daysStr  = InputHelper::getString("Nhap chu ky goi cuoc moi (ngay): ", true);
     
     // Bước 4 & 5: Kiểm tra tính hợp lệ qua Setter và ghi đồng bộ ra file
@@ -446,11 +456,11 @@ void PackageMenu::handleUpdate(Repository<Package>& repo) {
 //   + Hỏi xác nhận người dùng (y/n) trước khi thực hiện hành động xóa.
 //   + repo.remove() sẽ xóa khỏi vector và ghi đồng bộ lại file dữ liệu.
 // ============================================================================
-void PackageMenu::handleDelete(Repository<Package>& repo) {
+void PackageMenu :: handleDelete(Repository<Package>& repo) {
     cout << "\n---------------- XOA GOI CUOC ----------------\n";
     
     // Bước 1: Nhập mã gói cước và kiểm tra xem có tồn tại trong hệ thống không
-    string id = InputHelper::getString("Nhap ma goi cuoc can xoa: ", false);
+    string id = InputHelper :: getString("Nhap ma goi cuoc can xoa: ", false);
     auto* pkg = repo.findById(id);
     if (pkg == nullptr) {
         cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
@@ -488,7 +498,7 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
     }
 
     // Bước 4: Hỏi xác nhận người dùng (xác nhận 2 bước an toàn)
-    string confirm = InputHelper::getString("Ban co chac chan muon xoa? (y/n): ", false);
+    string confirm = InputHelper :: getString("Ban co chac chan muon xoa? (y/n): ", false);
     if (confirm == "y" || confirm == "Y") {
         repo.remove(id); // Thu hồi vùng nhớ và xóa phần tử khỏi vector, đồng thời cập nhật file
         cout << ">> [THANH CONG] Xoa thanh cong goi cuoc [" << id << "]!\n";
@@ -501,7 +511,7 @@ void PackageMenu::handleDelete(Repository<Package>& repo) {
 // PHẦN 3: MENU CONSOLE ĐIỀU KHIỂN CHÍNH CỦA GÓI CƯỚC
 // =====================================================================
 
-void PackageMenu::run() {
+void PackageMenu :: run() {
     // Khởi tạo Repository và nạp dữ liệu từ file packages.txt vào RAM khi mở menu
     Repository<Package> repo("data/packages.txt");
     try {
