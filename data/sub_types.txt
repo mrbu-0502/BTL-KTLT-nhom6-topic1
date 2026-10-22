@@ -2,8 +2,7 @@ SUB01|Tra Truoc Economy|Thue bao tra truoc goi cuoc thong thuong|0
 SUB02|Tra Truoc Tomato|Thue bao tra truoc khong gioi han thoi gian su dung|0
 SUB03|Tra Truoc Student|Thue bao tra truoc uu dai sinh vien hoc sinh|0
 SUB04|Tra Sau Basic+|Thue bao tra sau ca nhan goi noi mang ngoai mang|50000
-SUB05|Tra Sau Family|Thue bao tra sau goi nhom gia dinh ket noi|70000
-SUB06|Tra Sau Corporate|Thue bao tra sau danh rieng cho doanh nghiep|90000
+SUB05|4g unlimit|khong gioi han data|200000
 SUB07|Tra Sau VIP|Thue bao tra sau han muc cao kem dich vu CSKH|150000
 SUB08|Dcom 4G Prepaid|Thue bao data chuyen dung tra truoc khong thoai|0
 SUB09|Dcom 4G Postpaid|Thue bao data chuyen dung tra sau cho Router|50000

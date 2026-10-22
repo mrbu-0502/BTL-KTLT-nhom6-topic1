@@ -6,7 +6,7 @@ using namespace std;
 
 // Khai báo trước các hàm menu con của 10 use case
 // Sau này khi từng bạn làm xong thì chỉ cần nối code vào đây
-void menuGoiCuoc();
+//void menuGoiCuoc();
 
 void menuKhachHang();
 
@@ -52,7 +52,7 @@ int main() {
         luaChon = InputHelper::getInt("Nhap lua chon cua ban (0-10): ", 0, 10);
 
         switch (luaChon) {
-            case 1:  menuGoiCuoc();  break;
+            //case 1:  menuGoiCuoc();  break;
             case 2:  menuKhachHang(); break;
             case 3:  menuLoaiHinh();  break;
             case 4:  menuKhieuNai();  break;

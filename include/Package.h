@@ -1,6 +1,18 @@
+/**
+ * ==============================================================================
+ * BÀI TẬP LỚN: HỆ THỐNG QUẢN LÝ THUÊ BAO DI ĐỘNG (NHÓM 06 - ĐỀ TÀI 01)
+ * Học phần: Kỹ thuật lập trình
+ * Người thực hiện: Bùi Gia Khánh
+ * MSSV: B24DCVT191
+ * Module phụ trách: Entity.h (Lớp cơ sở trừu tượng)
+ * Use Case: Quản lý Gói cước (Package)
+ * ==============================================================================
+ */
+
 #pragma once
 #include "Entity.h"
 #include "Repository.h"
+#include "Exceptions.h"
 #include <string>
 
 using namespace std;
@@ -47,7 +59,6 @@ public:
 // 2: Giao diện điều khiển menu console
 // =====================================
 
-// Trong class PackageMenu:
 class PackageMenu {
 public:
     static void run();
@@ -61,5 +72,5 @@ private:
     static void printHeader();
 };
 
-// Hoặc khai báo hàm độc lập để main.cpp gọi trực tiếp:
+// Khai báo hàm độc lập để main.cpp gọi trực tiếp:
 void menuGoiCuoc();
