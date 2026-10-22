@@ -108,13 +108,13 @@ void Package :: getInformation() {
 }
 
 void Package :: display() const {
-    cout << left << setw(10) << ID 
-         << setw(30) << PackageName << right
-         << setw(10) << (long long)Price << " D"
-         << setw(10) << DataMB << " MB"
-         << setw(10) << VoiceMinutes << " P"
-         << setw(10) << SMS << " tin"
-         << setw(10) << Days << " ngay" << endl;
+    cout << left  << setw(10) << ID 
+         << left  << setw(18) << PackageName 
+         << right << setw(11) << (long long)Price << " D"
+         << right << setw(11) << DataMB << " MB"
+         << right << setw(8)  << VoiceMinutes << " P"
+         << right << setw(5)  << SMS << " tin"
+         << right << setw(6)  << Days << " ngay" << endl;
 }
 
 // Cài đặt getter
@@ -187,12 +187,12 @@ void Package :: setDays(int d) {
 void PackageMenu :: printHeader() {
     cout << string(85, '-') << "\n";
     cout << left  << setw(10) << "Ma Goi"
-         << setw(26) << "Ten Goi Cuoc"
-         << right << setw(12) << "Gia Cuoc"
-         << setw(11) << "Data"
-         << setw(8)  << "Thoai"
-         << setw(8)  << "SMS"
-         << setw(10) << "Chu Ky" << "\n";
+         << left  << setw(18) << "Ten Goi Cuoc"
+         << right << setw(13) << "Gia Cuoc"
+         << right << setw(14) << "Data"
+         << right << setw(10) << "Thoai"
+         << right << setw(9)  << "SMS"
+         << right << setw(11) << "Chu Ky" << "\n";
     cout << string(85, '-') << "\n";
 }
 
