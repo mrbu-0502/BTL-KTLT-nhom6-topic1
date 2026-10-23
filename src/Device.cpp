@@ -17,7 +17,7 @@ Device::Device() {
 }
 
 // ============================================================================
-// 2. QUAN LY MA DINH DANH (ID) CUA THIET BI
+// 2. QUAN LY MA DINH DANH (ID) CUA THIET BI VA GETTER / SETTER
 // ============================================================================
 string Device::getID() const {
     return MaIMEI;
@@ -28,7 +28,6 @@ void Device::setID(const string& value) {
     MaIMEI = value;
 }
 
-// Cac ham Getter va Setter
 string Device::getMaIMEI() const { return MaIMEI; }
 string Device::getTenMay() const { return TenMay; }
 string Device::getHangSX() const { return HangSX; }
@@ -42,9 +41,10 @@ void Device::setNamSX(const string& value) { NamSX = value; }
 void Device::setTinhTrang(const string& value) { TinhTrang = value; }
 
 // ============================================================================
-// 3. NHAP DU LIEU TU BAN PHIM (Kiem tra IMEI dung 15 chu so chuan vien thong)
+// 3. NHAP DU LIEU TU BAN PHIM (Co kiem tra ngoai le cho tat ca cac truong)
 // ============================================================================
 void Device::getInformation() {
+    // 1. Kiem tra Ma IMEI: Dung 15 chu so
     while (true) {
         MaIMEI = InputHelper::getString("Nhap ma IMEI (dung 15 chu so): ");
         if (MaIMEI.length() != 15) {
@@ -66,10 +66,53 @@ void Device::getInformation() {
     }
     ID = MaIMEI;
 
-    TenMay = InputHelper::getString("Nhap ten may: ");
-    HangSX = InputHelper::getString("Nhap hang san xuat: ");
-    NamSX = InputHelper::getString("Nhap nam san xuat: ");
-    TinhTrang = InputHelper::getString("Nhap tinh trang (Moi/Cu): ");
+    // 2. Kiem tra Ten may: Khong rong, khong chua dau '|'
+    while (true) {
+        TenMay = InputHelper::getString("Nhap ten may: ");
+        if (TenMay.empty() || TenMay.find('|') != string::npos) {
+            cout << "Loi: Ten may khong hop le! Vui long nhap lai.\n";
+            continue;
+        }
+        break;
+    }
+
+    // 3. Kiem tra Hang san xuat: Khong rong, khong chua dau '|'
+    while (true) {
+        HangSX = InputHelper::getString("Nhap hang san xuat: ");
+        if (HangSX.empty() || HangSX.find('|') != string::npos) {
+            cout << "Loi: Hang san xuat khong hop le! Vui long nhap lai.\n";
+            continue;
+        }
+        break;
+    }
+
+    // 4. Kiem tra Nam san xuat: Phai la 4 chu so (1990 - 2026)
+    while (true) {
+        NamSX = InputHelper::getString("Nhap nam san xuat (1990-2026): ");
+        bool hopLe = (NamSX.length() == 4);
+        for (char c : NamSX) {
+            if (!isdigit(c)) hopLe = false;
+        }
+        if (hopLe) {
+            int nam = stoi(NamSX);
+            if (nam < 1990 || nam > 2026) hopLe = false;
+        }
+        if (!hopLe) {
+            cout << "Loi: Nam san xuat phai la so co 4 chu so (tu 1990 den 2026)!\n";
+            continue;
+        }
+        break;
+    }
+
+    // 5. Kiem tra Tinh trang: Chi nhan "Moi" hoac "Cu"
+    while (true) {
+        TinhTrang = InputHelper::getString("Nhap tinh trang (Moi/Cu): ");
+        if (TinhTrang != "Moi" && TinhTrang != "Cu") {
+            cout << "Loi: Tinh trang chi duoc nhap 'Moi' hoac 'Cu'!\n";
+            continue;
+        }
+        break;
+    }
 }
 
 // ============================================================================
@@ -115,7 +158,7 @@ void Device::fromString(const string& line) {
 // ============================================================================
 void menuThietBi() {
     Repository<Device> repo("data/devices.txt");
-    repo.loadFromFile(); // Doc du lieu tu file devices.txt len
+    repo.loadFromFile();
 
     int chon = -1;
     while (chon != 0) {
@@ -197,7 +240,7 @@ void menuThietBi() {
                 string tenMoi = InputHelper::getStringOrDefault("Ten may", p->getTenMay());
                 string hangMoi = InputHelper::getStringOrDefault("Hang san xuat", p->getHangSX());
                 string namMoi = InputHelper::getStringOrDefault("Nam san xuat", p->getNamSX());
-                string tinhTrangMoi = InputHelper::getStringOrDefault("Tinh trang", p->getTinhTrang());
+                string tinhTrangMoi = InputHelper::getStringOrDefault("Tinh trang (Moi/Cu)", p->getTinhTrang());
                 
                 Device moi;
                 moi.setID(ma);
