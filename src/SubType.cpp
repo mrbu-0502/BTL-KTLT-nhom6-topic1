@@ -153,7 +153,11 @@ static void themMoiSubType(Repository<SubType>& repo) {
         return;
     }
 
-    long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
+    long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND, nhap -1 de thoat): ", -1);
+    if (cuoc == -1) {
+        cout << "Da huy thao tac them moi.\n";
+        return;
+    }
 
     SubType subtypenew(id, ten, moTa, cuoc);
     repo.add(subtypenew);

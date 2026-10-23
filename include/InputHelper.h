@@ -99,6 +99,11 @@ public:
                 cout << "[Loi] Du lieu khong duoc de trong! Vui long nhap lai.\n";
                 continue;
             }
+            //'|' la ky tu phan cach truong trong file du lieu, khong duoc nam trong gia tri;
+            if (s.find('|') != string::npos) {
+                cout << "[Loi] Du lieu khong duoc chua ky tu '|'! Vui long nhap lai.\n";
+                continue;
+            }
             return s;
         }
     }
@@ -124,11 +129,18 @@ public:
     // NHẬP GIÁ TRỊ MỚI HOẶC GIỮ NGUYÊN GIÁ TRỊ CŨ (GET DEFAULT OR NEW)
     // ==========================================================================
     static string getStringOrDefault(const string& CauThongBao, const string& oldValue) {
-        cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
-        string newstring;
-        getline(cin, newstring);
-        if (newstring.empty()) return oldValue;
-        return newstring;
+        while (true) {
+            cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
+            string newstring;
+            getline(cin, newstring);
+            if (newstring.empty()) return oldValue;
+            //'|' la ky tu phan cach truong trong file du lieu, khong duoc nam trong gia tri;
+            if (newstring.find('|') != string::npos) {
+                cout << "[Loi] Du lieu khong duoc chua ky tu '|'! Vui long nhap lai.\n";
+                continue;
+            }
+            return newstring;
+        }
     }
 
     static double getDoubleOrDefault(const string& CauThongBao, double oldValue) {
