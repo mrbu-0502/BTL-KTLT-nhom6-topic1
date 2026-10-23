@@ -20,10 +20,11 @@ using namespace std;
 class InputHelper {
 public:
 
-    static void clearBuffer() {
-        cin.clear();
-        cin.ignore(100000, '\n');
-    }
+    // static void clearBuffer() {
+    //     cin.clear();
+    //     cin.ignore(100000, '\n');
+    // }
+    // khong dung, bo;
 
 
     static int getInt(const string& CauThongBao, int minVal = numeric_limits<int>::min(), int maxVal = numeric_limits<int>::max()) {
