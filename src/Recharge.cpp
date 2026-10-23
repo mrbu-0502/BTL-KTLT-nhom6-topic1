@@ -273,7 +273,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Contra
     while(true){
         try{
             code = InputHelper::getString("Nhap ma phieu can sua (RC + so | 0 de quay lai): ", false);
-            if(code == "0")  break; 
+            if(code == "0")  {return;} 
             Recharge candidate;
             candidate.setRefID(code);
         }
