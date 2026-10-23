@@ -203,7 +203,7 @@ public:
         if (PhoneNumber.size() != 10) return false;
         if (PhoneNumber[0] != '0') return false;
         for (int i = 0; i < 10; i++) {
-            if (!isdigit(static_cast<unsigned char>(PhoneNumber[i]))) return false;
+            if (!isdigit(PhoneNumber[i])) return false;
         }
         return true;
     }
@@ -218,12 +218,12 @@ public:
     //kiem tra ma id: phan dau phai trung tien to, phan con lai phai la chu so (vi du HD01, SUB12);
     static bool checkidvalid(const string& id, const string& check){
         //phai co it nhat 1 ky tu sau tien to, neu khong thi chuoi chi gom tien to (vd "SUB") se lot qua;
-        if (check.empty() || id.length() <= check.length()) return false;
-        for (size_t i = 0; i < check.length(); i++) {
+        if (check.empty() || id.size() <= check.size()) return false;
+        for (int i = 0; i < check.size(); i++) {
             if (id[i] != check[i]) return false;
         }
-        for (size_t i = check.length(); i < id.length(); i++) {
-            if (!isdigit(static_cast<unsigned char>(id[i]))) return false;
+        for (int i = check.size(); i < id.size(); i++) {
+            if (!isdigit(id[i])) return false;
         }
         return true;
     }
