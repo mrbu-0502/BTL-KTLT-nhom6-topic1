@@ -29,16 +29,19 @@ public:
     static int getInt(const string& CauThongBao, int minVal = numeric_limits<int>::min(), int maxVal = numeric_limits<int>::max()) {
         while (true) {
             cout << CauThongBao;
+            string line;
+            getline(cin, line);
+
+            stringstream ss(line);
             int value;
-            if (cin >> value) {
-                clearBuffer();
+            char extra;
+            if ((ss >> value) && !(ss >> extra)) {
                 if (value >= minVal && value <= maxVal) {
                     return value;
                 }
                 cout << "[Loi] Gia tri phai trong khoang [" << minVal << ", " << maxVal << "]! Vui long nhap lai.\n";
             } else {
                 cout << "[Loi] Vui long chi nhap so nguyen hop le!\n";
-                clearBuffer();
             }
         }
     }
@@ -47,16 +50,19 @@ public:
     static double getDouble(const string& CauThongBao, double minVal = 0.0, double maxVal = numeric_limits<double>::max()) {
         while (true) {
             cout << CauThongBao;
+            string line;
+            getline(cin, line);
+
+            stringstream ss(line);
             double value;
-            if (cin >> value) {
-                clearBuffer();
+            char extra;
+            if ((ss >> value) && !(ss >> extra)) {
                 if (value >= minVal && value <= maxVal) {
                     return value;
                 }
                 cout << "[Loi] Gia tri phai lon hon hoac bang " << minVal << "! Vui long nhap lai.\n";
             } else {
                 cout << "[Loi] Vui long chi nhap so thuc hop le!\n";
-                clearBuffer();
             }
         }
     }
@@ -65,16 +71,19 @@ public:
     static long long getLongLong(const string& CauThongBao, long long minVal = 0, long long maxVal = numeric_limits<long long>::max()) {
         while (true) {
             cout << CauThongBao;
+            string line;
+            getline(cin, line);
+
+            stringstream ss(line);
             long long value;
-            if (cin >> value) {
-                clearBuffer();
+            char extra;
+            if ((ss >> value) && !(ss >> extra)) {
                 if (value >= minVal && value <= maxVal) {
                     return value;
                 }
                 cout << "[Loi] Gia tri phai trong khoang [" << minVal << ", " << maxVal << "]! Vui long nhap lai.\n";
             } else {
                 cout << "[Loi] Vui long chi nhap so nguyen hop le!\n";
-                clearBuffer();
             }
         }
     }
