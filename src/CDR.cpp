@@ -18,7 +18,7 @@ CDR::CDR() {
 }
 
 // ============================================================================
-// 2. QUAN LY MA DINH DANH (ID) VA GETTER KHOA NGOAI
+// 2. QUAN LY MA DINH DANH (ID) VA GETTER / SETTER KHOA NGOAI
 // ============================================================================
 string CDR::getID() const {
     return MaCDR;
@@ -29,9 +29,19 @@ void CDR::setID(const string& value) {
     MaCDR = value;
 }
 
-string CDR::getSoGoi() const {
-    return SoGoi;
-}
+string CDR::getMaCDR() const { return MaCDR; }
+string CDR::getSoGoi() const { return SoGoi; }
+string CDR::getSoNhan() const { return SoNhan; }
+string CDR::getThoiDiem() const { return ThoiDiem; }
+string CDR::getSoGiay() const { return SoGiay; }
+string CDR::getCuocPhi() const { return CuocPhi; }
+
+void CDR::setMaCDR(const string& value) { MaCDR = value; ID = value; }
+void CDR::setSoGoi(const string& value) { SoGoi = value; }
+void CDR::setSoNhan(const string& value) { SoNhan = value; }
+void CDR::setThoiDiem(const string& value) { ThoiDiem = value; }
+void CDR::setSoGiay(const string& value) { SoGiay = value; }
+void CDR::setCuocPhi(const string& value) { CuocPhi = value; }
 
 // ============================================================================
 // 3. NHAP 6 THONG TIN CUOC GOI TU BAN PHIM (Co kiem tra ngoai le & chuan dinh dang)
@@ -191,7 +201,7 @@ void menuCuocGoi() {
         cout << "1. Xem toan bo danh sach cuoc goi\n";
         cout << "2. Them ban ghi cuoc goi moi (Co kiem tra khoa ngoai)\n";
         cout << "3. Tra cuu cuoc goi theo lua chon\n";
-        cout << "4. Sua thong tin cuoc goi\n";
+        cout << "4. Sua thong tin cuoc goi (Co kiem tra khoa ngoai)\n";
         cout << "5. Xoa ban ghi cuoc goi\n";
         cout << "0. Quay lai menu chinh\n";
         cout << "============================================\n";
@@ -219,7 +229,7 @@ void menuCuocGoi() {
             if (repo.findById(c.getID()) != nullptr) {
                 cout << "Loi: Ma CDR nay da ton tai!\n";
             } else {
-                // 2. Kiem tra khoa ngoai: SoGoi phai ton tai trong file SIM
+                // 2. Kiem tra khoa ngoai: SoGoi phai ton tai trong he thong SIM
                 Repository<Sim> simRepo("data/sims.txt");
                 simRepo.loadFromFile();
 
@@ -229,7 +239,7 @@ void menuCuocGoi() {
                 } else {
                     repo.add(c);
                     repo.saveToFile();
-                    cout << "Them cuoc goi thanh cong va da lien ket khoa ngoai!\n";
+                    cout << "Them cuoc goi thanh cong va da lien ket khoa ngoai SoGoi hop le!\n";
                 }
             }
         }
@@ -250,7 +260,7 @@ void menuCuocGoi() {
                     p->display();
                 }
             } else if (kieu == 2) {
-                string tuKhoa = InputHelper::getString("Nhap SDT hoac Ngay muon xem (VD: 0981000001, 2026): ");
+                string tuKhoa = InputHelper::getString("Nhap SDT hoac Ngay muon xem (VD: 0981000001, 2024): ");
                 vector<CDR> ds = repo.getAll();
                 int dem = 0;
                 for (int i = 0; i < (int)ds.size(); i++) {
@@ -272,20 +282,33 @@ void menuCuocGoi() {
             } else {
                 cout << "Thong tin cu:\n";
                 p->display();
-                cout << "\nNhap thong tin moi:\n";
-                CDR moi;
-                moi.getInformation();
+                cout << "\nNhap thong tin moi (Nhan Enter de giu nguyen):\n";
                 
+                string soGoiMoi = InputHelper::getStringOrDefault("So dien thoai goi: ", p->getSoGoi());
                 // Kiem tra khoa ngoai cho so goi moi
                 Repository<Sim> simRepo("data/sims.txt");
                 simRepo.loadFromFile();
-                if (simRepo.findById(moi.getSoGoi()) == nullptr) {
-                    cout << "Loi khoa ngoai: So dien thoai goi moi [" << moi.getSoGoi() << "] chua ton tai trong kho SIM!\n";
+                if (simRepo.findById(soGoiMoi) == nullptr) {
+                    cout << "Loi khoa ngoai: So dien thoai goi moi [" << soGoiMoi << "] chua ton tai trong he thong SIM!\n";
+                    cout << "Cap nhat that bai!\n";
                 } else {
-                    moi.setID(ma); // Giu nguyen ma CDR cu
+                    string soNhanMoi = InputHelper::getStringOrDefault("So dien thoai nhan: ", p->getSoNhan());
+                    string thoiDiemMoi = InputHelper::getStringOrDefault("Thoi diem goi: ", p->getThoiDiem());
+                    string soGiayMoi = InputHelper::getStringOrDefault("Thoi luong giay: ", p->getSoGiay());
+                    string cuocPhiMoi = InputHelper::getStringOrDefault("Cuoc phi: ", p->getCuocPhi());
+
+                    CDR moi;
+                    moi.setID(ma);
+                    moi.setMaCDR(ma);
+                    moi.setSoGoi(soGoiMoi);
+                    moi.setSoNhan(soNhanMoi);
+                    moi.setThoiDiem(thoiDiemMoi);
+                    moi.setSoGiay(soGiayMoi);
+                    moi.setCuocPhi(cuocPhiMoi);
+
                     repo.update(ma, moi);
                     repo.saveToFile();
-                    cout << "Cap nhat thanh cong!\n";
+                    cout << "Cap nhat cuoc goi thanh cong!\n";
                 }
             }
         }
