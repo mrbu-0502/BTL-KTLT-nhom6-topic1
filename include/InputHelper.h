@@ -199,12 +199,11 @@ public:
 
     //kiem tra xem sdt co hop le khong: 10 so va so 0 o dau;
     static bool checkPhoneNumber(const string& PhoneNumber){
-        if(PhoneNumber[0] != '0') return false;
-        if(PhoneNumber.size() != 10) return false;
-        else{
-            for(int i = 0; i < 10; i++){
-                if(!isdigit(PhoneNumber[i])) return false;
-            }
+        //kiem tra do dai truoc de khong truy cap chi so 0 tren chuoi rong;
+        if (PhoneNumber.size() != 10) return false;
+        if (PhoneNumber[0] != '0') return false;
+        for (int i = 0; i < 10; i++) {
+            if (!isdigit(static_cast<unsigned char>(PhoneNumber[i]))) return false;
         }
         return true;
     }
@@ -216,11 +215,15 @@ public:
         }
     }
 
-    //kiem tra ma id xem co dung dinh dang khong (vi du HDxxxx, kiem tra xem cac chu dau co phai check khong);
+    //kiem tra ma id: phan dau phai trung tien to, phan con lai phai la chu so (vi du HD01, SUB12);
     static bool checkidvalid(const string& id, const string& check){
-        if (id.length() < check.length() || check.empty()) return false;
-        for (int i = 0; i < check.length(); i++) {
+        //phai co it nhat 1 ky tu sau tien to, neu khong thi chuoi chi gom tien to (vd "SUB") se lot qua;
+        if (check.empty() || id.length() <= check.length()) return false;
+        for (size_t i = 0; i < check.length(); i++) {
             if (id[i] != check[i]) return false;
+        }
+        for (size_t i = check.length(); i < id.length(); i++) {
+            if (!isdigit(static_cast<unsigned char>(id[i]))) return false;
         }
         return true;
     }
