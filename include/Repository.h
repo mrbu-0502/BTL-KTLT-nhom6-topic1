@@ -40,12 +40,7 @@ public:
         }
         return nullptr;
     }
-
-    void sortRecords(bool (*cmp)(const T&, const T&)) {
-        sort(records.begin(), records.end(), cmp);
-        saveToFile();
-    }
-    
+ 
     void add(T item) {
         if (findById(item.getID()) != nullptr) {
             throw invalid_argument("Loi: Ma dinh danh da ton tai!");
