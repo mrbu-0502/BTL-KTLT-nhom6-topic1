@@ -209,9 +209,9 @@ public:
         return true;
     }
 
-    //doi phan dau +84 thanh 0;
+    //doi phan dau +84 thanh 0 (chi doi khi chuoi bat dau dung bang "+84");
     static void xuly_84(string& phone){
-        if(phone[0] == '+'){
+        if(phone.size() >= 3 && phone.substr(0, 3) == "+84"){
             phone = "0" + phone.substr(3);
         }
     }

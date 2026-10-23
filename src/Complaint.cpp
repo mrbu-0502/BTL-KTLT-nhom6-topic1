@@ -112,22 +112,19 @@ static void inTieuDeBangComplaint() {
     cout << string(93, '-') << endl;
 }
 
-//tu dong sinh ma KN;
-//lay phan tu cuoi cung lam max roi ma KN moi = KN max + 1;
+//tu dong sinh ma KN: tim ma KN nho nhat chua dung (giong cach sinh ma cua SubType);
 static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
-    int max = 0;
-    vector<Complaint> list = repo_complaint.getAll();
-    if (list.empty()) {
-        return "KN01";
+    int moi = 1;
+    stringstream maknmoi;
+    maknmoi << "KN" << setfill('0') << setw(2) << moi;
+    while (repo_complaint.findById(maknmoi.str()) != nullptr) {
+        moi++;
+        maknmoi.clear();
+        maknmoi.str("");
+        maknmoi << "KN" << setfill('0') << setw(2) << moi;
     }
 
-    string maKNmax = list[list.size() - 1].getID();
-    max =stoi(maKNmax.substr(2));
-
-    stringstream ss;
-    ss << "KN" << setw(2) << setfill('0') << max + 1;
-    
-    return ss.str();
+    return maknmoi.str();
 }
 
 
@@ -183,7 +180,7 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
             ngaygui.input(ngay);
             if(ngaygui.compare(ngayhopdong) >= 0) break;
             else {
-                cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!";
+                cout << "Ngay gui khieu nai khong the som hon ngay tao hop dong!" << endl;
             }
         }
         catch(const exception& error){
