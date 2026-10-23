@@ -1,7 +1,7 @@
 #include "CDR.h"      
 #include "InputHelper.h" 
 #include "Repository.h"
-#include "Sim.h" 
+#include "Sim.h" // Khai bao them thu vien Sim de tham chieu khoa ngoai (hoac Customer.h tuy nhom)
 
 using namespace std;
 
