@@ -219,7 +219,7 @@ public:
     //kiem tra ma id xem co dung dinh dang khong (vi du HDxxxx, kiem tra xem cac chu dau co phai check khong);
     static bool checkidvalid(const string& id, const string& check){
         if (id.length() < check.length() || check.empty()) return false;
-        for (size_t i = 0; i < check.length(); i++) {
+        for (int i = 0; i < check.length(); i++) {
             if (id[i] != check[i]) return false;
         }
         return true;
