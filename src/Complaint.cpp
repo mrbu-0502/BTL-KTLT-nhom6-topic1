@@ -198,16 +198,9 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
         return;
     }
 
-    string trangThai;
-    while(true){
-        trangThai = InputHelper::getString("Nhap trang thai (TiepNhan / DangXuLy / DaXuLy, nhap 0 de thoat): ", false);
-        if (trangThai == "0") {
-            cout << "Da huy thao tac them moi.\n";
-            return;
-        }
-        if(trangThai == "TiepNhan" || trangThai == "DangXuLy" || trangThai == "DaXuLy") break;
-        else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
-    }
+    //phieu khieu nai moi luon o trang thai TiepNhan, khong cho nguoi dung tu nhap;
+    string trangThai = "TiepNhan";
+    cout << "Trang thai duoc gan tu dong: " << trangThai << endl;
 
     Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
