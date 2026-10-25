@@ -102,17 +102,19 @@ static void inTieuDeBangSubType() {
     cout << string(115, '-') << endl;
 }
 
+//tu dong sinh ma loai hinh moi, ma loai hinh lon nhat hien tai + 1;
 static string sinhMaLoaimoi(Repository<SubType>& repo) {
-    int moi = 1;
-    stringstream Maloaimoi;
-    Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
-    while (repo.findById(Maloaimoi.str()) != nullptr) {
-        moi++;
-        Maloaimoi.clear();
-        Maloaimoi.str("");
-        Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
+    int maxID = 0;
+    vector<SubType> list = repo.getAll();
+    if (list.empty()) return "SUB01";
+    for (int i = 0; i < list.size(); i++) {
+        int currentID = stoi(list[i].getID().substr(3));
+        if (currentID > maxID) {
+            maxID = currentID;
+        }
     }
-
+    stringstream Maloaimoi;
+    Maloaimoi << "SUB" << setfill('0') << setw(2) << (maxID + 1);
     return Maloaimoi.str();
 }
 
