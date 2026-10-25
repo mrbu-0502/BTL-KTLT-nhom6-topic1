@@ -62,14 +62,14 @@ Dữ liệu lưu trong file `.txt`, các trường phân tách bằng dấu `|`.
 | Khách hàng (`Customer`) | `customers.txt` | `MaKH\|HoTen\|CCCD\|DiaChi\|NgaySinh` |
 | Loại hình thuê bao (`SubType`) | `sub_types.txt` | `MaLoai\|TenLoai\|MoTa\|CuocThang` |
 | Phiếu khiếu nại (`Complaint`) | `complaints.txt` | `MaKN\|MaHD\|NgayGui\|NoiDung\|TrangThai` |
-| Thiết bị (`Device`) | `devices.txt` | `MaIMEI\|TenMay\|HangSX\|NamSX\|TinhTrang` |
+| Thiết bị (`Device`) | `devices.txt` | `MaThietBi\|MaIMEI1\|MaIMEI2\|TenMay\|HangSX\|NgaySanXuat\|TinhTrang` |
 | Bản ghi cuộc gọi (`CDR`) | `cdrs.txt` | `MaCDR\|SoGoi\|SoNhan\|ThoiDiem\|SoGiay\|CuocPhi` |
 | SIM (`Sim`) | `sims.txt` | `SoSim\|MaIMSI\|MaLoai\|MaIMEI\|NgayKichHoat\|TrangThai` |
 | Hóa đơn cước (`Bill`) | `bills.txt` | `MaHoaDon\|SoSim\|ThangNam\|TongTien\|TrangThai` |
 | Phiếu nạp tiền (`Recharge`) | `recharges.txt` | `MaPhieu\|SoSim\|MenhGia\|NgayNap\|HinhThuc` |
 | Hợp đồng đăng ký (`Contract`) | `contracts.txt` | `MaHopDong\|MaKH\|SoSim\|MaGoi\|NgayDangKy\|TrangThai` |
 
-> Ghi chú khóa ngoại: `Complaint.MaHD` tham chiếu `contracts.txt`; `Sim.MaLoai` → `sub_types.txt`, `Sim.MaIMEI` → `devices.txt`; `CDR.SoGoi/SoNhan`, `Bill.SoSim`, `Recharge.SoSim` → `sims.txt`; `Contract.MaKH` → `customers.txt`, `Contract.SoSim` → `sims.txt`, `Contract.MaGoi` → `packages.txt`.
+> Ghi chú khóa ngoại: `Complaint.MaHD` tham chiếu `contracts.txt`; `Sim.MaLoai` → `sub_types.txt`, `Sim.MaIMEI` → `devices.txt` (khớp `MaIMEI1` hoặc `MaIMEI2`, `NONE` nếu chưa gán máy); `CDR.SoGoi/SoNhan`, `Bill.SoSim`, `Recharge.SoSim` → `sims.txt`; `Contract.MaKH` → `customers.txt`, `Contract.SoSim` → `sims.txt`, `Contract.MaGoi` → `packages.txt`.
 
 ---
 
