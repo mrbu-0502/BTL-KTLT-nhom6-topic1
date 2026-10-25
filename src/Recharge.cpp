@@ -100,9 +100,9 @@ void Recharge::setPhoneNumber(const string& value){
         throw InvalidDataException("SDT phai gom 10 chu so va bat dau bang 0!");
     PhoneNumber = value;
 }
-void Recharge::setPraValue(int value){
-    if (value <= 0) {
-        throw InvalidDataException("So tien phai lon hon 0!");
+void Recharge::setPraValue(int value) {
+    if (value < 10000 || value > 5000000 || value % 10000 != 0) {
+        throw InvalidDataException("Menh gia phai la boi so cua 10.000 va nam trong khoang 10.000 - 5.000.000 VND!");
     }
     PraValue = value;
 }
@@ -129,14 +129,17 @@ static bool CheckPhoneNumberStatus(Repository<Sim>& simRepo, const string& phone
     return true;
 }
 // Kiem tra xem ngay nap tien co lon hon ngay tao hop dong khong
-static bool checkRechargeDate(Repository<Sim>& simRepo, const string& phoneNumber, Date d) {
+static bool checkRechargeDate(Repository<Sim>& simRepo, const string& phoneNumber, Date rechargeDate) {
     Sim* sim = simRepo.findById(phoneNumber);
+    if (sim == nullptr)
+        throw InvalidDataException("So SIM khong ton tai!");
+
     Date activated;
-    activated.input_string(sim->getNgayKichHoat());
-    if (d.compare(activated) < 0)
-        throw InvalidDataException("Ngay nap phai tu ngay kich hoat " + activated.output() + " tro di!");
-    if (d.compare(activated) > 0)
-        throw InvalidDataException("Ngay nap khong duoc o tuong lai!");
+    activated.input(sim->getNgayKichHoat());
+
+    if (rechargeDate.compare(activated) < 0)
+        throw InvalidDataException(
+            "Ngay nap phai tu ngay kich hoat " + activated.output() + " tro di!");
     return true;
 }
 // ============================================================================
@@ -166,7 +169,7 @@ static void listRecharge(Repository<Recharge>& repo) {
 // ============================================================================
 static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& simRepo){
     Recharge item;
-    string ID = generateNextRechargetID(rechargeRepo);
+    string ID = InputHelper::generateAutoID(rechargeRepo, "RC", "data/recharge_seq.txt");
     cout << "\n--- THEM PHIEU NAP TIEN (Nhap 0 o bat ky buoc nao de huy) ---\n";
     // 1. Ma Phieu nap tu sinh
     cout << "Ma RC (tu dong sinh): " << ID << '\n';
@@ -197,7 +200,7 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& sim
     }
     while (true) {
         try {
-            string text = InputHelper::getString("Ngay nap (DD/MM/YYYY | 0 de giu nguyen): ", false);
+            string text = InputHelper::getString("Ngay nap (DD/MM/YYYY | 0 de quay lai): ", false);
             if(text == "0") { cout << "Da huy thao tac them.\n"; return; }
             item.setRDate(text);
             Date rechargeDate;
@@ -221,7 +224,6 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& sim
         }
     }
     rechargeRepo.add(item);
-    rechargeRepo.saveToFile();
     cout << "Nap tien thanh cong!\n";
     printTitleRecharge();
     item.display();
@@ -302,19 +304,17 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
         }
     }
     while (true) {
-        string text = InputHelper::getString("Ngay nap (DD/MM/YYYY | 0 de giu nguyen): ", false);
-        if(text == "0") break; 
         try {
+            string text = InputHelper::getString("Ngay nap (DD/MM/YYYY | 0 de giu nguyen): ", false);
             Recharge candidate = update;
-            candidate.setRDate(text);
+            if (text != "0")
+                candidate.setRDate(text);
             Date rechargeDate;
-            rechargeDate.input_string(candidate.getRDate());
-            if(checkRechargeDate(simRepo, candidate.getPhoneNumber(), rechargeDate)) {
-                update = candidate;
-                break;
-            }
-        }
-        catch (const exception& error) {
+            rechargeDate.input(candidate.getRDate());
+            checkRechargeDate(simRepo,candidate.getPhoneNumber(),rechargeDate);
+            update = candidate;
+            break;
+        } catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
         }
     }
@@ -330,7 +330,6 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
         }
     }
     rechargeRepo.update(code, update);
-    rechargeRepo.saveToFile();
     cout << "Cap nhat phieu nap tien thanh cong!\n";
     printTitleRecharge();
     update.display();
@@ -357,7 +356,6 @@ static void removeRecharge(Repository<Recharge>& repo) {
                 return;
             }
             repo.remove(text);
-            repo.saveToFile();
             cout << "Da xoa phieu nap tien " << text << ".\n";
             return;
         } catch (const exception& error) {

@@ -10,11 +10,14 @@
  */
 
 #pragma once
+#include "Repository.h"
 #include <iostream>
 #include <string>
 #include <limits>
-#include<cctype>
+#include <cctype>
 #include <sstream>
+#include <fstream>
+#include <iomanip>
 using namespace std;
 
 class InputHelper {
@@ -99,6 +102,11 @@ public:
                 cout << "[Loi] Du lieu khong duoc de trong! Vui long nhap lai.\n";
                 continue;
             }
+            //'|' la ky tu phan cach truong trong file du lieu, khong duoc nam trong gia tri;
+            if (s.find('|') != string::npos) {
+                cout << "[Loi] Du lieu khong duoc chua ky tu '|'! Vui long nhap lai.\n";
+                continue;
+            }
             return s;
         }
     }
@@ -124,11 +132,18 @@ public:
     // NHẬP GIÁ TRỊ MỚI HOẶC GIỮ NGUYÊN GIÁ TRỊ CŨ (GET DEFAULT OR NEW)
     // ==========================================================================
     static string getStringOrDefault(const string& CauThongBao, const string& oldValue) {
-        cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
-        string newstring;
-        getline(cin, newstring);
-        if (newstring.empty()) return oldValue;
-        return newstring;
+        while (true) {
+            cout << CauThongBao << "(Hien tai: " << oldValue << "): ";
+            string newstring;
+            getline(cin, newstring);
+            if (newstring.empty()) return oldValue;
+            //'|' la ky tu phan cach truong trong file du lieu, khong duoc nam trong gia tri;
+            if (newstring.find('|') != string::npos) {
+                cout << "[Loi] Du lieu khong duoc chua ky tu '|'! Vui long nhap lai.\n";
+                continue;
+            }
+            return newstring;
+        }
     }
 
     static double getDoubleOrDefault(const string& CauThongBao, double oldValue) {
@@ -199,29 +214,63 @@ public:
 
     //kiem tra xem sdt co hop le khong: 10 so va so 0 o dau;
     static bool checkPhoneNumber(const string& PhoneNumber){
-        if(PhoneNumber[0] != '0') return false;
-        if(PhoneNumber.size() != 10) return false;
-        else{
-            for(int i = 0; i < 10; i++){
-                if(!isdigit(PhoneNumber[i])) return false;
-            }
+        //kiem tra do dai truoc de khong truy cap chi so 0 tren chuoi rong;
+        if (PhoneNumber.size() != 10) return false;
+        if (PhoneNumber[0] != '0') return false;
+        for (int i = 0; i < 10; i++) {
+            if (!isdigit(PhoneNumber[i])) return false;
         }
         return true;
     }
 
-    //doi phan dau +84 thanh 0;
+    //doi phan dau +84 thanh 0 (chi doi khi chuoi bat dau dung bang "+84");
     static void xuly_84(string& phone){
-        if(phone[0] == '+'){
+        if(phone.size() >= 3 && phone.substr(0, 3) == "+84"){
             phone = "0" + phone.substr(3);
         }
     }
 
-    //kiem tra ma id xem co dung dinh dang khong (vi du HDxxxx, kiem tra xem cac chu dau co phai check khong);
+    //kiem tra ma id: phan dau phai trung tien to, phan con lai phai la chu so (vi du HD01, SUB12);
     static bool checkidvalid(const string& id, const string& check){
-        if (id.length() < check.length() || check.empty()) return false;
-        for (size_t i = 0; i < check.length(); i++) {
+        //phai co it nhat 1 ky tu sau tien to, neu khong thi chuoi chi gom tien to (vd "SUB") se lot qua;
+        if (check.empty() || id.size() <= check.size()) return false;
+        for (int i = 0; i < check.size(); i++) {
             if (id[i] != check[i]) return false;
         }
+        for (int i = check.size(); i < id.size(); i++) {
+            if (!isdigit(id[i])) return false;
+        }
         return true;
+    }
+    //Sinh ma ID tu dong
+    template <typename T>
+    static string generateAutoID(Repository<T>& repo, const std::string& prefix, const std::string& seqFilename) {
+        int maxID = 0;
+        
+        //Đọc ID lớn nhất từ file cấu hình
+        std::ifstream inFile(seqFilename);
+        if (inFile.is_open()) {
+            inFile >> maxID;
+            inFile.close();
+        } else {
+            for (const auto& item : repo.getAll()) {
+                try {
+                    int currentID = std::stoi(item.getID().substr(prefix.length()));
+                    if (currentID > maxID) maxID = currentID;
+                } catch (...) {
+                    // Bỏ qua nếu dữ liệu lỗi
+                }
+            }
+        }
+        maxID++;
+        std::ofstream outFile(seqFilename);
+        if (outFile.is_open()) {
+            outFile << maxID;
+            outFile.close();
+        }
+        //Định dạng chuỗi (VD: prefix="HD", maxID=5 => "HD05")
+        std::ostringstream nextID;
+        nextID << prefix << std::setfill('0') << std::setw(2) << maxID;
+        return nextID.str();
     }
 };
