@@ -112,26 +112,6 @@ static void inTieuDeBangComplaint() {
     cout << string(93, '-') << endl;
 }
 
-<<<<<<< HEAD
-//tu dong sinh ma KN: tim ma KN nho nhat chua dung (giong cach sinh ma cua SubType);
-static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
-    int moi = 1;
-    stringstream maknmoi;
-    maknmoi << "KN" << setfill('0') << setw(2) << moi;
-    while (repo_complaint.findById(maknmoi.str()) != nullptr) {
-        moi++;
-        maknmoi.clear();
-        maknmoi.str("");
-        maknmoi << "KN" << setfill('0') << setw(2) << moi;
-    }
-
-    return maknmoi.str();
-}
-
-
-
-=======
->>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -211,11 +191,8 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     //phieu khieu nai moi luon o trang thai TiepNhan, khong cho nguoi dung tu nhap;
     string trangThai = "TiepNhan";
 
-<<<<<<< HEAD
-=======
     //ma KN duoc sinh sau khi da nhap xong du lieu, tranh tang so thu tu khi nguoi dung huy;
     string maKN = InputHelper::generateAutoID(repo_complaint, "KN", "data_counter/complaint_counter.txt");
->>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
     Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
     cout << "Them phieu khieu nai id: " << maKN << " thanh cong!\n";
@@ -284,11 +261,7 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     p->display();
     cout << string(93, '-') << endl;
 
-<<<<<<< HEAD
-    cout << "(Luu y: Nhan Enter de giu nguyen ma HD, noi dung, trang thai)\n";
-=======
     cout << "(Luu y: Nhan Enter de giu nguyen ma HD, ngay gui, noi dung, trang thai)\n";
->>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
     string maHDMoi;
     Contract* hopdongmoi = nullptr;
     while (true) {
@@ -315,12 +288,8 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     }
     while(true) {
         try{
-<<<<<<< HEAD
-            string text = InputHelper::getString("Nhap ngay gui moi (DD/MM/YYYY, nhap 0 de huy): ", false);
-=======
             //de trong (Enter) se giu nguyen ngay gui cu;
             string text = InputHelper::getStringOrDefault("Nhap ngay gui moi (DD/MM/YYYY, nhap 0 de huy)", p->getNgayGui());
->>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
             if (text == "0") {
                 cout << "Da huy thao tac cap nhat.\n";
                 return;

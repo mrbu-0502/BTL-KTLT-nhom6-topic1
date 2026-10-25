@@ -142,13 +142,10 @@ static void themMoiSubType(Repository<SubType>& repo) {
         cout << "Da huy thao tac them moi.\n";
         return;
     }
-<<<<<<< HEAD
-=======
 
     //ma loai hinh duoc sinh sau khi da nhap xong du lieu, tranh tang so thu tu khi nguoi dung huy;
     string id = InputHelper::generateAutoID(repo, "SUB", "data_counter/subtype_counter.txt");
     cout << "Ma loai hinh: " << id << endl;
->>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
 
     SubType subtypenew(id, ten, moTa, cuoc);
     repo.add(subtypenew);
