@@ -48,6 +48,13 @@ static bool timTrongFile(const string& file, int cot, const string& giaTri,
     return false;
 }
 
+// Kiem tra IMEI co ton tai trong devices.txt khong: thiet bi luu IMEI o khe 1
+// (cot 1) hoac khe 2 (cot 2) cua file devices.txt
+static bool imeiTonTai(const string& maIMEI) {
+    return timTrongFile("data/devices.txt", 1, maIMEI)
+        || timTrongFile("data/devices.txt", 2, maIMEI);
+}
+
 static bool laChuSo(const string& s) {
     return !s.empty() && all_of(s.begin(), s.end(),
                                 [](unsigned char c) { return isdigit(c) != 0; });
@@ -98,8 +105,10 @@ static string tenLoai(const string& maLoai) {
 
 static string tenMay(const string& maIMEI) {
     if (maIMEI == "NONE") return "(chua gan may)";
+    // devices.txt: MaThietBi|MaIMEI1|MaIMEI2|TenMay|... -> ten may nam o cot 3
     vector<string> f;
-    if (timTrongFile("data/devices.txt", 0, maIMEI, &f) && f.size() > 1) return f[1];
+    if (timTrongFile("data/devices.txt", 1, maIMEI, &f) && f.size() > 3) return f[3];
+    if (timTrongFile("data/devices.txt", 2, maIMEI, &f) && f.size() > 3) return f[3];
     return "(khong ro)";
 }
 
@@ -206,7 +215,7 @@ void Sim::getInformation() {
         try {
             string v = InputHelper::getString("Ma IMEI (15 so, hoac NONE neu chua gan may): ");
             setMaIMEI(v);
-            if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
+            if (v != "NONE" && !imeiTonTai(v))
                 throw ForeignKeyException("MaIMEI", v);
             break;
         } catch (const BaseException& e) {
@@ -268,7 +277,7 @@ void Sim::capNhatThongTin() {
             string v = InputHelper::getStringOrDefault("Ma IMEI ", maIMEI);
             Sim temp;
             temp.setMaIMEI(v);   // kiem tra truoc, chua doi gia tri hien tai
-            if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
+            if (v != "NONE" && !imeiTonTai(v))
                 throw ForeignKeyException("MaIMEI", v);
             setMaIMEI(v);
             break;
