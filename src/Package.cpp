@@ -61,39 +61,60 @@ void Package :: fromString(const string& line) {
     string VoiceMinutesStr;
     string SMSStr;
     string DaysStr;
+    string tempName;
 
+    // [FIX LỖI 4] Kiểm tra đủ số cột trước khi parse; dùng setter để validate dữ liệu đọc từ file
     string tempID;
     getline(ss, tempID, '|');
     if (tempID == "MaGoi" || tempID.empty()) {
         ID = "";
         return;
     }
-    ID = tempID;
-    getline(ss, PackageName, '|');
-    getline(ss, PriceStr, '|');
-    getline(ss, DataMBStr, '|');
-    getline(ss, VoiceMinutesStr, '|');
-    getline(ss, SMSStr, '|');
-    getline(ss, DaysStr, '|');
+    if (!getline(ss, tempName,       '|')) return;
+    if (!getline(ss, PriceStr,       '|')) return;
+    if (!getline(ss, DataMBStr,      '|')) return;
+    if (!getline(ss, VoiceMinutesStr,'|')) return;
+    if (!getline(ss, SMSStr,         '|')) return;
+    if (!getline(ss, DaysStr))             return; // cột cuối, không có '|' theo sau
 
     try {
-        if (!PriceStr.empty()){
-            Price = stod(PriceStr);
-        }       
-        if (!DataMBStr.empty()){
-            DataMB = stoi(DataMBStr);
+        size_t pos;
+        double parsedPrice = 0;
+        int parsedData = 0, parsedVoice = 0, parsedSMS = 0, parsedDays = 30;
+
+        if (!PriceStr.empty()) {
+            parsedPrice = stod(PriceStr, &pos);
+            if (pos != PriceStr.size())  // [FIX LỖI 4] "100abc" sẽ bị loại bỏ
+                throw invalid_argument("Gia cuoc chua ky tu la!");
         }
-        if (!VoiceMinutesStr.empty()){
-            VoiceMinutes = stoi(VoiceMinutesStr);
+        if (!DataMBStr.empty()) {
+            parsedData = stoi(DataMBStr, &pos);
+            if (pos != DataMBStr.size()) throw invalid_argument("DataMB chua ky tu la!");
         }
-        if (!SMSStr.empty()){
-            SMS = stoi(SMSStr);
+        if (!VoiceMinutesStr.empty()) {
+            parsedVoice = stoi(VoiceMinutesStr, &pos);
+            if (pos != VoiceMinutesStr.size()) throw invalid_argument("VoiceMinutes chua ky tu la!");
         }
-        if (!DaysStr.empty()){
-            Days = stoi(DaysStr);
+        if (!SMSStr.empty()) {
+            parsedSMS = stoi(SMSStr, &pos);
+            if (pos != SMSStr.size()) throw invalid_argument("SMS chua ky tu la!");
         }
+        if (!DaysStr.empty()) {
+            parsedDays = stoi(DaysStr, &pos);
+            if (pos != DaysStr.size()) throw invalid_argument("Days chua ky tu la!");
+        }
+
+        // [FIX LỖI 4] Gọi setter để đảm bảo dữ liệu file hợp lệ (không âm, chu kỳ > 0...)
+        ID = tempID;
+        setName(tempName);
+        setPrice(parsedPrice);
+        setDataMB(parsedData);
+        setVoiceMinutes(parsedVoice);
+        setSMS(parsedSMS);
+        setDays(parsedDays);
     } catch (...) {
-        // Phòng thủ bỏ qua nếu parse dữ liệu số thất bại
+        // Nếu dữ liệu bất hợp lệ: đặt ID rỗng để Repository bỏ qua bản ghi này
+        ID = "";
     }
 }
 
@@ -201,6 +222,7 @@ void PackageMenu :: printHeader() {
 // - Mục đích: Cho phép người dùng nhập thông tin và thêm một gói cước mới vào hệ thống.
 // - Kỹ thuật áp dụng:
 //   + Kiểm tra tính duy nhất của Mã gói cước (Primary Key không được trùng).
+//   + [FIX LỖI 5] Mã gói phải theo đúng định dạng PKG + số để đồng bộ với Contract.cpp.
 //   + Sử dụng InputHelper để bắt lỗi nhập liệu (chống tràn bộ đệm, ép kiểu an toàn).
 //   + Áp dụng tính đóng gói: Constructor gọi các Setter để validate dữ liệu đầu vào.
 //   + Cơ chế Exception Handling: Bắt InvalidDataException nếu thông số vi phạm nghiệp vụ.
@@ -210,7 +232,21 @@ void PackageMenu :: handleCreate(Repository<Package>& repo) {
     cout << "\n---------------- THEM GOI CUOC MOI ----------------\n";
     
     // Bước 1: Nhập mã gói cước và kiểm tra trùng lặp khóa chính
-    string id = InputHelper :: getString("Nhap ma goi cuoc: ", false);
+    // [FIX LỖI 5] Bắt buộc mã gói cước phải có định dạng PKGxxx (bắt đầu bằng PKG + số)
+    //             để nhất quán với Contract.cpp (setPhonePlan yêu cầu định dạng này)
+    string id;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma goi cuoc (dinh dang PKGxxx, vi du PKG01): ", false);
+        bool validPrefix = (id.size() >= 4 && id.substr(0, 3) == "PKG");
+        bool allDigitsAfter = validPrefix;
+        if (validPrefix) {
+            for (size_t i = 3; i < id.size(); i++) {
+                if (id[i] < '0' || id[i] > '9') { allDigitsAfter = false; break; }
+            }
+        }
+        if (validPrefix && allDigitsAfter) break;
+        cout << ">> [LOI] Ma goi cuoc phai bat dau bang PKG va theo sau la chu so (vi du: PKG01)!\n";
+    }
     if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma goi cuoc da ton tai tren he thong!\n";
         return; // Dừng thao tác thêm nếu mã đã tồn tại
@@ -437,12 +473,22 @@ void PackageMenu :: handleUpdate(Repository<Package>& repo) {
             pkg->setDays(stoi(daysStr)); // Kiểm tra >= 1 qua setDays
         }
 
-        // Lưu toàn bộ danh sách đã cập nhật từ RAM xuống file database/packages.txt
-        repo.saveToFile();
+        // [FIX LOI 3] Tao ban sao de kiem tra tinh hop le cua TAT CA truong moi
+        // truoc khi ghi vao doi tuong goc. Neu bat ky truong nao loi, khong co gi thay doi.
+        Package updated = *pkg;
+        if (!newName.empty())  updated.setName(newName);
+        if (!priceStr.empty()) updated.setPrice(stod(priceStr));
+        if (!dataStr.empty())  updated.setDataMB(stoi(dataStr));
+        if (!voiceStr.empty()) updated.setVoiceMinutes(stoi(voiceStr));
+        if (!smsStr.empty())   updated.setSMS(stoi(smsStr));
+        if (!daysStr.empty())  updated.setDays(stoi(daysStr));
+        // Tat ca setter deu thanh cong -> ghi ban cap nhat vao repo va file
+        repo.update(id, updated);
         cout << "\n>> [THANH CONG] Da cap nhat thong tin goi cuoc [" << id << "] thanh cong!\n";
     }
     catch (const exception& e) {
-        // Bắt lỗi nếu người dùng nhập số âm hoặc định dạng không hợp lệ
+        // Bat loi neu nguoi dung nhap so am hoac dinh dang khong hop le
+        // Doi tuong goc trong repo KHONG bi thay doi vi ta lam viec tren ban sao
         cout << "\n>> [THAT BAI] Khong the cap nhat: " << e.what() << "\n";
     }
 }
@@ -475,11 +521,16 @@ void PackageMenu :: handleDelete(Repository<Package>& repo) {
     
     // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (Foreign Key Integrity)
     // Một gói cước chỉ được xóa khi không có hợp đồng nào đang đăng ký gói đó.
-    Repository<Contract> contractRepo("data/contracts.txt"); // Nạp danh sách hợp đồng
+    // [FIX LOI 1] Neu tai file hop dong that bai, DUNG thao tac xoa de an toan,
+    //             khong am tham bo qua loi roi de nguoi dung xoa goi dang dung.
+    Repository<Contract> contractRepo("data/contracts.txt");
     try {
         contractRepo.loadFromFile();
-    } catch (...) {
-        // Nếu file hợp đồng chưa có dữ liệu hoặc chưa tạo thì bỏ qua lỗi đọc file
+    } catch (const exception& e) {
+        cout << ">> [LOI] Khong the tai danh sach hop dong de kiem tra rang buoc: "
+             << e.what() << "\n";
+        cout << ">> [TU CHOI] Khong the xac minh rang buoc - thao tac xoa bi huy bo.\n";
+        return;
     }
 
     bool isLinked = false;
@@ -513,10 +564,16 @@ void PackageMenu :: handleDelete(Repository<Package>& repo) {
 
 void PackageMenu :: run() {
     // Khởi tạo Repository và nạp dữ liệu từ file packages.txt vào RAM khi mở menu
+    // [FIX LOI 2] Nap du lieu tu file: neu that bai phai bao loi va thoat,
+    // khong duoc de menu chay voi danh sach rong roi ghi de mat toan bo du lieu cu.
     Repository<Package> repo("data/packages.txt");
     try {
         repo.loadFromFile();
-    } catch (...) {}
+    } catch (const exception& e) {
+        cout << "\n>> [LOI NGHIEM TRONG] Khong the tai du lieu goi cuoc: " << e.what() << "\n";
+        cout << ">> Vui long kiem tra file data/packages.txt. Quay lai menu chinh...\n";
+        return;
+    }
 
     int choice;
     do {
