@@ -244,18 +244,18 @@ public:
     }
     //Sinh ma ID tu dong
     template <typename T>
-    static string generateAutoID(Repository<T>& repo, const std::string& prefix, const std::string& seqFilename) {
+    static string generateAutoID(Repository<T>& repo, const string& prefix, const string& seqFilename) {
         int maxID = 0;
         
         //Đọc ID lớn nhất từ file cấu hình
-        std::ifstream inFile(seqFilename);
+        ifstream inFile(seqFilename);
         if (inFile.is_open()) {
             inFile >> maxID;
             inFile.close();
         } else {
             for (const auto& item : repo.getAll()) {
                 try {
-                    int currentID = std::stoi(item.getID().substr(prefix.length()));
+                    int currentID = stoi(item.getID().substr(prefix.length()));
                     if (currentID > maxID) maxID = currentID;
                 } catch (...) {
                     // Bỏ qua nếu dữ liệu lỗi
@@ -263,14 +263,14 @@ public:
             }
         }
         maxID++;
-        std::ofstream outFile(seqFilename);
+        ofstream outFile(seqFilename);
         if (outFile.is_open()) {
             outFile << maxID;
             outFile.close();
         }
         //Định dạng chuỗi (VD: prefix="HD", maxID=5 => "HD05")
-        std::ostringstream nextID;
-        nextID << prefix << std::setfill('0') << std::setw(2) << maxID;
+        stringstream nextID;
+        nextID << prefix << setfill('0') << setw(2) << maxID;
         return nextID.str();
     }
 };

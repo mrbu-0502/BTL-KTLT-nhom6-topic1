@@ -149,7 +149,6 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
     cout << "\n--- THEM HOP DONG MOI (Nhap 0 o bat ky buoc nao de huy) ---\n";
     // 1. Ma Hop dong tu sinh
     cout << "Ma HD (tu dong sinh): " << ID << '\n';
-    item.setContractID(ID);
     // 2. Nhap Ma Khach Hang
     while (true) {
         try {
@@ -223,7 +222,9 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
     }
     // 6. Trang thai: Mac dinh hop dong moi tao phai la "HieuLuc"
     item.setStatus("HieuLuc");
-
+    
+    contractRepo.add(item);
+    item.display();
     contractRepo.add(item);
     cout << "--> Dang ky hop dong thanh cong (Trang thai mac dinh: HieuLuc)!\n";
     printTitleContract();

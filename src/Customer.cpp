@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==============================================================================
  * BÀI TẬP LỚN: HỆ THỐNG QUẢN LÝ THUÊ BAO DI ĐỘNG (NHÓM 06 - ĐỀ TÀI 01)
  * Học phần: Kỹ thuật lập trình
@@ -59,11 +59,22 @@ void Customer :: fromString(const string& line) {
         ID = "";
         return;
     }
-    ID = tempID;
-    getline(ss, FullName, '|');
-    getline(ss, CCCD, '|');
-    getline(ss, Address, '|');
-    getline(ss, DateOfBirth, '|');
+    // [FIX LOI 4] Kiem tra du so cot truoc khi gan; dung setter de validate du lieu doc tu file.
+    string tempName, tempCCCD, tempAddress, tempDOB;
+    if (!getline(ss, tempName,    '|')) return;
+    if (!getline(ss, tempCCCD,    '|')) return;
+    if (!getline(ss, tempAddress, '|')) return;
+    if (!getline(ss, tempDOB))          return;
+    try {
+        ID = tempID;
+        setFullName(tempName);
+        setCCCD(tempCCCD);
+        setAddress(tempAddress);
+        setDateOfBirth(tempDOB);
+    } catch (...) {
+        // Du lieu file khong hop le: dat ID rong de Repository bo qua ban ghi nay
+        ID = "";
+    }
 }
 
 void Customer :: getInformation() {
@@ -172,8 +183,22 @@ void CustomerMenu :: printHeader() {
 void CustomerMenu :: handleCreate(Repository<Customer>& repo) {
     cout << "\n---------------- THEM KHACH HANG MOI ----------------\n";
 
-    // Bước 1: Nhập mã khách hàng và kiểm tra tính duy nhất (không được trùng)
-    string id = InputHelper :: getString("Nhap ma khach hang: ", false);
+    // Buoc 1: Nhap ma khach hang va kiem tra tinh duy nhat (khong duoc trung)
+    // [FIX LOI 5] Bat buoc ma KH phai theo dinh dang KHxxx (bat dau bang KH + so)
+    //             de nhat quan voi Contract.cpp (setCustomerID yeu cau dinh dang nay).
+    string id;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma khach hang (dinh dang KHxxx, vi du KH01): ", false);
+        bool validPrefix = (id.size() >= 3 && id.substr(0, 2) == "KH");
+        bool allDigitsAfter = validPrefix;
+        if (validPrefix) {
+            for (size_t i = 2; i < id.size(); i++) {
+                if (id[i] < '0' || id[i] > '9') { allDigitsAfter = false; break; }
+            }
+        }
+        if (validPrefix && allDigitsAfter) break;
+        cout << ">> [LOI] Ma khach hang phai bat dau bang KH va theo sau la chu so (vi du: KH01)!\n";
+    }
     if (repo.findById(id) != nullptr) {
         cout << ">> [LOI] Ma khach hang da ton tai tren he thong!\n";
         return;
@@ -398,22 +423,17 @@ void CustomerMenu :: handleUpdate(Repository<Customer>& repo) {
     string newAddress     = InputHelper :: getString("Nhap dia chi cua khach hang moi: ", true);
     string newDateOfBirth = InputHelper :: getString("Nhap ngay sinh moi: ", true);
 
-    // Bước 4 & 5: Kiểm tra tính hợp lệ qua Setter và ghi lại vào file
+    // [FIX LOI 3] Dung ban sao: kiem tra tinh hop le cua TAT CA truong moi
+    // truoc khi ghi vao doi tuong goc. Neu bat ky truong nao loi, khong co gi thay doi.
     try {
-        if (!newName.empty()){
-            cus->setFullName(newName);
-        }
-        if (!newCCCD.empty()){
-            cus->setCCCD(newCCCD); // Kiểm tra đúng 12 chữ số
-        }
-        if (!newAddress.empty()){
-            cus->setAddress(newAddress);
-        }
-        if (!newDateOfBirth.empty()){
-            cus->setDateOfBirth(newDateOfBirth); // Kiểm tra dd/mm/yyyy
-        }
-
-        repo.saveToFile(); // Lưu danh sách từ RAM xuống file customers.txt
+        // [FIX LOI 3] Dung ban sao: kiem tra tat ca truong hop le truoc khi ghi vao goc.
+        Customer updated = *cus;
+        if (!newName.empty())        updated.setFullName(newName);
+        if (!newCCCD.empty())        updated.setCCCD(newCCCD);
+        if (!newAddress.empty())     updated.setAddress(newAddress);
+        if (!newDateOfBirth.empty()) updated.setDateOfBirth(newDateOfBirth);
+        // Tat ca setter deu thanh cong -> ghi ban cap nhat vao repo va file
+        repo.update(id, updated);
         cout << "\n>> [THANH CONG] Da cap nhat thong tin khach hang [" << id << "] thanh cong!\n";
     }
     catch (const exception& e) {
@@ -449,10 +469,16 @@ void CustomerMenu :: handleDelete(Repository<Customer>& repo) {
     cout << string(78, '-') << "\n";
 
     // Bước 3: Kiểm tra ràng buộc toàn vẹn khóa ngoại (liên kết với hợp đồng)
+    // [FIX LOI 1] Neu tai file hop dong that bai, DUNG thao tac xoa de an toan.
     Repository<Contract> contractRepo("data/contracts.txt");
     try {
         contractRepo.loadFromFile();
-    } catch (...) {}
+    } catch (const exception& e) {
+        cout << ">> [LOI] Khong the tai danh sach hop dong de kiem tra rang buoc: "
+             << e.what() << "\n";
+        cout << ">> [TU CHOI] Khong the xac minh rang buoc - thao tac xoa bi huy bo.\n";
+        return;
+    }
 
     bool isLinked = false;
     for (const auto& contract : contractRepo.getAll()) {
@@ -484,10 +510,16 @@ void CustomerMenu :: handleDelete(Repository<Customer>& repo) {
 
 void CustomerMenu :: run() {
     // Tự khởi tạo Repository và nạp dữ liệu từ file customers.txt vào RAM khi mở menu
+    // [FIX LOI 2] Nap du lieu tu file: neu that bai phai bao loi va thoat,
+    // khong duoc de menu chay voi danh sach rong roi ghi de mat toan bo du lieu cu.
     Repository<Customer> repo("data/customers.txt");
     try {
         repo.loadFromFile();
-    } catch (...) {}
+    } catch (const exception& e) {
+        cout << "\n>> [LOI NGHIEM TRONG] Khong the tai du lieu khach hang: " << e.what() << "\n";
+        cout << ">> Vui long kiem tra file data/customers.txt. Quay lai menu chinh...\n";
+        return;
+    }
 
     int choice;
     do {

@@ -102,20 +102,6 @@ static void inTieuDeBangSubType() {
     cout << string(115, '-') << endl;
 }
 
-static string sinhMaLoaimoi(Repository<SubType>& repo) {
-    int moi = 1;
-    stringstream Maloaimoi;
-    Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
-    while (repo.findById(Maloaimoi.str()) != nullptr) {
-        moi++;
-        Maloaimoi.clear();
-        Maloaimoi.str("");
-        Maloaimoi << "SUB" << setfill('0') << setw(2) << moi;
-    }
-
-    return Maloaimoi.str();
-}
-
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -138,8 +124,6 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 //them moi subtype;
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    string id = sinhMaLoaimoi(repo);
-    cout << "Ma loai hinh: " << id << endl;
 
     string ten = InputHelper::getString("Nhap ten loai hinh (nhap 0 de thoat): ", false);
     if (ten == "0"){
@@ -158,6 +142,13 @@ static void themMoiSubType(Repository<SubType>& repo) {
         cout << "Da huy thao tac them moi.\n";
         return;
     }
+<<<<<<< HEAD
+=======
+
+    //ma loai hinh duoc sinh sau khi da nhap xong du lieu, tranh tang so thu tu khi nguoi dung huy;
+    string id = InputHelper::generateAutoID(repo, "SUB", "data_counter/subtype_counter.txt");
+    cout << "Ma loai hinh: " << id << endl;
+>>>>>>> 4478ff2c3ef8ab61a6895cd60d396c059533d067
 
     SubType subtypenew(id, ten, moTa, cuoc);
     repo.add(subtypenew);
