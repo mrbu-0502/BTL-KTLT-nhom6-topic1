@@ -10,11 +10,14 @@
  */
 
 #pragma once
+#include "Repository.h"
 #include <iostream>
 #include <string>
 #include <limits>
-#include<cctype>
+#include <cctype>
 #include <sstream>
+#include <fstream>
+#include <iomanip>
 using namespace std;
 
 class InputHelper {
@@ -238,5 +241,36 @@ public:
             if (!isdigit(id[i])) return false;
         }
         return true;
+    }
+    //Sinh ma ID tu dong
+    template <typename T>
+    static string generateAutoID(Repository<T>& repo, const std::string& prefix, const std::string& seqFilename) {
+        int maxID = 0;
+        
+        //Đọc ID lớn nhất từ file cấu hình
+        std::ifstream inFile(seqFilename);
+        if (inFile.is_open()) {
+            inFile >> maxID;
+            inFile.close();
+        } else {
+            for (const auto& item : repo.getAll()) {
+                try {
+                    int currentID = std::stoi(item.getID().substr(prefix.length()));
+                    if (currentID > maxID) maxID = currentID;
+                } catch (...) {
+                    // Bỏ qua nếu dữ liệu lỗi
+                }
+            }
+        }
+        maxID++;
+        std::ofstream outFile(seqFilename);
+        if (outFile.is_open()) {
+            outFile << maxID;
+            outFile.close();
+        }
+        //Định dạng chuỗi (VD: prefix="HD", maxID=5 => "HD05")
+        std::ostringstream nextID;
+        nextID << prefix << std::setfill('0') << std::setw(2) << maxID;
+        return nextID.str();
     }
 };

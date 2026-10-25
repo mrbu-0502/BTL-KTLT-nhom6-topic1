@@ -1,5 +1,3 @@
-// Nguyễn Văn Cường - B24DCVT053
-
 #pragma once
 #include "Entity.h"
 #include <string>

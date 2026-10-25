@@ -32,22 +32,4 @@ public:
     void display() const override;              // Hien thi 6 thong tin ra man hinh
     string toString() const override;           // Ghep 6 bien thanh chuoi co dau '|'
     void fromString(const string& line) override; // Tach chuoi co dau '|' thanh 6 bien
-
-    // 3. Cac ham Getter va Setter ho tro truy xuat & rang buoc khoa ngoai
-    string getMaCDR() const;
-    string getSoGoi() const;
-    string getSoNhan() const;
-    string getThoiDiem() const;
-    string getSoGiay() const;
-    string getCuocPhi() const;
-
-    void setMaCDR(const string& value);
-    void setSoGoi(const string& value);
-    void setSoNhan(const string& value);
-    void setThoiDiem(const string& value);
-    void setSoGiay(const string& value);
-    void setCuocPhi(const string& value);
 };
-
-// Menu con quan ly cuoc goi (goi tu main.cpp)
-void menuCuocGoi();
