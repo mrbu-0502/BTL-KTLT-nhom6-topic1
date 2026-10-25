@@ -83,28 +83,6 @@ static bool imeiDaTonTai(Repository<Device>& repo, const string& imei) {
     return false;
 }
 
-// Ngày sản xuất: nhập theo dạng dd/mm/yyyy và phải là ngày có thật. Dùng lớp
-// Date chung của dự án để kiểm tra rồi chuẩn hóa lại chuỗi dd/mm/yyyy;
-static bool hopLeNgaySanXuat(const string& s, string& ngayChuan) {
-    if (s.size() != 10) return false;
-    if (s[2] != '/' || s[5] != '/') return false;
-
-    for (int i = 0; i < (int)s.size(); i++) {
-        if (i == 2 || i == 5) continue;
-        if (!laChuSo(s[i])) return false;
-    }
-
-    int ngay = (s[0] - '0') * 10 + (s[1] - '0');
-    int thang = (s[3] - '0') * 10 + (s[4] - '0');
-    int nam = (s[6] - '0') * 1000 + (s[7] - '0') * 100 + (s[8] - '0') * 10 + (s[9] - '0');
-
-    Date d(ngay, thang, nam);
-    if (d.valid() == 0) return false;
-
-    ngayChuan = d.output();
-    return true;
-}
-
 // Tên máy: 2-40 ký tự, bắt đầu bằng chữ cái, chỉ gồm chữ cái, chữ số, khoảng
 // trắng và các ký tự - + . / ( ). Không có 2 khoảng trắng liền nhau và không
 // lặp 4 ký tự giống nhau liên tiếp (chặn dữ liệu gõ lặp vô nghĩa như "iphoneeee").
@@ -412,19 +390,20 @@ static void themMoiThietBi(Repository<Device>& repo) {
         break;
     }
 
-    // 5. Ngày sản xuất: nhập theo dạng dd/mm/yyyy;
-    string ngaySanXuat;
+    // 5. Ngày sản xuất: nhập và kiểm tra bằng lớp Date chung (giống Complaint);
+    Date ngaySanXuat;
     while (true) {
-        string ngay = InputHelper::getString("Nhap ngay san xuat (dd/mm/yyyy, nhap 0 de thoat): ", false);
-        if (ngay == "0") {
-            cout << "Da huy thao tac them moi.\n";
-            return;
+        try {
+            string ngay = InputHelper::getString("Nhap ngay san xuat (dd/mm/yyyy, nhap 0 de thoat): ", false);
+            if (ngay == "0") {
+                cout << "Da huy thao tac them moi.\n";
+                return;
+            }
+            ngaySanXuat.input(ngay);
+            break;
+        } catch (const exception& error) {
+            cout << "Loi: " << error.what() << endl;
         }
-        if (!hopLeNgaySanXuat(ngay, ngaySanXuat)) {
-            cout << "[Loi] Ngay san xuat phai co dang dd/mm/yyyy va la ngay co that!\n";
-            continue;
-        }
-        break;
     }
 
     // 6. Tình trạng;
@@ -448,7 +427,7 @@ static void themMoiThietBi(Repository<Device>& repo) {
     string maThietBi = InputHelper::generateAutoID(repo, "DE", "data_counter/device_counter.txt");
     cout << "Ma thiet bi: " << maThietBi << endl;
 
-    Device thietbi(maThietBi, imei1, imei2, tenMay, hangSX, ngaySanXuat, tinhTrang);
+    Device thietbi(maThietBi, imei1, imei2, tenMay, hangSX, ngaySanXuat.output(), tinhTrang);
     repo.add(thietbi);
     cout << "Them thiet bi " << maThietBi << " (IMEI 1: " << imei1 << ") thanh cong!\n";
 }
