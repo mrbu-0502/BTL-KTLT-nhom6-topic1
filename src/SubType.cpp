@@ -153,7 +153,11 @@ static void themMoiSubType(Repository<SubType>& repo) {
         return;
     }
 
-    long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
+    long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND, nhap -1 de thoat): ", -1);
+    if (cuoc == -1) {
+        cout << "Da huy thao tac them moi.\n";
+        return;
+    }
 
     SubType subtypenew(id, ten, moTa, cuoc);
     repo.add(subtypenew);
@@ -171,7 +175,7 @@ static void timKiemSubType(Repository<SubType>& repo) {
         if(id == "0") return;
 
         if (!InputHelper::checkidvalid(id, "SUB")) {
-            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            cout << "[Loi] Ma loai hinh khong hop le (dang SUB + chu so, vi du SUB01)!\n";
             continue;
         }
         
@@ -200,7 +204,7 @@ static void suaSubType(Repository<SubType>& repo) {
         if (id == "0") return;
 
         if (!InputHelper::checkidvalid(id, "SUB")) {
-            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            cout << "[Loi] Ma loai hinh khong hop le (dang SUB + chu so, vi du SUB01)!\n";
             continue;
         }
         p = repo.findById(id);
@@ -238,7 +242,7 @@ static void xoaSubType(Repository<SubType>& repo, Repository<Sim>& repo_sim) {
         if (id == "0") return;
         
         if (!InputHelper::checkidvalid(id, "SUB")) {
-            cout << "[Loi] Ma loai hinh khong hop le (phai bat dau bang 'SUB')!\n";
+            cout << "[Loi] Ma loai hinh khong hop le (dang SUB + chu so, vi du SUB01)!\n";
             continue;
         }
         p = repo.findById(id);

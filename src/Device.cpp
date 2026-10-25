@@ -1,11 +1,69 @@
-#include "Device.h"     
-#include "InputHelper.h" 
+#include <iostream>
+#include "Device.h"
+#include "InputHelper.h"
 #include "Repository.h"
 
 using namespace std;
 
+// 1. Kiem tra chuoi chi chua chu so (Tra ve 1 neu dung, 0 neu sai)
+int laSoDevice(const string& s) {
+    if (s == "") return 0;
+    for (int i = 0; i < (int)s.length(); i++) {
+        if (s[i] < '0' || s[i] > '9') return 0;
+    }
+    return 1;
+}
+
+// 2. Kiem tra Ma IMEI: Dung 15 chu so va khong phai 15 so giong het nhau
+int hopLeIMEI(const string& s) {
+    if (s.length() != 15 || laSoDevice(s) == 0) return 0;
+    int trungHet = 1;
+    for (int i = 1; i < 15; i++) {
+        if (s[i] != s[0]) trungHet = 0;
+    }
+    if (trungHet == 1) return 0;
+    return 1;
+}
+
+// 3. Kiem tra Ten may: Bat dau bang chu cai, khong go lap 3 ky tu (chan "2233", "iphoneeee")
+int hopLeTenMay(const string& s) {
+    if (s.length() < 2 || s.length() > 30) return 0;
+    char d = s[0];
+    if (!((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) return 0;
+
+    for (int i = 0; i < (int)s.length(); i++) {
+        char c = s[i];
+        int hopLe = 0;
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9') || c == ' ' || c == '+' || c == '-') {
+            hopLe = 1;
+        }
+        if (hopLe == 0) return 0;
+        if (i >= 2 && s[i] == s[i - 1] && s[i] == s[i - 2]) return 0;
+        if (i >= 1 && s[i] == ' ' && s[i - 1] == ' ') return 0;
+    }
+    return 1;
+}
+
+// 4. Kiem tra Hang SX: Chi nhan ten hang dien thoai co that (chan "233223", "appleeee")
+int hopLeHangSX(string& s) {
+    if (s == "") return 0;
+    string thuong = "";
+    for (int i = 0; i < (int)s.length(); i++) {
+        char c = s[i];
+        if (c >= 'A' && c <= 'Z') c = c + 32;
+        thuong += c;
+    }
+    string dsHang = "|apple|samsung|xiaomi|oppo|vivo|realme|nokia|huawei|honor|sony|asus|google|lg|motorola|viettel|vsmart|bphone|tecno|infinix|oneplus|htc|lenovo|zte|masstel|nothing|blackberry|vertu|";
+    if (dsHang.find("|" + thuong + "|") == string::npos) return 0;
+
+    s = thuong;
+    s[0] = s[0] - 32; // Viet hoa chu cai dau (VD: "apple" -> "Apple")
+    return 1;
+}
+
 // ============================================================================
-// 1. HAM KHOI TAO: Dat tat ca 5 thuoc tinh ban dau la chuoi rong ""
+// 1. HAM KHOI TAO
 // ============================================================================
 Device::Device() {
     MaIMEI = "";
@@ -28,16 +86,57 @@ void Device::setID(const string& value) {
 }
 
 // ============================================================================
-// 3. NHAP DU LIEU TU BAN PHIM
+// 3. NHAP DU LIEU TU BAN PHIM (Chan sai dinh dang & trung ma ngay tai cho)
 // ============================================================================
 void Device::getInformation() {
-    MaIMEI = InputHelper::getString("Nhap ma IMEI: ");
-    ID = MaIMEI;
+    if (MaIMEI == "") {
+        Repository<Device> repoCheck("data/devices.txt");
+        repoCheck.loadFromFile();
+        while (1) {
+            MaIMEI = InputHelper::getString("Nhap ma IMEI (dung 15 chu so): ");
+            if (hopLeIMEI(MaIMEI) == 0) {
+                cout << "Loi: Ma IMEI phai gom 15 chu so (0-9) va khong duoc trung 15 so!\n";
+                continue;
+            }
+            if (repoCheck.findById(MaIMEI) != nullptr) {
+                cout << "Loi: Ma IMEI [" << MaIMEI << "] da ton tai! Vui long nhap ma khac.\n";
+                continue;
+            }
+            break;
+        }
+        ID = MaIMEI;
+    }
 
-    TenMay = InputHelper::getString("Nhap ten may: ");
-    HangSX = InputHelper::getString("Nhap hang san xuat: ");
-    NamSX = InputHelper::getString("Nhap nam san xuat: ");
-    TinhTrang = InputHelper::getString("Nhap tinh trang (Moi/Cu): ");
+    while (1) {
+        TenMay = InputHelper::getString("Nhap ten may (VD: iPhone 15, Galaxy S24): ");
+        if (hopLeTenMay(TenMay) == 1) break;
+        cout << "Loi: Ten may phai bat dau bang chu cai va khong go lap ky tu vo nghia!\n";
+    }
+
+    while (1) {
+        HangSX = InputHelper::getString("Nhap hang san xuat (VD: Apple, Samsung, Xiaomi...): ");
+        if (hopLeHangSX(HangSX) == 1) break;
+        cout << "Loi: Hang san xuat khong hop le! Hay nhap dung ten hang (Apple, Samsung, Xiaomi, Oppo, Vivo, Nokia...).\n";
+    }
+
+    while (1) {
+        NamSX = InputHelper::getString("Nhap nam san xuat (1980-2026): ");
+        if (NamSX.length() == 4 && laSoDevice(NamSX) == 1 && NamSX >= "1980" && NamSX <= "2026") break;
+        cout << "Loi: Nam san xuat phai la 4 chu so tu 1980 den 2026!\n";
+    }
+
+    while (1) {
+        TinhTrang = InputHelper::getString("Nhap tinh trang (Moi/Cu): ");
+        if (TinhTrang == "Moi" || TinhTrang == "moi") {
+            TinhTrang = "Moi";
+            break;
+        }
+        if (TinhTrang == "Cu" || TinhTrang == "cu") {
+            TinhTrang = "Cu";
+            break;
+        }
+        cout << "Loi: Tinh trang chi duoc nhap 'Moi' hoac 'Cu'!\n";
+    }
 }
 
 // ============================================================================
@@ -79,11 +178,11 @@ void Device::fromString(const string& line) {
 }
 
 // ============================================================================
-// 7. MENU QUAN LY THIET BI (Cho khach hang lua chon xem va thao tac)
+// 7. MENU QUAN LY THIET BI
 // ============================================================================
 void menuThietBi() {
     Repository<Device> repo("data/devices.txt");
-    repo.loadFromFile(); // Doc du lieu tu file devices.txt len
+    repo.loadFromFile();
 
     int chon = -1;
     while (chon != 0) {
@@ -97,7 +196,6 @@ void menuThietBi() {
         cout << "=============================================\n";
         chon = InputHelper::getInt("Nhap lua chon cua ban (0-5): ", 0, 5);
 
-        // Chuc nang 1: Xem tat ca
         if (chon == 1) {
             vector<Device> ds = repo.getAll();
             if (ds.empty()) {
@@ -109,20 +207,14 @@ void menuThietBi() {
                 }
             }
         }
-        // Chuc nang 2: Them moi
         else if (chon == 2) {
             cout << "\n--- THEM THIET BI MOI ---\n";
             Device d;
             d.getInformation();
-            if (repo.findById(d.getID()) != nullptr) {
-                cout << "Loi: Ma IMEI nay da ton tai!\n";
-            } else {
-                repo.add(d);
-                repo.saveToFile();
-                cout << "Them thiet bi thanh cong!\n";
-            }
+            repo.add(d);
+            repo.saveToFile();
+            cout << "Them thiet bi thanh cong!\n";
         }
-        // Chuc nang 3: Menu con cho khach hang chon kieu xem / tim kiem
         else if (chon == 3) {
             cout << "\n--- BAN MUON XEM THEO TIEU CHI NAO? ---\n";
             cout << "1. Tim chinh xac theo Ma IMEI\n";
@@ -151,7 +243,6 @@ void menuThietBi() {
                 if (dem == 0) cout << "Khong co thiet bi nao phu hop!\n";
             }
         }
-        // Chuc nang 4: Sua thong tin
         else if (chon == 4) {
             cout << "\n--- SUA THONG TIN THIET BI ---\n";
             string ma = InputHelper::getString("Nhap ma IMEI can sua: ");
@@ -163,14 +254,13 @@ void menuThietBi() {
                 p->display();
                 cout << "\nNhap thong tin moi:\n";
                 Device moi;
+                moi.setID(ma);
                 moi.getInformation();
-                moi.setID(ma); // Giu nguyen ma IMEI cu
                 repo.update(ma, moi);
                 repo.saveToFile();
                 cout << "Cap nhat thanh cong!\n";
             }
         }
-        // Chuc nang 5: Xoa
         else if (chon == 5) {
             cout << "\n--- XOA THIET BI ---\n";
             string ma = InputHelper::getString("Nhap ma IMEI can xoa: ");
@@ -184,4 +274,3 @@ void menuThietBi() {
         }
     }
 }
-

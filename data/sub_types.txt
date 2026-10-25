@@ -1,4 +1,4 @@
-SUB01|Tra Truoc Economy|Thue bao tra truoc goi cuoc thong thuong|0
+SUB01|Tra Truoc Economy|Thue bao tra truoc goi cuoc thong thuong|12000
 SUB02|Tra Truoc Tomato|Thue bao tra truoc khong gioi han thoi gian su dung|0
 SUB03|Tra Truoc Student|Thue bao tra truoc uu dai sinh vien hoc sinh|0
 SUB04|Tra Sau Basic+|Thue bao tra sau ca nhan goi noi mang ngoai mang|50000
@@ -8,4 +8,4 @@ SUB08|Dcom 4G Prepaid|Thue bao data chuyen dung tra truoc khong thoai|0
 SUB09|Dcom 4G Postpaid|Thue bao data chuyen dung tra sau cho Router|50000
 SUB10|eSIM IoT|Thue bao chuyen dung cho thiet bi thong minh va dong ho|20000
 SUB06|tratruoc 5g|dung 5g free...|696969
-SUB11|trasau022|nfnanaf da da da d ã dw d..,./[,|2
+SUB12|NV12|dung free|696969

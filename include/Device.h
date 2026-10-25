@@ -48,4 +48,20 @@ public:
 
     // 7. Ham cat 1 dong chu tu file txt ra thanh 5 thuoc tinh
     void fromString(const string& line) override;
+
+    // 8. Cac ham Getter va Setter ho tro rang buoc du lieu
+    string getMaIMEI() const;
+    string getTenMay() const;
+    string getHangSX() const;
+    string getNamSX() const;
+    string getTinhTrang() const;
+
+    void setMaIMEI(const string& value);
+    void setTenMay(const string& value);
+    void setHangSX(const string& value);
+    void setNamSX(const string& value);
+    void setTinhTrang(const string& value);
 };
+
+// Menu con quan ly thiet bi (goi tu main.cpp)
+void menuThietBi();

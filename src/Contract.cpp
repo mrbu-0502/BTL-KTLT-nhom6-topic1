@@ -145,7 +145,7 @@ static void listContract(Repository<Contract>& repo) {
 // ============================================================================
 static void addContract(Repository<Contract>& contractRepo, Repository<Customer>& customerRepo, Repository<Package>& packageRepo, Repository<Sim>& simRepo) {
     Contract item;
-    string ID = InputHelper::generateAutoID(contractRepo, "HD", "data/contract_seq.txt");
+    string ID = InputHelper::generateAutoID(contractRepo, "HD", "data/contract_counter.txt");
     cout << "\n--- THEM HOP DONG MOI (Nhap 0 o bat ky buoc nao de huy) ---\n";
     // 1. Ma Hop dong tu sinh
     cout << "Ma HD (tu dong sinh): " << ID << '\n';

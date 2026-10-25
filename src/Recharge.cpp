@@ -169,7 +169,7 @@ static void listRecharge(Repository<Recharge>& repo) {
 // ============================================================================
 static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& simRepo){
     Recharge item;
-    string ID = InputHelper::generateAutoID(rechargeRepo, "RC", "data/recharge_seq.txt");
+    string ID = InputHelper::generateAutoID(rechargeRepo, "RC", "data/recharge_counter.txt");
     cout << "\n--- THEM PHIEU NAP TIEN (Nhap 0 o bat ky buoc nao de huy) ---\n";
     // 1. Ma Phieu nap tu sinh
     cout << "Ma RC (tu dong sinh): " << ID << '\n';
@@ -189,7 +189,7 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& sim
     }
     while(true){
         try{
-            int value = InputHelper::getInt("Menh gia (VND | 0 de quay lai): ", false);
+            int value = InputHelper::getInt("Menh gia (VND - so tien phai la boi cua 10.000 va nam trong [10.000 - 5.000.000])  | 0 de quay lai): ", false);
             if(value == 0) { cout << "Da huy thao tac them.\n"; return; }
             item.setPraValue(value);
             break;                                                                                                                                                                  
@@ -294,7 +294,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
     }
     while(true){
         try{
-            int value = InputHelper::getInt("Nhap menh gia moi (VND | 0 de giu nguyen): ", false);
+            int value = InputHelper::getInt("Menh gia (VND - so tien phai la boi cua 10.000 va nam trong [10.000 - 5.000.000])  | 0 de quay lai): ", false);
             if(value == 0) break;
             update.setPraValue(value);
             break;
