@@ -1,5 +1,5 @@
 #include "Recharge.h"
-#include "Contract.h"
+#include "Sim.h"
 #include "Date.h"
 #include "InputHelper.h"
 #include "Exceptions.h"
@@ -120,39 +120,24 @@ void Recharge::setPayment(const string& value) {
 // ============================================================================
 // CHECK
 // ============================================================================
-static bool CheckPhoneNumberStatus(Repository<Contract>& contractRepo, const string& phoneNumber) {
-    bool flag = false;
-    for (const auto& contract : contractRepo.getAll()) {
-        if (contract.getPhoneNumber() == phoneNumber) {
-            if (contract.getStatus() != "DaHuy") {
-                flag = true;
-                break;
-            }
-        }
-    }
-    if (!flag) {
-        throw InvalidDataException("So sim " + phoneNumber + " hien khong co hop dong nao hoat dong (hoac da bi huy)!");
-    }
+static bool CheckPhoneNumberStatus(Repository<Sim>& simRepo, const string& phoneNumber) {
+    Sim* sim = simRepo.findById(phoneNumber);
+    if(sim == nullptr)
+        throw InvalidDataException("So sim " + phoneNumber + " khong ton tai!");
+    if (sim->getTrangThai() != "HoatDong")  
+        throw InvalidDataException("So sim " + phoneNumber + " khong o trang thai hoat dong!");
     return true;
 }
 // Kiem tra xem ngay nap tien co lon hon ngay tao hop dong khong
-static bool checkRechargeDate(Repository<Contract>& contractRepo,const string& PhoneNumber, Date rechargeDate) {
-    Date temp;
-    bool flag = false;
-    for (const auto& item : contractRepo.getAll()) {
-        if (PhoneNumber == item.getPhoneNumber() && item.getStatus() != "DaHuy") {
-            temp.input_string(item.getRDate());
-            flag = true;
-            break;
-        }
-    }
-    if(!flag){
-        throw InvalidDataException("Khong tim thay hop dong dang Hoat Dong de kiem tra ngay!");
-    }
-    if (rechargeDate.compare(temp) >= 0) {
-        return true;
-    }
-    throw InvalidDataException("Ngay nap tien phai lon hon ngay tao hop dong " + temp.output() + " tro di!");
+static bool checkRechargeDate(Repository<Sim>& simRepo, const string& phoneNumber, Date d) {
+    Sim* sim = simRepo.findById(phoneNumber);
+    Date activated;
+    activated.input_string(sim->getNgayKichHoat());
+    if (d.compare(activated) < 0)
+        throw InvalidDataException("Ngay nap phai tu ngay kich hoat " + activated.output() + " tro di!");
+    if (d.compare(activated) > 0)
+        throw InvalidDataException("Ngay nap khong duoc o tuong lai!");
+    return true;
 }
 // ============================================================================
 // IN TIEU DE
@@ -179,7 +164,7 @@ static void listRecharge(Repository<Recharge>& repo) {
 // ============================================================================
 // THEM MA PHIEU
 // ============================================================================
-static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Contract>& contractRepo){
+static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& simRepo){
     Recharge item;
     string ID = generateNextRechargetID(rechargeRepo);
     cout << "\n--- THEM PHIEU NAP TIEN (Nhap 0 o bat ky buoc nao de huy) ---\n";
@@ -191,7 +176,7 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Contract>
             string text = InputHelper::getString("Nhap so sim (0 de quay lai): ", false);
             if(text == "0") { cout << "Da huy thao tac them.\n"; return; }
             item.setPhoneNumber(text);
-            if(CheckPhoneNumberStatus(contractRepo, text)){
+            if(CheckPhoneNumberStatus(simRepo, text)){
                 break;
             }
         }
@@ -217,7 +202,8 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Contract>
             item.setRDate(text);
             Date rechargeDate;
             rechargeDate.input_string(item.getRDate());
-            if(checkRechargeDate(contractRepo,item.getPhoneNumber(),rechargeDate)) break;
+            if(checkRechargeDate(simRepo,item.getPhoneNumber(),rechargeDate)) 
+                break;
         }
         catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
@@ -267,7 +253,7 @@ static void findIDRecharge(Repository<Recharge>& repo){
 // ============================================================================
 // CAP NHAT MA PHIEU
 // ============================================================================
-static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Contract>& contractRepo){
+static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& simRepo){
     Recharge* found;
     string code;
     while(true){
@@ -295,7 +281,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Contra
             if(text == "0") break;
             Recharge temp = update;
             temp.setPhoneNumber(text);
-            if(CheckPhoneNumberStatus(contractRepo, text)){
+            if(CheckPhoneNumberStatus(simRepo, text)){
                 update.setPhoneNumber(text);
                 break;
             }
@@ -323,7 +309,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Contra
             candidate.setRDate(text);
             Date rechargeDate;
             rechargeDate.input_string(candidate.getRDate());
-            if(checkRechargeDate(contractRepo, candidate.getPhoneNumber(), rechargeDate)) {
+            if(checkRechargeDate(simRepo, candidate.getPhoneNumber(), rechargeDate)) {
                 update = candidate;
                 break;
             }
@@ -381,10 +367,10 @@ static void removeRecharge(Repository<Recharge>& repo) {
 }
 void menuNapTien(){
     Repository<Recharge> rechargeRepo("data/recharges.txt");
-    Repository<Contract> contractRepo("data/contracts.txt");
+    Repository<Sim> simRepo("data/sims.txt");
      try {
         rechargeRepo.loadFromFile();
-        contractRepo.loadFromFile();
+        simRepo.loadFromFile();
     } 
     catch (const exception& e) {
         cout << "Canh bao: " << e.what() << '\n';
@@ -405,9 +391,9 @@ void menuNapTien(){
 
         switch (choice) {
             case 1: listRecharge(rechargeRepo); break;
-            case 2: addRecharge(rechargeRepo, contractRepo); break;
+            case 2: addRecharge(rechargeRepo, simRepo); break;
             case 3: findIDRecharge(rechargeRepo); break;
-            case 4: updateRecharge(rechargeRepo, contractRepo); break;
+            case 4: updateRecharge(rechargeRepo, simRepo); break;
             case 5: removeRecharge(rechargeRepo); break;
             case 0: 
                 break;

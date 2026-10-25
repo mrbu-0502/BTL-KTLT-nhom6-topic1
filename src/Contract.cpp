@@ -416,14 +416,6 @@ static void removeContract(Repository<Contract>& contractRepo, Repository<Compla
                 cout << "Vui long cap nhat trang thai sang 'DaHuy' hoac 'HetHan' truoc khi xoa.\n";
                 return;
             }
-            // Khong cho phep xoa Hop dong dang co Khieu nai
-            for(const auto& kn : complaintRepo.getAll()){
-                if(text == kn.getMaHD()){
-                    cout << "Loi nghiep vu: " << text << " dang co phieu khieu nai (" << kn.getID() << ") tham chieu!\n";
-                    cout << "Khong the xoa vinh vien. Vui long chi de o trang thai 'DaHuy' hoac 'HetHan'.\n";
-                    return;
-                }
-            }
             if (!InputHelper::getConfirm("Ban co chac muon xoa vinh vien hop dong nay? (y/n): ")) {
                 cout << "Da huy thao tac xoa.\n";
                 return;
