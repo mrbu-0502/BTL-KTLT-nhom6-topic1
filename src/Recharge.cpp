@@ -8,23 +8,15 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
+#include <ctime>
 using namespace std;
 // ============================================================================
-// HAM BO TRO
+// HAM BO TRO LAY NGAY HIEN TAI HE THONG
 // ============================================================================
-// Sinh ma ID Phieu nap tien
-static string generateNextRechargetID(Repository<Recharge>& repo)  {
-    int maxID = 0;
-    for (const auto& item : repo.getAll()) {
-        int currentID = stoi(item.getRefID().substr(2));
-        if (currentID > maxID) {
-            maxID = currentID;
-        }
-    }
-    ostringstream nextID;
-    nextID << "RC" << setfill('0') << setw(2) << (maxID + 1);
-    return nextID.str();
+static Date today() {
+    time_t t = time(nullptr);
+    tm* lt = localtime(&t);
+    return Date(lt->tm_mday, lt->tm_mon + 1, lt->tm_year + 1900);
 }
 // ============================================================================
 // CONSTRUCTOR
@@ -109,6 +101,10 @@ void Recharge::setPraValue(int value) {
 void Recharge::setRDate(const string& value) {
     Date rechargeDate;
     rechargeDate.input(value);
+    Date currentDate = today();
+    if (rechargeDate.compare(currentDate) > 0) {
+        throw InvalidDataException("Ngay nap tien (" + rechargeDate.output() + ") khong duoc vuot qua ngay hien tai (" + currentDate.output() + ")!");
+    }
     RDate = rechargeDate.output();
 }
 void Recharge::setPayment(const string& value) {
@@ -128,7 +124,7 @@ static bool CheckPhoneNumberStatus(Repository<Sim>& simRepo, const string& phone
         throw InvalidDataException("So sim " + phoneNumber + " khong o trang thai hoat dong!");
     return true;
 }
-// Kiem tra xem ngay nap tien co lon hon ngay tao hop dong khong
+// Kiem tra xem ngay nap tien co lon hon ngay kich hoat Sim khong
 static bool checkRechargeDate(Repository<Sim>& simRepo, const string& phoneNumber, Date rechargeDate) {
     Sim* sim = simRepo.findById(phoneNumber);
     if (sim == nullptr)
@@ -169,11 +165,7 @@ static void listRecharge(Repository<Recharge>& repo) {
 // ============================================================================
 static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& simRepo){
     Recharge item;
-    string ID = InputHelper::generateAutoID(rechargeRepo, "RC", "data/recharge_counter.txt");
     cout << "\n--- THEM PHIEU NAP TIEN (Nhap 0 o bat ky buoc nao de huy) ---\n";
-    // 1. Ma Phieu nap tu sinh
-    cout << "Ma RC (tu dong sinh): " << ID << '\n';
-    item.setRefID(ID);
     while(true){
         try{
             string text = InputHelper::getString("Nhap so sim (0 de quay lai): ", false);
@@ -223,33 +215,42 @@ static void addRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& sim
             cout << "Loi: " << error.what() << '\n';
         }
     }
-    rechargeRepo.add(item);
-    cout << "Nap tien thanh cong!\n";
-    printTitleRecharge();
-    item.display();
+    try{
+        string ID = InputHelper::generateAutoID(rechargeRepo, "RC", "data_counter/recharge_counter.txt");
+        item.setRefID(ID);
+        rechargeRepo.add(item);
+        cout << "--> Ma phieu " << ID << " nap tien thanh cong!\n";
+        printTitleRecharge();
+        item.display();
+    }
+    catch(const exception& error){
+        cout << "Loi: " << error.what() << '\n';
+    }
 }
 // ============================================================================
-// TIM THEO MA PHIEU
+// TIM THEO MA PHIEU HOAC SO SIM
 // ============================================================================
-static void findIDRecharge(Repository<Recharge>& repo){
+static void findIDRecharge(Repository<Recharge>& repo) {
     while (true) {
-        string text = InputHelper::getString("Nhap ma phieu can tim (0 de quay lai): ", false);
-        if (text == "0") return;
-        try {
-            Recharge candidate;
-            candidate.setRefID(text);
-            Recharge* item = repo.findById(text);
-            if (item == nullptr) {
-                cout << "Khong tim thay ma " << text << ". Vui long nhap lai.\n";
-                continue;
+        string keyword = InputHelper::getString("Nhap Ma phieu (RC+so) hoac So SIM can tim (0 de quay lai): ", false);
+        if (keyword == "0") return;
+        vector<Recharge> results;
+        for (const auto& item : repo.getAll()) {
+            if (item.getRefID() == keyword || item.getPhoneNumber() == keyword) {
+                results.push_back(item);
             }
-            printTitleRecharge();
-            item->display();
-            return;
         }
-        catch (const exception& error) {
-            cout << "Loi: " << error.what() << " Vui long nhap lai.\n";
+        if (results.empty()) {
+            cout << "Khong tim thay phieu nap nao khop voi " << keyword << ". Vui long thu lai.\n";
+            continue;
         }
+        printTitleRecharge();
+        for (const auto& item : results) {
+            item.display();
+        }
+        cout << string(80, '-') << '\n';
+        cout << "Tim thay " << results.size() << " ket qua.\n";
+        return;
     }
 }
 // ============================================================================
@@ -279,7 +280,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
     Recharge update = *found;
     while(true){
         try{
-            string text = InputHelper::getString("Nhap so dien thoai moi (10 so | 0 de de giu nguyen): ", false);
+            string text = InputHelper::getString("Nhap so dien thoai moi (10 so | 0 de giu nguyen): ", false);
             if(text == "0") break;
             Recharge temp = update;
             temp.setPhoneNumber(text);
@@ -294,7 +295,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
     }
     while(true){
         try{
-            int value = InputHelper::getInt("Menh gia (VND - so tien phai la boi cua 10.000 va nam trong [10.000 - 5.000.000])  | 0 de quay lai): ", false);
+            int value = InputHelper::getInt("Menh gia (VND - so tien phai la boi cua 10.000 va nam trong [10.000 - 5.000.000])  | 0 de giu nguyen): ", false);
             if(value == 0) break;
             update.setPraValue(value);
             break;
@@ -310,7 +311,7 @@ static void updateRecharge(Repository<Recharge>& rechargeRepo, Repository<Sim>& 
             if (text != "0")
                 candidate.setRDate(text);
             Date rechargeDate;
-            rechargeDate.input(candidate.getRDate());
+            rechargeDate.input_string(candidate.getRDate());
             checkRechargeDate(simRepo,candidate.getPhoneNumber(),rechargeDate);
             update = candidate;
             break;
@@ -372,6 +373,7 @@ void menuNapTien(){
     } 
     catch (const exception& e) {
         cout << "Canh bao: " << e.what() << '\n';
+        return;
     }
     int choice = -1;
     do {
@@ -380,7 +382,7 @@ void menuNapTien(){
         cout << "========================================\n";
         cout << "1. Xem danh sach phieu nap tien\n";
         cout << "2. Them phieu nap tien\n";
-        cout << "3. Tim phieu nap tien theo ma\n";
+        cout << "3. Tim kiem phieu nap tien (Ma phieu / So SIM)\n";
         cout << "4. Cap nhat phieu nap tien\n";
         cout << "5. Xoa phieu nap tien\n";
         cout << "0. Quay lai menu chinh\n";

@@ -14,7 +14,16 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <ctime>
 using namespace std;
+// ============================================================================
+// HAM BO TRO LAY NGAY HIEN TAI HE THONG
+// ============================================================================
+static Date today() {
+    time_t t = time(nullptr);
+    tm* lt = localtime(&t);
+    return Date(lt->tm_mday, lt->tm_mon + 1, lt->tm_year + 1900);
+}
 // ============================================================================
 // CONSTRUCTOR
 // ============================================================================
@@ -72,6 +81,10 @@ void Contract::setPhonePlan(const string& value) {
 void Contract::setRDate(const string& value) {
     Date contractDate;
     contractDate.input(value);
+    Date currentDate = today();
+    if (contractDate.compare(currentDate) > 0) {
+        throw InvalidDataException("Ngay dang ky HD (" + contractDate.output() + ") khong duoc vuot qua ngay hien tai (" + currentDate.output() + ")!");
+    }
     RDate = contractDate.output();
 }
 void Contract::setStatus(const string& value) {
@@ -131,6 +144,10 @@ static void printTitleContract() {
          << "Trang thai" << '\n';
     cout << string(80, '-') << '\n';
 }
+int sizeContract(Repository<Contract>& repoContract){
+    vector<Contract> items = repoContract.getAll();
+    return items.size();
+}
 static void listContract(Repository<Contract>& repo) {
     vector<Contract> items = repo.getAll();
     printTitleContract();
@@ -145,11 +162,9 @@ static void listContract(Repository<Contract>& repo) {
 // ============================================================================
 static void addContract(Repository<Contract>& contractRepo, Repository<Customer>& customerRepo, Repository<Package>& packageRepo, Repository<Sim>& simRepo) {
     Contract item;
-    string ID = InputHelper::generateAutoID(contractRepo, "HD", "data/contract_counter.txt");
+    //
     cout << "\n--- THEM HOP DONG MOI (Nhap 0 o bat ky buoc nao de huy) ---\n";
-    // 1. Ma Hop dong tu sinh
-    cout << "Ma HD (tu dong sinh): " << ID << '\n';
-    // 2. Nhap Ma Khach Hang
+    // 1. Nhap Ma Khach Hang
     while (true) {
         try {
             string text = InputHelper::getString("Nhap ma khach hang (KH + so | 0 de quay lai): ", false);
@@ -163,7 +178,7 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
             cout << "Loi: " << error.what() << '\n';
         }
     }
-    // 3. Nhap So SIM (Cho phep tai su dung SIM cua hop dong "DaHuy")
+    // 2. Nhap So SIM (Cho phep tai su dung SIM cua hop dong "DaHuy")
     while (true) {
         try {
             string text = InputHelper::getString("Nhap so sim (10 so | 0 de quay lai): ", false);
@@ -187,7 +202,7 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
             cout << "Loi: " << error.what() << '\n';
         }
     }
-    // 4. Nhap Goi Cuoc
+    // 3. Nhap Goi Cuoc
     while (true) {
         try {
             string text = InputHelper::getString("Nhap ma goi cuoc (PKG + so | 0 de quay lai): ", false);
@@ -202,7 +217,7 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
             cout << "Loi: " << error.what() << '\n';
         }
     }
-    // 5. Nhap ngay dang ky phai >= ngay kich hoat Sim
+    // 4. Nhap ngay dang ky phai >= ngay kich hoat Sim
     while (true) {
         try {
             string text = InputHelper::getString("Ngay dang ky (DD/MM/YYYY | 0 de quay lai): ", false);
@@ -216,19 +231,23 @@ static void addContract(Repository<Contract>& contractRepo, Repository<Customer>
                 throw InvalidDataException("Ngay dang ky HD (" + contractDate.output() + ") khong duoc nho hon ngay kich hoat SIM (" + simDate.output() + ")!");
             }
             break;
-        } catch (const InvalidDataException& error) {
+        } catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
         }
     }
-    // 6. Trang thai: Mac dinh hop dong moi tao phai la "HieuLuc"
+    // 5. Trang thai: Mac dinh hop dong moi tao phai la "HieuLuc"
     item.setStatus("HieuLuc");
-    
-    contractRepo.add(item);
-    item.display();
-    contractRepo.add(item);
-    cout << "--> Dang ky hop dong thanh cong (Trang thai mac dinh: HieuLuc)!\n";
-    printTitleContract();
-    item.display();
+    try{
+        string ID = InputHelper::generateAutoID(contractRepo, "HD", "data_counter/contract_counter.txt");
+        item.setContractID(ID);
+        contractRepo.add(item);
+        cout << "--> Dang ky hop dong " << ID << " thanh cong!\n";
+        printTitleContract();
+        item.display();
+    }
+    catch(const exception& error){
+        cout << "Loi: " << error.what() << '\n';
+    }
 }
 // ============================================================================
 // TIM KIEM HOP DONG DA NANG (THEO MA HD, MA KH, HOAC SDT)
@@ -284,9 +303,21 @@ static void updateContract(Repository<Contract>& contractRepo, Repository<Custom
         cout << "(Neu khach hang muon su dung lai dich vu, vui long tao hop dong moi).\n";
         return;
     }
+    //Neu co don khieu nai khong cho phep chinh sua hop dong
+    bool hasComplaint = false;
+    for (const auto& complaint : complaintRepo.getAll()) {
+        if (complaint.getMaHD() == code) {
+            hasComplaint = true;
+            cout<< "Khong the sua thong tin hop dong " << code
+                << " vi da co khieu nai " << complaint.getID()
+                << ". Chi duoc cap nhat trang thai.\n";
+            break;
+        }   
+    }
     Contract update = *found;
     // 1. Cap nhat Ma Khach Hang
     while (true) {
+        if(hasComplaint) break;
         string text = InputHelper::getString("Nhap ma khach hang moi (KH + so hoac nhan 0 de giu nguyen): ", false);
         Contract temp = update;
         if (text == "0") break;
@@ -302,8 +333,9 @@ static void updateContract(Repository<Contract>& contractRepo, Repository<Custom
     }
     // 2. Cap nhat so dien thoai
     while (true) {
+        if(hasComplaint) break;
         string text = InputHelper::getString("Nhap so dien thoai moi (hoac nhan 0 de giu nguyen): ", false);
-        if (text == "0") break;
+        if (text == "0") {break;}
         try {
             Contract temp = update;
             temp.setPhoneNumber(text);
@@ -327,6 +359,7 @@ static void updateContract(Repository<Contract>& contractRepo, Repository<Custom
     }
     // 3. Cap nhat Ma Goi Cuoc
     while (true) {
+        if(hasComplaint) break;
         string text = InputHelper::getString("Nhap ma goi cuoc moi (PKG + so hoac nhan 0 de giu nguyen): ", false);
         if (text == "0") break;
         try {
@@ -343,30 +376,27 @@ static void updateContract(Repository<Contract>& contractRepo, Repository<Custom
     }
     // 4. Cap nhat Ngay Dang Ky >= Ngay kich hoat Sim
     while (true) {
-        string text = InputHelper::getString(
-            "Ngay dang ky moi (DD/MM/YYYY hoac nhan 0 de giu nguyen): ",false);
-        try {
+        if(hasComplaint) break;
+        string text = InputHelper::getString("Ngay dang ky moi (DD/MM/YYYY hoac nhan 0 de giu nguyen): ",false);
+        try{
             Contract tmp = update;
-            // Chi thay doi ngay khi nguoi dung nhap ngay moi.
             if (text != "0") {
                 tmp.setRDate(text);
             }
             Sim* sim = simRepo.findById(tmp.getPhoneNumber());
             Date contractDate, simDate;
-            // Kiem tra ca ngay moi va ngay duoc giu nguyen.
-            contractDate.input(tmp.getRDate());
+            contractDate.input(tmp.getRDate());       // Kiểm tra ngày sẽ được lưu
             simDate.input(sim->getNgayKichHoat());
             if (contractDate.compare(simDate) < 0) {
-                throw InvalidDataException("Ngay dang ky HD (" + contractDate.output() +") khong duoc som hon ngay kich hoat SIM (" +simDate.output() + ")! Vui long nhap ngay moi."
-                );
+                throw InvalidDataException("Ngay dang ky HD (" + contractDate.output() +") khong duoc som hon ngay kich hoat SIM (" +simDate.output() + ")! Vui long nhap ngay moi.");
             }
-            // Chi chap nhan thay doi sau khi kiem tra thanh cong.
             update = tmp;
             break;
-        } catch (const InvalidDataException& error) {
+        } 
+        catch (const exception& error) {
             cout << "Loi: " << error.what() << '\n';
         }
-    }
+}
     // 5. Cap nhat Trang Thai
     while (true) {
         string text = InputHelper::getString("Trang thai moi (HieuLuc|HetHan|DaHuy hoac nhan 0 de giu nguyen): ", false);
@@ -376,21 +406,6 @@ static void updateContract(Repository<Contract>& contractRepo, Repository<Custom
             break;
         } catch (const InvalidDataException& error) {
             cout << "Loi: " << error.what() << '\n';
-        }
-    }
-    //Neu co don khieu nay khong cho phep sua thong tin hop dong
-    bool changed = update.getCustomerID() != found->getCustomerID() || 
-    update.getPhoneNumber() != found->getPhoneNumber() ||
-    update.getPhonePlan() != found->getPhonePlan() ||
-    update.getRDate() != found->getRDate();
-    if(changed){
-        for (const auto& complaint : complaintRepo.getAll()) {
-            if (complaint.getMaHD() == code) {
-                cout << "Khong the sua thong tin hop dong " << code
-                    << " vi da co khieu nai " << complaint.getID()
-                    << ". Chi duoc cap nhat trang thai.\n";
-                    return;
-            }
         }
     }
     contractRepo.update(code, update);

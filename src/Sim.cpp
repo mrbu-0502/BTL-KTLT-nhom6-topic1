@@ -19,7 +19,6 @@ static const string FILE_SIM = "data/sims.txt";
 // ============================================================================
 // HAM BO TRO (chi dung trong file nay)
 // ============================================================================
-
 // Tach mot dong theo dau '|' (bo ky tu '\r' thua neu file co xuong dong kieu Windows)
 static vector<string> tachDong(string line) {
     if (!line.empty() && line.back() == '\r') line.pop_back();
@@ -88,7 +87,71 @@ static void kiemTraRangBuocXoa(const string& soSim) {
         if (timTrongFile(r.file, r.cot, soSim))
             throw ReferencedException("SIM", soSim, r.ten);
 }
+// Kiem tra trung ma IMSI hoac IMEI (bo qua chinh soSim dang sua)
+static void kiemTraTrungIMSI_IMEI(int cot, const string& giaTri, const string& tenTruong, const string& soSimBoQua = "") {
+    if (giaTri == "NONE") return; // IMEI = NONE thi cho phep nhieu SIM cung chua gan may
+    ifstream in(FILE_SIM);
+    if (!in.is_open()) return;
+    string line;
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+        vector<string> f = tachDong(line);
+        if (f.size() == 6 && f[0] != soSimBoQua && f[cot] == giaTri) {
+            throw InvalidDataException(tenTruong + " '" + giaTri + "' da duoc su dung boi SIM " + f[0]);
+        }
+    }
+}
 
+// Kiem tra ngay kich hoat moi khi cap nhat: Khong duoc muộn hon ngay HD hoac ngay Nap tien da co
+static void kiemTraHopLeNgayKichHoatMoi(const string& soSim, const string& ngayKichHoatMoi) {
+    Date dSim;
+    dSim.input_string(ngayKichHoatMoi);
+
+    // Kiem tra voi bang Contract (cot 2: soSim, cot 4: ngay dang ky HD)
+    ifstream inHD("data/contracts.txt");
+    if (inHD.is_open()) {
+        string line;
+        while (getline(inHD, line)) {
+            vector<string> f = tachDong(line);
+            if (f.size() >= 6 && f[2] == soSim) {
+                Date dHD;
+                if (phanTichNgay(f[4], dHD) && dSim.compare(dHD) > 0) {
+                    throw InvalidDataException("Ngay kich hoat moi (" + dSim.output() + ") khong duoc sau ngay dang ky Hop dong " + f[0] + " (" + dHD.output() + ")");
+                }
+            }
+        }
+    }
+
+    // Kiem tra voi bang Recharge (cot 1: soSim, cot 3: ngay nap tien)
+    ifstream inRC("data/recharges.txt");
+    if (inRC.is_open()) {
+        string line;
+        while (getline(inRC, line)) {
+            vector<string> f = tachDong(line);
+            if (f.size() >= 5 && f[1] == soSim) {
+                Date dRC;
+                if (phanTichNgay(f[3], dRC) && dSim.compare(dRC) > 0) {
+                    throw InvalidDataException("Ngay kich hoat moi (" + dSim.output() + ") khong duoc sau ngay Nap tien phieu " + f[0] + " (" + dRC.output() + ")");
+                }
+            }
+        }
+    }
+}
+
+// Kiem tra neu chuyen SIM sang BiKhoa: Canh bao hoac chan neu dang co Hop dong HieuLuc
+static void kiemTraKhoaSim(const string& soSim, const string& trangThaiMoi) {
+    if (trangThaiMoi != "BiKhoa") return;
+    ifstream inHD("data/contracts.txt");
+    if (!inHD.is_open()) return;
+    string line;
+    while (getline(inHD, line)) {
+        vector<string> f = tachDong(line);
+        // Cot 0: MaHD, Cot 2: SoSim, Cot 5: TrangThai
+        if (f.size() >= 6 && f[2] == soSim && f[5] == "HieuLuc") {
+            throw InvalidDataException("Khong the khoa SIM dang co hop dong HieuLuc (" + f[0] + ")!");
+        }
+    }
+}
 // Tra ten loai hinh / ten may tu ma (hien thi cho de doc)
 static string tenLoai(const string& maLoai) {
     vector<string> f;
@@ -104,10 +167,12 @@ static string tenMay(const string& maIMEI) {
 }
 
 // ============================================================================
-// PHAN 1: LOP DU LIEU
+// CONSTRUCTOR
 // ============================================================================
 Sim::Sim() : maIMSI(""), maLoai(""), maIMEI("NONE"), ngayKichHoat(""), trangThai("HoatDong") {}
-
+// ============================================================================
+// GETTER/SETTER
+// ============================================================================
 Sim::Sim(const string& soSim, const string& imsi, const string& loai,
          const string& imei, const string& ngay, const string& tt) {
     setSoSim(soSim);
@@ -164,8 +229,9 @@ void Sim::setTrangThai(const string& v) {
         throw InvalidDataException("Trang thai chi duoc la HoatDong hoac BiKhoa");
     trangThai = v;
 }
-
-// ----- Ham thuan ao tu Entity -----
+// ============================================================================
+// KE THUA TU ENTITY
+// ============================================================================
 void Sim::getInformation() {
     // 1. Nhap So SIM: 10 so, bat dau bang 0, chua ton tai tren he thong
     while (true) {
@@ -182,7 +248,9 @@ void Sim::getInformation() {
     // 2. Nhap Ma IMSI: 15 chu so
     while (true) {
         try {
-            setMaIMSI(InputHelper::getString("Ma IMSI (15 so): "));
+            string imsi = InputHelper::getString("Ma IMSI (15 so): ");
+            setMaIMSI(imsi);
+            kiemTraTrungIMSI_IMEI(1, imsi, "Ma IMSI"); // Cot 1 la maIMSI
             break;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
@@ -208,6 +276,7 @@ void Sim::getInformation() {
             setMaIMEI(v);
             if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
                 throw ForeignKeyException("MaIMEI", v);
+            kiemTraTrungIMSI_IMEI(3, v, "Ma IMEI"); // Cot 3 la maIMEI
             break;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
@@ -238,10 +307,14 @@ void Sim::getInformation() {
 void Sim::capNhatThongTin() {
     cout << "(Nhan Enter de giu nguyen gia tri hien tai. Khong duoc sua So SIM)\n";
 
-    // 1. Sua Ma IMSI
+    // 1. Sua Ma IMSI (kiem tra trung voi SIM khac)
     while (true) {
         try {
-            setMaIMSI(InputHelper::getStringOrDefault("Ma IMSI ", maIMSI));
+            string v = InputHelper::getStringOrDefault("Ma IMSI ", maIMSI);
+            Sim temp;
+            temp.setMaIMSI(v);
+            kiemTraTrungIMSI_IMEI(1, v, "Ma IMSI", ID); // Bo qua chinh SIM dang sua (ID)
+            setMaIMSI(v);
             break;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
@@ -262,7 +335,7 @@ void Sim::capNhatThongTin() {
         }
     }
 
-    // 3. Sua Ma IMEI
+    // 3. Sua Ma IMEI (kiem tra ton tai trong devices.txt va chua gan cho SIM khac)
     while (true) {
         try {
             string v = InputHelper::getStringOrDefault("Ma IMEI ", maIMEI);
@@ -270,6 +343,7 @@ void Sim::capNhatThongTin() {
             temp.setMaIMEI(v);   // kiem tra truoc, chua doi gia tri hien tai
             if (v != "NONE" && !timTrongFile("data/devices.txt", 0, v))
                 throw ForeignKeyException("MaIMEI", v);
+            kiemTraTrungIMSI_IMEI(3, v, "Ma IMEI", ID);
             setMaIMEI(v);
             break;
         } catch (const BaseException& e) {
@@ -277,10 +351,14 @@ void Sim::capNhatThongTin() {
         }
     }
 
-    // 4. Sua Ngay kich hoat
+    // 4. Sua Ngay kich hoat (Khong duoc muon hon ngay Hop dong / Nap tien da co)
     while (true) {
         try {
-            setNgayKichHoat(InputHelper::getStringOrDefault("Ngay kich hoat ", ngayKichHoat));
+            string v = InputHelper::getStringOrDefault("Ngay kich hoat ", ngayKichHoat);
+            Sim temp;
+            temp.setNgayKichHoat(v); // Kiem tra dinh dang va <= homNay()
+            kiemTraHopLeNgayKichHoatMoi(ID, temp.getNgayKichHoat()); // Kiem tra cheo voi HD & Recharge
+            setNgayKichHoat(v);
             break;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
@@ -290,7 +368,11 @@ void Sim::capNhatThongTin() {
     // 5. Sua Trang thai
     while (true) {
         try {
-            setTrangThai(InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", trangThai));
+            string v = InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", trangThai);
+            Sim temp;
+            temp.setTrangThai(v);
+            kiemTraKhoaSim(ID, v); // Neu chuyen sang BiKhoa thi kiem tra HD HieuLuc
+            setTrangThai(v);
             break;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
@@ -326,9 +408,8 @@ ostream& operator<<(ostream& os, const Sim& s) {
        << setw(12) << s.ngayKichHoat << " | " << setw(10) << s.trangThai;
     return os;
 }
-
 // ============================================================================
-// PHAN 2: NGHIEP VU CRUD VA MENU CON
+// IN TIEU DE 
 // ============================================================================
 static void inTieuDe() {
     cout << left << setw(12) << "So SIM" << " | " << setw(15) << "Ma IMSI" << " | "
@@ -336,7 +417,9 @@ static void inTieuDe() {
          << setw(12) << "Ngay KH" << " | " << setw(10) << "Trang thai" << " | Ten loai hinh\n"
          << string(95, '-') << '\n';
 }
-
+// ============================================================================
+// IN DANH SACH
+// ============================================================================
 static void inDanhSach(const vector<Sim>& ds) {
     if (ds.empty()) {
         cout << "(Khong co SIM nao)\n";
@@ -346,7 +429,9 @@ static void inDanhSach(const vector<Sim>& ds) {
     for (const Sim& s : ds) cout << s << " | " << tenLoai(s.getMaLoai()) << '\n';
     cout << string(95, '-') << "\nTong so: " << ds.size() << " SIM\n";
 }
-
+// ============================================================================
+// IN CHI TIET
+// ============================================================================
 static void inChiTiet(const Sim& s) {
     cout << "So SIM        : " << s.getSoSim() << '\n'
          << "Ma IMSI       : " << s.getMaIMSI() << '\n'
@@ -355,14 +440,18 @@ static void inChiTiet(const Sim& s) {
          << "Ngay kich hoat: " << s.getNgayKichHoat() << '\n'
          << "Trang thai    : " << s.getTrangThai() << '\n';
 }
-
+// ============================================================================
+// THEM SIM
+// ============================================================================
 static void themSim(Repository<Sim>& repo) {
     Sim s;
     s.getInformation();
     repo.add(s);
     cout << "Them SIM thanh cong.\n";
 }
-
+// ============================================================================
+// TIM KIEM
+// ============================================================================
 static void timKiem(Repository<Sim>& repo) {
     cout << "\n--- TIM KIEM SIM ---\n"
          << "1. Theo so SIM (chinh xac, xem chi tiet)\n"
@@ -418,7 +507,9 @@ static void timKiem(Repository<Sim>& repo) {
     }
     inDanhSach(ketQua);
 }
-
+// ============================================================================
+// SAP XEP
+// ============================================================================
 static void sapXep(Repository<Sim>& repo) {
     cout << "\n--- SAP XEP SIM ---\n"
          << "1. So SIM tang dan\n"
@@ -442,7 +533,9 @@ static void sapXep(Repository<Sim>& repo) {
     else return;
     inDanhSach(ds);
 }
-
+// ============================================================================
+// CAP NHAT SIM
+// ============================================================================
 static void capNhatSim(Repository<Sim>& repo) {
     string so = InputHelper::getString("Nhap so SIM can sua: ");
     InputHelper::xuly_84(so);
@@ -454,7 +547,9 @@ static void capNhatSim(Repository<Sim>& repo) {
     repo.update(so, moi);
     cout << "Cap nhat SIM thanh cong.\n";
 }
-
+// ============================================================================
+// XOA SIM 
+// ============================================================================
 static void xoaSim(Repository<Sim>& repo) {
     string so = InputHelper::getString("Nhap so SIM can xoa: ");
     InputHelper::xuly_84(so);
