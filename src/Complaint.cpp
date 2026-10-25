@@ -112,24 +112,6 @@ static void inTieuDeBangComplaint() {
     cout << string(93, '-') << endl;
 }
 
-//tu dong sinh ma KN moi, ma KN lon nhat hien tai + 1;
-static string sinhmaKNmoi(Repository<Complaint>& repo_complaint){
-    int maxID = 0;
-    vector<Complaint> list = repo_complaint.getAll();
-    if (list.empty()) return "KN01";
-    for (int i = 0; i < list.size(); i++) {
-        int currentID = stoi(list[i].getID().substr(2));
-        if (currentID > maxID) {
-            maxID = currentID;
-        }
-    }
-    stringstream nextID;
-    nextID << "KN" << setfill('0') << setw(2) << (maxID + 1);
-    return nextID.str();
-}
-
-
-
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -152,8 +134,6 @@ static void xemDanhSachComplaint(Repository<Complaint>& repo) {
 //them moi khieu nai;
 static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<Contract>& repo_contract ) {
     cout << "\n=== THEM MOI PHIEU KHIEU NAI ===\n";
-
-    string maKN = sinhmaKNmoi(repo_complaint);
 
     string maHD;
     while (true) {
@@ -198,6 +178,8 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
         else cout << "Sai trang thai, trang thai chi co the nhap (TiepNhan / DangXuLy / DaXuLy)!" << endl;
     }
 
+    //ma KN duoc sinh sau khi da nhap xong du lieu, tranh tang so thu tu khi nguoi dung huy;
+    string maKN = InputHelper::generateAutoID(repo_complaint, "KN", "data/complaint_seq.txt");
     Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
     cout << "Them phieu khieu nai id: " << maKN << " thanh cong!\n";

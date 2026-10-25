@@ -102,22 +102,6 @@ static void inTieuDeBangSubType() {
     cout << string(115, '-') << endl;
 }
 
-//tu dong sinh ma loai hinh moi, ma loai hinh lon nhat hien tai + 1;
-static string sinhMaLoaimoi(Repository<SubType>& repo) {
-    int maxID = 0;
-    vector<SubType> list = repo.getAll();
-    if (list.empty()) return "SUB01";
-    for (int i = 0; i < list.size(); i++) {
-        int currentID = stoi(list[i].getID().substr(3));
-        if (currentID > maxID) {
-            maxID = currentID;
-        }
-    }
-    stringstream Maloaimoi;
-    Maloaimoi << "SUB" << setfill('0') << setw(2) << (maxID + 1);
-    return Maloaimoi.str();
-}
-
 // ============================================================================
 // THAO TAC CRUD
 // ============================================================================
@@ -140,8 +124,6 @@ static void xemDanhSachSubType(Repository<SubType>& repo) {
 //them moi subtype;
 static void themMoiSubType(Repository<SubType>& repo) {
     cout << "\n=== THEM MOI LOAI HINH THUE BAO ===\n";
-    string id = sinhMaLoaimoi(repo);
-    cout << "Ma loai hinh: " << id << endl;
 
     string ten = InputHelper::getString("Nhap ten loai hinh (nhap 0 de thoat): ", false);
     if (ten == "0"){
@@ -156,6 +138,10 @@ static void themMoiSubType(Repository<SubType>& repo) {
     }
 
     long long cuoc = InputHelper::getLongLong("Nhap cuoc phi thang (VND): ", 0);
+
+    //ma loai hinh duoc sinh sau khi da nhap xong du lieu, tranh tang so thu tu khi nguoi dung huy;
+    string id = InputHelper::generateAutoID(repo, "SUB", "data/subtype_seq.txt");
+    cout << "Ma loai hinh: " << id << endl;
 
     SubType subtypenew(id, ten, moTa, cuoc);
     repo.add(subtypenew);
