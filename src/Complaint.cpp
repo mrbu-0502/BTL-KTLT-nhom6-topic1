@@ -136,6 +136,7 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     cout << "\n=== THEM MOI PHIEU KHIEU NAI ===\n";
 
     string maHD;
+    Contract* hopdong = nullptr;
     while (true) {
         maHD = InputHelper::getString("Nhap ma hop dong (vi du: HD01, nhap 0 de thoat): ", false);
         if (maHD == "0") {
@@ -145,7 +146,9 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
             cout << "[Loi] Ma hop dong phai co dang HD + chu so (vi du HD01)! Vui long nhap lai.\n";
             continue;
         }
-        if (repo_contract.findById(maHD) == nullptr) {
+        //giu lai con tro hop dong de dung ben duoi, khong goi findById nhieu lan;
+        hopdong = repo_contract.findById(maHD);
+        if (hopdong == nullptr) {
             cout << "[Canh bao] Ma hop dong " << maHD << " chua ton tai trong he thong!\n";
             continue;
         }
@@ -153,7 +156,13 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     }
 
     Date ngaygui, ngayhopdong;
-    ngayhopdong.input(repo_contract.findById(maHD)->getRDate());
+    //ngay tao hop dong doc tu file co the sai dinh dang, phai bat ngoai le ngay tai day;
+    try {
+        ngayhopdong.input(hopdong->getRDate());
+    } catch (const exception& error) {
+        cout << "[Loi] Ngay tao hop dong " << maHD << " trong du lieu khong hop le: " << error.what() << endl;
+        return;
+    }
     while(true){
         try{
             string ngay = InputHelper::getString("nhap ngay (DD/MM/YYYY, nhap 0 de thoat):", false);
@@ -252,28 +261,35 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     p->display();
     cout << string(93, '-') << endl;
 
-    cout << "(Luu y: Nhan Enter de giu nguyen ma HD, noi dung, trang thai)\n";
+    cout << "(Luu y: Nhan Enter de giu nguyen ma HD, ngay gui, noi dung, trang thai)\n";
     string maHDMoi;
+    Contract* hopdongmoi = nullptr;
     while (true) {
         maHDMoi = InputHelper::getStringOrDefault("Ma HD moi(de trong se giu nguyen): ", p->getMaHD());
-        if (maHDMoi == p->getMaHD()) {
-            break; // Giu nguyen ma hop dong cu
-        }
         if (!InputHelper::checkidvalid(maHDMoi, "HD")) {
             cout << "[Loi] Ma hop dong phai co dang HD + chu so (vi du HD01)! Vui long nhap lai.\n";
             continue;
         }
-        if (repo_contract.findById(maHDMoi) != nullptr) {
-            break; // Ma hop dong moi hop le
+        //kiem tra ton tai ca khi nguoi dung giu nguyen ma HD cu, vi hop dong do co the da bi xoa;
+        hopdongmoi = repo_contract.findById(maHDMoi);
+        if (hopdongmoi != nullptr) {
+            break; // Ma hop dong hop le
         }
         cout << "[Canh bao] Ma hop dong '" << maHDMoi << "' chua ton tai trong he thong! Vui long nhap lai.\n";
     }
 
     Date ngayguimoi, ngayHDmoi;
-    ngayHDmoi.input(repo_contract.findById(maHDMoi)->getRDate());
+    //ngay tao hop dong doc tu file co the sai dinh dang, phai bat ngoai le ngay tai day;
+    try {
+        ngayHDmoi.input(hopdongmoi->getRDate());
+    } catch (const exception& error) {
+        cout << "[Loi] Ngay tao hop dong " << maHDMoi << " trong du lieu khong hop le: " << error.what() << endl;
+        return;
+    }
     while(true) {
         try{
-            string text = InputHelper::getString("Nhap ngay gui moi (DD/MM/YYYY, nhap 0 de huy): ", false);
+            //de trong (Enter) se giu nguyen ngay gui cu;
+            string text = InputHelper::getStringOrDefault("Nhap ngay gui moi (DD/MM/YYYY, nhap 0 de huy)", p->getNgayGui());
             if (text == "0") {
                 cout << "Da huy thao tac cap nhat.\n";
                 return;
