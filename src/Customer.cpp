@@ -182,26 +182,9 @@ void CustomerMenu :: printHeader() {
 void CustomerMenu :: handleCreate(Repository<Customer>& repo) {
     cout << "\n---------------- THEM KHACH HANG MOI ----------------\n";
 
-    // Buoc 1: Nhap ma khach hang va kiem tra tinh duy nhat (khong duoc trung)
-    // [FIX LOI 5] Bat buoc ma KH phai theo dinh dang KHxxx (bat dau bang KH + so)
-    //             de nhat quan voi Contract.cpp (setCustomerID yeu cau dinh dang nay).
-    string id;
-    while (true) {
-        id = InputHelper :: getString("Nhap ma khach hang (dinh dang KHxxx, vi du KH01): ", false);
-        bool validPrefix = (id.size() >= 3 && id.substr(0, 2) == "KH");
-        bool allDigitsAfter = validPrefix;
-        if (validPrefix) {
-            for (size_t i = 2; i < id.size(); i++) {
-                if (id[i] < '0' || id[i] > '9') { allDigitsAfter = false; break; }
-            }
-        }
-        if (validPrefix && allDigitsAfter) break;
-        cout << ">> [LOI] Ma khach hang phai bat dau bang KH va theo sau la chu so (vi du: KH01)!\n";
-    }
-    if (repo.findById(id) != nullptr) {
-        cout << ">> [LOI] Ma khach hang da ton tai tren he thong!\n";
-        return;
-    }
+    // Bước 1: Tự động sinh mã khách hàng theo định dạng KH + số qua InputHelper
+    string id = InputHelper::generateAutoID(repo, "KH", "data_counter/customer_counter.txt");
+    cout << ">> Ma khach hang (tu dong sinh): " << id << "\n";
 
     // Bước 2: Nhập các thông tin cá nhân của khách hàng
     string name        = InputHelper :: getString("Nhap ten khach hang moi: ", false);

@@ -231,26 +231,9 @@ void PackageMenu :: printHeader() {
 void PackageMenu :: handleCreate(Repository<Package>& repo) {
     cout << "\n---------------- THEM GOI CUOC MOI ----------------\n";
     
-    // Bước 1: Nhập mã gói cước và kiểm tra trùng lặp khóa chính
-    // [FIX LỖI 5] Bắt buộc mã gói cước phải có định dạng PKGxxx (bắt đầu bằng PKG + số)
-    //             để nhất quán với Contract.cpp (setPhonePlan yêu cầu định dạng này)
-    string id;
-    while (true) {
-        id = InputHelper :: getString("Nhap ma goi cuoc (dinh dang PKGxxx, vi du PKG01): ", false);
-        bool validPrefix = (id.size() >= 4 && id.substr(0, 3) == "PKG");
-        bool allDigitsAfter = validPrefix;
-        if (validPrefix) {
-            for (size_t i = 3; i < id.size(); i++) {
-                if (id[i] < '0' || id[i] > '9') { allDigitsAfter = false; break; }
-            }
-        }
-        if (validPrefix && allDigitsAfter) break;
-        cout << ">> [LOI] Ma goi cuoc phai bat dau bang PKG va theo sau la chu so (vi du: PKG01)!\n";
-    }
-    if (repo.findById(id) != nullptr) {
-        cout << ">> [LOI] Ma goi cuoc da ton tai tren he thong!\n";
-        return; // Dừng thao tác thêm nếu mã đã tồn tại
-    }
+    // Bước 1: Tự động sinh mã gói cước theo định dạng PKG + số qua InputHelper
+    string id = InputHelper::generateAutoID(repo, "PKG", "data_counter/package_counter.txt");
+    cout << ">> Ma goi cuoc (tu dong sinh): " << id << "\n";
 
     // Bước 2: Nhập các thông tin chi tiết của gói cước mới
     string name  = InputHelper :: getString("Nhap ten goi cuoc: ", false);
