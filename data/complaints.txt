@@ -10,4 +10,4 @@ KN09|HD09|25/03/2024|Thiet bi Dcom khong nhan song LTE|DangXuLy
 KN10|HD10|02/04/2024|Phan anh thai do nhan vien tong dai|DaXuLy
 KN11|HD02|30/06/2025|khong dung duoc|TiepNhan
 KN12|HD08|30/05/2025|sajiodwjdi qd wq d wqd wqd|TiepNhan
-
+KN13|HD05|12/03/2026|thai do nhan vien|Dong
