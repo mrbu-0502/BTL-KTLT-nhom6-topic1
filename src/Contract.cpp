@@ -1,3 +1,10 @@
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Luong Duc Anh
+// Use Case: Quan ly Hop Dong
+// ===============================================================
 #include "Contract.h"
 #include "Customer.h"
 #include "Package.h"

@@ -1,24 +1,30 @@
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Vu Quang Anh
+// Use Case: Quan Bill thanh toán
+// ===============================================================
 #include "Bill.h"
 #include "Date.h"
 #include "Exceptions.h"
 #include "InputHelper.h"
 #include "Repository.h"
 #include "Sim.h"
-
 #include <algorithm>
 #include <cctype>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <vector>
-
+#include <fstream>
 using namespace std;
 
 static const string FILE_BILL = "data/bills.txt";
 static const long long TIEN_TOI_DA = 1000000000000LL;
 
 // ============================================================================
-// HAM BO TRO (chi dung trong file nay)
+// HAM BO TRO
 // ============================================================================
 // Tach mot dong theo dau '|' (phuc vu doc file sims.txt)
 static vector<string> tachDongBill(string line) {
@@ -29,40 +35,7 @@ static vector<string> tachDongBill(string line) {
     while (getline(ss, f, '|')) fields.push_back(f);
     return fields;
 }
-// Kiem tra thang/nam hoa don (mm/yyyy) khong duoc truoc thang/nam kich hoat cua SIM
-static void kiemTraThangHopLeVoiSIM(const string& soSim, const string& thangNamHD) {
-    ifstream in("data/sims.txt");
-    if (!in.is_open()) return;
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        vector<string> f = tachDongBill(line);
-        // f[0] la SoSim, f[4] la NgayKichHoat (DD/MM/YYYY)
-        if (f.size() >= 6 && f[0] == soSim) {
-            string ngayKH = f[4]; 
-            if (ngayKH.size() >= 10) {
-                int tSim = stoi(ngayKH.substr(3, 2));
-                int nSim = stoi(ngayKH.substr(6, 4));
-                int khoaSim = nSim * 100 + tSim;
-                
-                int tHD = 0, nHD = 0;
-                if (phanTichThangNam(thangNamHD, tHD, nHD)) {
-                    int khoaHD = nHD * 100 + tHD;
-                    if (khoaHD < khoaSim) {
-                        throw InvalidDataException("Thang/nam hoa don (" + thangNamHD + 
-                            ") khong duoc truoc thang kich hoat SIM (" + ngayKH.substr(3) + ")!");
-                    }
-                }
-            }
-            break;
-        }
-    }
-}
-static bool laChuSo(const string& s) {
-    return !s.empty() && all_of(s.begin(), s.end(),
-                                [](unsigned char c) { return isdigit(c) != 0; });
-}
-// Doi "mm/yyyy" thanh thang, nam (dung Date::input() co san de kiem tra hop le)
+// Doi "mm/yyyy" thanh thang, nam
 static bool phanTichThangNam(const string& s, int& thang, int& nam) {
     if (s.size() != 7 || s[2] != '/') return false;
     try {
@@ -76,7 +49,41 @@ static bool phanTichThangNam(const string& s, int& thang, int& nam) {
     }
 }
 
-// Khoa so sanh thang/nam: nam * 100 + thang (de so sanh va sap xep)
+// Kiem tra thang/nam hoa don (mm/yyyy) khong duoc truoc thang/nam kich hoat cua SIM
+static void kiemTraThangHopLeVoiSIM(const string& soSim, const string& thangNamHD) {
+    ifstream in("data/sims.txt");
+    if (!in.is_open()) throw FileException("data/sims.txt");
+    string line;
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+        vector<string> f = tachDongBill(line);
+        if (f.size() != 6)
+            throw InvalidDataException("Dong SIM sai dinh dang: " + line);
+        if (f[0] != soSim) continue;
+
+        Date ngayKichHoat;
+        ngayKichHoat.input(f[4]);
+        const string ngayChuan = ngayKichHoat.output();
+        const int khoaSim = stoi(ngayChuan.substr(6, 4)) * 100
+                           + stoi(ngayChuan.substr(3, 2));
+
+        int tHD = 0, nHD = 0;
+        if (!phanTichThangNam(thangNamHD, tHD, nHD))
+            throw InvalidDataException("Thang/nam hoa don khong hop le: " + thangNamHD);
+        if (nHD * 100 + tHD < khoaSim)
+            throw InvalidDataException("Thang/nam hoa don (" + thangNamHD
+                + ") khong duoc truoc thang kich hoat SIM ("
+                + ngayChuan.substr(3) + ")!");
+        return;
+    }
+    if (in.bad()) throw FileException("data/sims.txt");
+    throw ForeignKeyException("SoSim", soSim);
+}
+static bool laChuSo(const string& s) {
+    return !s.empty() && all_of(s.begin(), s.end(),
+                                [](unsigned char c) { return isdigit(c) != 0; });
+}
+// Khoa so sanh thang/nam: nam * 100 + thang 
 static int khoaThang(const string& thangNam) {
     int t = 0, n = 0;
     return phanTichThangNam(thangNam, t, n) ? n * 100 + t : 0;
@@ -100,12 +107,10 @@ static void kiemTraTrungKy(Repository<Bill>& repo, const string& soSim,
 static void kiemTraSimTonTai(const string& soSim) {
     if (!Sim::tonTai(soSim)) throw ForeignKeyException("SoSim", soSim);
 }
-
 // ============================================================================
-// PHAN 1: LOP DU LIEU
+// CONSTRUCTOR
 // ============================================================================
 Bill::Bill() : soSim(""), thangNam(""), tongTien(0), trangThai("ChuaThanhToan") {}
-
 Bill::Bill(const string& maHD, const string& so, const string& tn,
            long long tien, const string& tt) {
     setMaHD(maHD);
@@ -114,7 +119,9 @@ Bill::Bill(const string& maHD, const string& so, const string& tn,
     setTongTien(tien);
     setTrangThai(tt);
 }
-
+// ============================================================================
+// GETTER/SETTER
+// ============================================================================
 string Bill::getMaHD() const { return ID; }
 string Bill::getSoSim() const { return soSim; }
 string Bill::getThangNam() const { return thangNam; }
@@ -155,13 +162,13 @@ void Bill::setTrangThai(const string& v) {
         throw InvalidDataException("Trang thai chi duoc la DaThanhToan hoac ChuaThanhToan");
     trangThai = v;
 }
-
-// ----- Ham thuan ao tu Entity -----
+// ============================================================================
+// KE THUA TU ENTITY
+// ============================================================================
 void Bill::getInformation() {
     Repository<Bill> repo(FILE_BILL);
     repo.loadFromFile();   // de kiem tra trung ma va trung ky hoa don
 
-    // Thay the doan nhap ma thu cong trong Bill::getInformation():
     string ma = InputHelper::generateAutoID(repo, "BILL", "data_counter/bill_counter.txt");
     setMaHD(ma);
     cout << "Ma hoa don (tu dong sinh): " << ma << '\n';
@@ -173,6 +180,8 @@ void Bill::getInformation() {
             setSoSim(so);
             kiemTraSimTonTai(soSim);
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -184,8 +193,10 @@ void Bill::getInformation() {
                 string tn = InputHelper::getString("Thang/nam (mm/yyyy): ");
                 setThangNam(tn);
                 kiemTraTrungKy(repo, soSim, tn, "");
-                kiemTraThangHopLeVoiSIM(soSim, tn); // <-- Thêm dòng gọi này vào đây là xong!
+            kiemTraThangHopLeVoiSIM(soSim, tn);
                 break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
                 cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -220,6 +231,8 @@ void Bill::capNhatThongTin() {
             kiemTraSimTonTai(temp.getSoSim());
             setSoSim(so);
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -232,8 +245,11 @@ void Bill::capNhatThongTin() {
             Bill temp;
             temp.setThangNam(tn);
             kiemTraTrungKy(repo, soSim, tn, ID);
+            kiemTraThangHopLeVoiSIM(soSim, tn);
             setThangNam(tn);
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -297,14 +313,16 @@ ostream& operator<<(ostream& os, const Bill& b) {
 }
 
 // ============================================================================
-// PHAN 2: NGHIEP VU CRUD VA MENU CON
+// IN TIEU DE
 // ============================================================================
 static void inTieuDe() {
     cout << left << setw(10) << "Ma HD" << " | " << setw(12) << "So SIM" << " | "
          << setw(9) << "Thang/nam" << " | " << right << setw(14) << "Tong tien" << " | "
          << left << "Trang thai\n" << string(70, '-') << '\n';
 }
-
+// ============================================================================
+// IN DANH SACH
+// ============================================================================
 static void inDanhSach(const vector<Bill>& ds) {
     if (ds.empty()) {
         cout << "(Khong co hoa don nao)\n";
@@ -341,14 +359,18 @@ static int docKhoaThang(const string& loiNhac) {
         }
     }
 }
-
+// ============================================================================
+// THEM HOA DON
+// ============================================================================
 static void themBill(Repository<Bill>& repo) {
     Bill b;
     b.getInformation();
     repo.add(b);
     cout << "Them hoa don thanh cong.\n";
 }
-
+// ============================================================================
+// TIM KIEM
+// ============================================================================
 static void timKiem(Repository<Bill>& repo) {
     cout << "\n--- TIM KIEM HOA DON ---\n"
          << "1. Theo ma hoa don (chinh xac, xem chi tiet)\n"
@@ -387,7 +409,9 @@ static void timKiem(Repository<Bill>& repo) {
     }
     inDanhSach(ketQua);
 }
-
+// ============================================================================
+// SAP XEP
+// ============================================================================
 static void sapXep(Repository<Bill>& repo) {
     cout << "\n--- SAP XEP HOA DON ---\n"
          << "1. Ma hoa don tang dan\n"
@@ -413,7 +437,9 @@ static void sapXep(Repository<Bill>& repo) {
     }
     inDanhSach(ds);
 }
-
+// ============================================================================
+// CAP NHAT HOA DON
+// ============================================================================
 static void capNhatBill(Repository<Bill>& repo) {
     string ma = InputHelper::getString("Nhap ma hoa don can sua: ");
     Bill* p = repo.findById(ma);

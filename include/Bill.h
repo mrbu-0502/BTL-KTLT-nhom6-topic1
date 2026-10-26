@@ -1,16 +1,7 @@
 /**
  * ==============================================================================
  * USE CASE 8 - QUAN LY HOA DON CUOC
- * Tac gia: Quang Anh (MSSV: B24DCVT...)   <-- ghi ho ten day du + MSSV cua ban
- * Dinh dang file data/bills.txt:
- *   MaHoaDon|SoSim|ThangNam|TongTien|TrangThai
- * Rang buoc:
- *   MaHoaDon  : BILL + cac chu so (vd BILL01), duy nhat, khong duoc sua (luu trong Entity::ID)
- *   SoSim     : phai ton tai trong data/sims.txt (khoa ngoai -> Sim)
- *   ThangNam  : mm/yyyy hop le, khong sau thang hien tai; moi SIM chi co 1 hoa don / thang
- *   TongTien  : so nguyen VND, tu 0 den 1.000.000.000.000
- *   TrangThai : DaThanhToan | ChuaThanhToan
- * Khong bang nao khac tham chieu den Bill nen xoa chi can xac nhan (y/n).
+ * Vu Quang Anh
  * ==============================================================================
  */
 #pragma once

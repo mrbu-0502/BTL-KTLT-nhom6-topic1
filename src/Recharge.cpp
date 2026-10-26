@@ -1,3 +1,10 @@
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Luong Duc Anh
+// Use Case: Quan ly Phieu Nap tien
+// ===============================================================
 #include "Recharge.h"
 #include "Sim.h"
 #include "Date.h"

@@ -1,9 +1,15 @@
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Vu Quang Anh
+// Use Case: Quan ly thue Bao Sim
+// ===============================================================
 #include "Sim.h"
 #include "Date.h"
 #include "Exceptions.h"
 #include "InputHelper.h"
 #include "Repository.h"
-
 #include <algorithm>
 #include <cctype>
 #include <ctime>
@@ -191,7 +197,6 @@ Sim::Sim(const string& soSim, const string& imsi, const string& loai,
     setNgayKichHoat(ngay);
     setTrangThai(tt);
 }
-
 string Sim::getSoSim() const { return ID; }
 string Sim::getMaIMSI() const { return maIMSI; }
 string Sim::getMaLoai() const { return maLoai; }

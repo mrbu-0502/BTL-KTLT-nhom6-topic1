@@ -1,6 +1,10 @@
-// Nguyễn Văn Cường - B24DCVT053
-// menu khiếu nại
-
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Nguyen Van Cuong
+// Use Case: Quan ly Phieu khieu nai
+// ===============================================================
 #include "Contract.h"
 #include "Date.h"
 #include "InputHelper.h"
@@ -13,9 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include<string>
-
-
+#include <string>
 using namespace std;
 
 // ============================================================================

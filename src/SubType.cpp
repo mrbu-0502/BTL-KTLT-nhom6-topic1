@@ -1,6 +1,10 @@
-// Nguyễn Văn Cường - B24DCVT053
-// menu loại hình thuê bao
-
+// ===============================================================
+// Hoc vien Cong nghe Buu chinh Vien thong
+// Hoc phan: Ky thuat lap trinh
+// De tai 1: Quan ly thue bao di dong
+// Tac gia: Nguyen Van Cuong
+// Use Case: Loai hinh thue bao
+// ===============================================================
 #include "SubType.h"
 #include "Repository.h"
 #include "InputHelper.h"

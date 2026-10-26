@@ -8,7 +8,6 @@
  * Use Case: Quản lý Khách hàng (Customer)
  * ==============================================================================
  */
-
 #include "Customer.h"       // Header khai báo lớp Customer và CustomerMenu
 #include "Contract.h"       // Khai báo lớp Contract (để kiểm tra khóa ngoại trước khi xóa khách)
 #include "Date.h"           // Xử lý và kiểm tra ngày sinh hợp lệ (leap, valid, output)
