@@ -1,10 +1,10 @@
-SUB01|Tra Truoc Economy|Thue bao tra truoc goi cuoc thong thuong|12000
-SUB02|Tra Truoc Tomato|Thue bao tra truoc khong gioi han thoi gian su dung|0
-SUB03|Tra Truoc Student|Thue bao tra truoc uu dai sinh vien hoc sinh|0
-SUB04|Tra Sau Basic+|Thue bao tra sau ca nhan goi noi mang ngoai mang|50000
-SUB05|4g unlimit|khong gioi han data|200000
-SUB07|Tra Sau VIP|Thue bao tra sau han muc cao kem dich vu CSKH|150000
-SUB08|Dcom 4G Prepaid|Thue bao data chuyen dung tra truoc khong thoai|0
-SUB09|Dcom 4G Postpaid|Thue bao data chuyen dung tra sau cho Router|50000
-SUB10|eSIM IoT|Thue bao chuyen dung cho thiet bi thong minh va dong ho|20000
-SUB06|tratruoc 5g|dung 5g free...|696969
+SUB01|Loai thue bao 01|Loai thu nghiem so 01|10000
+SUB02|Loai thue bao 02|Loai thu nghiem so 02|20000
+SUB03|Loai thue bao 03|Loai thu nghiem so 03|30000
+SUB04|Loai thue bao 04|Loai thu nghiem so 04|40000
+SUB05|Loai thue bao 05|Loai thu nghiem so 05|50000
+SUB06|Loai thue bao 06|Loai thu nghiem so 06|60000
+SUB07|Loai thue bao 07|Loai thu nghiem so 07|70000
+SUB08|Loai thue bao 08|Loai thu nghiem so 08|80000
+SUB09|Loai thue bao 09|Loai thu nghiem so 09|90000
+SUB10|Loai thue bao 10|Loai thu nghiem so 10|100000

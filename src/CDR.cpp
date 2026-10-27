@@ -123,7 +123,10 @@ CDR::CDR() {
 string CDR::getID() const {
     return MaCDR;
 }
-
+string CDR::getSoGoi() const { return SoGoi; }
+string CDR::getSoNhan() const { return SoNhan; }
+string CDR::getThoiDiem() const { return ThoiDiem; }
+string CDR::getCuocPhi() const { return CuocPhi; }
 void CDR::setID(const string& value) {
     kiemTraMaCDR(value);
     ID = value;

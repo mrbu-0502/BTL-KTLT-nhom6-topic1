@@ -1,13 +1,10 @@
-KN01|HD01|10/01/2024|Toc do 4G cham tai khu vuc Cau Giay|DaXuLy
-KN02|HD03|13/01/2026|sadad9sadsadwq wnqd dwq dw qd|Dong
-KN03|HD03|20/01/2024|Bi tru tien tai khoan khong ro nguyen nhan|DaXuLy
-KN04|HD04|05/02/2024|Song chap chon tai toa nha cao tang|Dong
-KN05|HD05|15/02/2024|Kiem tra cuoc phi phat sinh trong hoa don|DaXuLy
-KN06|HD06|28/02/2024|De nghi mo khoa chieu goi di|DaXuLy
-KN07|HD07|05/03/2024|Chua nhan duoc tin nhan ma OTP|DangXuLy
-KN08|HD08|12/03/2024|Yeu cau cap lai hoa don dien tu thang 2|DaXuLy
-KN09|HD09|25/03/2024|Thiet bi Dcom khong nhan song LTE|DangXuLy
-KN10|HD10|02/04/2024|Phan anh thai do nhan vien tong dai|DaXuLy
-KN11|HD02|30/06/2025|khong dung duoc|TiepNhan
-KN12|HD08|30/05/2025|sajiodwjdi qd wq d wqd wqd|TiepNhan
-KN13|HD05|12/03/2026|thai do nhan vien|Dong
+KN01|HD01|01/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000001|TiepNhan
+KN02|HD02|02/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000002|DangXuLy
+KN03|HD03|03/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000003|DaXuLy
+KN04|HD04|04/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000004|Dong
+KN05|HD05|05/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000005|TiepNhan
+KN06|HD06|06/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000006|DangXuLy
+KN07|HD07|07/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000007|DaXuLy
+KN08|HD08|08/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000008|Dong
+KN09|HD09|09/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000009|TiepNhan
+KN10|HD10|10/10/2026|Yeu cau doi soat cuoc thang 09 cua SIM 0981000010|DangXuLy

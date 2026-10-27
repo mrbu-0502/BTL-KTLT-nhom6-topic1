@@ -10,6 +10,12 @@
 #include "Exceptions.h"
 #include "InputHelper.h"
 #include "Repository.h"
+#include "Bill.h"
+#include "CDR.h"
+#include "Contract.h"
+#include "Device.h"
+#include "Recharge.h"
+#include "SubType.h"
 #include <algorithm>
 #include <cctype>
 #include <ctime>
@@ -35,29 +41,22 @@ static vector<string> tachDong(string line) {
     return fields;
 }
 
-// Tim giaTri o cot `cot` (tinh tu 0) trong file. Thay thi tra ve true va (tuy chon) ca dong.
-// Khong mo duoc file -> nem FileException.
-static bool timTrongFile(const string& file, int cot, const string& giaTri,
-                         vector<string>* dong = nullptr) {
+// Repository tu tao file neu thieu; cac bang tham chieu phai ton tai san.
+template <typename T>
+static void napBangThamChieu(Repository<T>& repo, const string& file) {
     ifstream in(file);
-    if (!in.is_open()) throw FileException(file);
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        vector<string> f = tachDong(line);
-        if (cot < static_cast<int>(f.size()) && f[cot] == giaTri) {
-            if (dong) *dong = f;
-            return true;
-        }
-    }
-    return false;
+    if (!in.is_open()) 
+        throw FileException(file);
+    repo.loadFromFile();
 }
 
-// Kiem tra IMEI co ton tai trong devices.txt khong: thiet bi luu IMEI o khe 1
-// (cot 1) hoac khe 2 (cot 2) cua file devices.txt
 static bool imeiTonTai(const string& maIMEI) {
-    return timTrongFile("data/devices.txt", 1, maIMEI)
-        || timTrongFile("data/devices.txt", 2, maIMEI);
+    Repository<Device> repo("data/devices.txt");
+    napBangThamChieu(repo, "data/devices.txt");
+    for (const Device& device : repo.getAll())
+        if (device.getMaIMEI1() == maIMEI || device.getMaIMEI2() == maIMEI)
+            return true;
+    return false;
 }
 
 static bool laChuSo(const string& s) {
@@ -70,114 +69,105 @@ static string chuThuong(string s) {
     return s;
 }
 
-// Su dung phuong thuc input() co san cua lop Date (Kieu Duc Hiep) de phan tich & kiem tra hop le
-static bool phanTichNgay(const string& s, Date& ketQua) {
-    try {
-        ketQua.input(s);
-        return true;
-    } catch (...) {
-        return false;
-    }
-}
-
 static Date homNay() {
     time_t t = time(nullptr);
     tm* lt = localtime(&t);
     return Date(lt->tm_mday, lt->tm_mon + 1, lt->tm_year + 1900);
 }
 
-// Khong cho xoa SIM neu con bang khac tham chieu den no
+// Khong cho xoa SIM neu con bang khac tham chieu den no.
 static void kiemTraRangBuocXoa(const string& soSim) {
-    struct Rang { const char* file; int cot; const char* ten; };
-    const Rang dsRang[] = {
-        {"data/bills.txt", 1, "Bill"},
-        {"data/contracts.txt", 2, "Contract"},
-        {"data/cdrs.txt", 1, "CDR (So goi)"},
-        {"data/cdrs.txt", 2, "CDR (So nhan)"},
-        {"data/recharges.txt", 1, "Recharge"},
-    };
-    for (const Rang& r : dsRang)
-        if (timTrongFile(r.file, r.cot, soSim))
-            throw ReferencedException("SIM", soSim, r.ten);
+    Repository<Bill> billRepo("data/bills.txt");
+    napBangThamChieu(billRepo, "data/bills.txt");
+    for (const Bill& bill : billRepo.getAll())
+        if (bill.getSoSim() == soSim)
+            throw ReferencedException("SIM", soSim, "Bill");
+
+    Repository<Contract> contractRepo("data/contracts.txt");
+    napBangThamChieu(contractRepo, "data/contracts.txt");
+    for (const Contract& hd : contractRepo.getAll())
+        if (hd.getPhoneNumber() == soSim)
+            throw ReferencedException("SIM", soSim, "Contract");
+
+    Repository<CDR> cdrRepo("data/cdrs.txt");
+    napBangThamChieu(cdrRepo, "data/cdrs.txt");
+    for (const CDR& cdr : cdrRepo.getAll()) {
+        if (cdr.getSoGoi() == soSim)
+            throw ReferencedException("SIM", soSim, "CDR (So goi)");
+        if (cdr.getSoNhan() == soSim)
+            throw ReferencedException("SIM", soSim, "CDR (So nhan)");
+    }
+
+    Repository<Recharge> rechargeRepo("data/recharges.txt");
+    napBangThamChieu(rechargeRepo, "data/recharges.txt");
+    for (const Recharge& phieu : rechargeRepo.getAll())
+        if (phieu.getPhoneNumber() == soSim)
+            throw ReferencedException("SIM", soSim, "Recharge");
 }
-// Kiem tra trung ma IMSI hoac IMEI (bo qua chinh soSim dang sua)
-static void kiemTraTrungIMSI_IMEI(int cot, const string& giaTri, const string& tenTruong, const string& soSimBoQua = "") {
-    if (giaTri == "NONE") return; // IMEI = NONE thi cho phep nhieu SIM cung chua gan may
-    ifstream in(FILE_SIM);
-    if (!in.is_open()) return;
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        vector<string> f = tachDong(line);
-        if (f.size() == 6 && f[0] != soSimBoQua && f[cot] == giaTri) {
-            throw InvalidDataException(tenTruong + " '" + giaTri + "' da duoc su dung boi SIM " + f[0]);
-        }
+
+// Kiem tra trung IMSI hoac IMEI, bo qua SIM dang sua.
+static void kiemTraTrungIMSI_IMEI(int cot, const string& giaTri,const string& tenTruong,const string& soSimBoQua = "") {
+    if (giaTri == "NONE") return;
+    Repository<Sim> repo(FILE_SIM);
+    napBangThamChieu(repo, FILE_SIM);
+    for (const Sim& sim : repo.getAll()) {
+        if (sim.getSoSim() == soSimBoQua) continue;
+        const string daDung = (cot == 1) ? sim.getMaIMSI() : sim.getMaIMEI();
+        if (daDung == giaTri)
+            throw InvalidDataException(tenTruong + " '" + giaTri + "' da duoc su dung boi SIM " + sim.getSoSim());
     }
 }
 
 // Kiem tra ngay kich hoat moi khi cap nhat: Khong duoc muộn hon ngay HD hoac ngay Nap tien da co
 static void kiemTraHopLeNgayKichHoatMoi(const string& soSim, const string& ngayKichHoatMoi) {
     Date dSim;
-    dSim.input_string(ngayKichHoatMoi);
+    dSim.input(ngayKichHoatMoi);
 
-    // Kiem tra voi bang Contract (cot 2: soSim, cot 4: ngay dang ky HD)
-    ifstream inHD("data/contracts.txt");
-    if (inHD.is_open()) {
-        string line;
-        while (getline(inHD, line)) {
-            vector<string> f = tachDong(line);
-            if (f.size() >= 6 && f[2] == soSim) {
-                Date dHD;
-                if (phanTichNgay(f[4], dHD) && dSim.compare(dHD) > 0) {
-                    throw InvalidDataException("Ngay kich hoat moi (" + dSim.output() + ") khong duoc sau ngay dang ky Hop dong " + f[0] + " (" + dHD.output() + ")");
-                }
-            }
-        }
+    Repository<Contract> contractRepo("data/contracts.txt");
+    napBangThamChieu(contractRepo, "data/contracts.txt");
+    for (const Contract& hd : contractRepo.getAll()) {
+        if (hd.getPhoneNumber() != soSim) continue;
+        Date dHD;
+        dHD.input(hd.getRDate());
+        if (dSim.compare(dHD) > 0)
+            throw InvalidDataException("Ngay kich hoat moi (" + dSim.output()+ ") khong duoc sau ngay dang ky Hop dong " + hd.getContractID()+ " (" + dHD.output() + ")");
     }
 
-    // Kiem tra voi bang Recharge (cot 1: soSim, cot 3: ngay nap tien)
-    ifstream inRC("data/recharges.txt");
-    if (inRC.is_open()) {
-        string line;
-        while (getline(inRC, line)) {
-            vector<string> f = tachDong(line);
-            if (f.size() >= 5 && f[1] == soSim) {
-                Date dRC;
-                if (phanTichNgay(f[3], dRC) && dSim.compare(dRC) > 0) {
-                    throw InvalidDataException("Ngay kich hoat moi (" + dSim.output() + ") khong duoc sau ngay Nap tien phieu " + f[0] + " (" + dRC.output() + ")");
-                }
-            }
-        }
+    Repository<Recharge> rechargeRepo("data/recharges.txt");
+    napBangThamChieu(rechargeRepo, "data/recharges.txt");
+    for (const Recharge& phieu : rechargeRepo.getAll()) {
+        if (phieu.getPhoneNumber() != soSim) continue;
+        Date dNap;
+        dNap.input(phieu.getRDate());
+        if (dSim.compare(dNap) > 0)
+            throw InvalidDataException("Ngay kich hoat moi (" + dSim.output()+ ") khong duoc sau ngay Nap tien phieu " + phieu.getRefID() + " (" + dNap.output() + ")");
     }
 }
 
 // Kiem tra neu chuyen SIM sang BiKhoa: Canh bao hoac chan neu dang co Hop dong HieuLuc
 static void kiemTraKhoaSim(const string& soSim, const string& trangThaiMoi) {
     if (trangThaiMoi != "BiKhoa") return;
-    ifstream inHD("data/contracts.txt");
-    if (!inHD.is_open()) return;
-    string line;
-    while (getline(inHD, line)) {
-        vector<string> f = tachDong(line);
-        // Cot 0: MaHD, Cot 2: SoSim, Cot 5: TrangThai
-        if (f.size() >= 6 && f[2] == soSim && f[5] == "HieuLuc") {
-            throw InvalidDataException("Khong the khoa SIM dang co hop dong HieuLuc (" + f[0] + ")!");
-        }
-    }
+    Repository<Contract> repo("data/contracts.txt");
+    napBangThamChieu(repo, "data/contracts.txt");
+    for (const Contract& hd : repo.getAll())
+        if (hd.getPhoneNumber() == soSim && hd.getStatus() == "HieuLuc")
+            throw InvalidDataException("Khong the khoa SIM dang co hop dong HieuLuc (" + hd.getContractID() + ")!");
 }
 // Tra ten loai hinh / ten may tu ma (hien thi cho de doc)
 static string tenLoai(const string& maLoai) {
-    vector<string> f;
-    if (timTrongFile("data/sub_types.txt", 0, maLoai, &f) && f.size() > 1) return f[1];
-    return "(khong ro)";
+    Repository<SubType> repo("data/sub_types.txt");
+    napBangThamChieu(repo, "data/sub_types.txt");
+    SubType* loai = repo.findById(maLoai);
+    return loai ? loai->getTenLoai() : "(khong ro)";
 }
 
 static string tenMay(const string& maIMEI) {
     if (maIMEI == "NONE") return "(chua gan may)";
-    // devices.txt: MaThietBi|MaIMEI1|MaIMEI2|TenMay|... -> ten may nam o cot 3
-    vector<string> f;
-    if (timTrongFile("data/devices.txt", 1, maIMEI, &f) && f.size() > 3) return f[3];
-    if (timTrongFile("data/devices.txt", 2, maIMEI, &f) && f.size() > 3) return f[3];
+    Repository<Device> repo("data/devices.txt");
+    napBangThamChieu(repo, "data/devices.txt");
+    for (const Device& device : repo.getAll())
+        if (device.getMaIMEI1() == maIMEI || device.getMaIMEI2() == maIMEI)
+            return device.getTenMay();
     return "(khong ro)";
 }
 
@@ -207,7 +197,7 @@ string Sim::getTrangThai() const { return trangThai; }
 void Sim::setSoSim(const string& v) {
     string phone = v;
     InputHelper::xuly_84(phone); // Chuan hoa +84 thanh 0 dung ham co san trong InputHelper
-    if (phone.empty() || !InputHelper::checkPhoneNumber(phone))
+    if (!InputHelper::checkPhoneNumber(phone))
         throw InvalidDataException("So SIM phai gom 10 chu so va bat dau bang 0");
     ID = phone;
 }
@@ -219,7 +209,7 @@ void Sim::setMaIMSI(const string& v) { // international mobile subscriber identi
 }
 
 void Sim::setMaLoai(const string& v) { // loai sim
-    if (v.empty() || !InputHelper::checkidvalid(v, "SUB") || v.find('|') != string::npos)
+    if (!InputHelper::checkidvalid(v, "SUB"))
         throw InvalidDataException("Ma loai hinh phai bat dau bang 'SUB' (vd SUB01) va khong chua '|'");
     maLoai = v;
 }
@@ -254,6 +244,8 @@ void Sim::getInformation() {
             setSoSim(so);
             if (tonTai(ID)) throw DuplicateIdException(ID);
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -264,8 +256,10 @@ void Sim::getInformation() {
         try {
             string imsi = InputHelper::getString("Ma IMSI (15 so): ");
             setMaIMSI(imsi);
-            kiemTraTrungIMSI_IMEI(1, imsi, "Ma IMSI"); // Cot 1 la maIMSI
+            kiemTraTrungIMSI_IMEI(1, imsi, "Ma IMSI");
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -276,8 +270,12 @@ void Sim::getInformation() {
         try {
             string v = InputHelper::getString("Ma loai hinh (vd SUB01): ");
             setMaLoai(v);
-            if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
+            Repository<SubType> repo("data/sub_types.txt");
+            napBangThamChieu(repo, "data/sub_types.txt");
+            if (repo.findById(v) == nullptr) throw ForeignKeyException("MaLoai", v);
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -290,8 +288,10 @@ void Sim::getInformation() {
             setMaIMEI(v);
             if (v != "NONE" && !imeiTonTai(v))
                 throw ForeignKeyException("MaIMEI", v);
-            kiemTraTrungIMSI_IMEI(3, v, "Ma IMEI"); // Cot 3 la maIMEI
+            kiemTraTrungIMSI_IMEI(3, v, "Ma IMEI");
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -319,17 +319,20 @@ void Sim::getInformation() {
 }
 
 void Sim::capNhatThongTin() {
+    Sim moi = *this;
     cout << "(Nhan Enter de giu nguyen gia tri hien tai. Khong duoc sua So SIM)\n";
 
     // 1. Sua Ma IMSI (kiem tra trung voi SIM khac)
     while (true) {
         try {
-            string v = InputHelper::getStringOrDefault("Ma IMSI ", maIMSI);
-            Sim temp;
-            temp.setMaIMSI(v);
-            kiemTraTrungIMSI_IMEI(1, v, "Ma IMSI", ID); // Bo qua chinh SIM dang sua (ID)
-            setMaIMSI(v);
+            string v = InputHelper::getStringOrDefault("Ma IMSI ", moi.getMaIMSI());
+            Sim thu = moi;
+            thu.setMaIMSI(v);
+            kiemTraTrungIMSI_IMEI(1, thu.getMaIMSI(), "Ma IMSI", ID);
+            moi = thu;
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -338,12 +341,17 @@ void Sim::capNhatThongTin() {
     // 2. Sua Ma loai hinh
     while (true) {
         try {
-            string v = InputHelper::getStringOrDefault("Ma loai hinh ", maLoai);
-            Sim temp;
-            temp.setMaLoai(v);   // kiem tra truoc, chua doi gia tri hien tai
-            if (!timTrongFile("data/sub_types.txt", 0, v)) throw ForeignKeyException("MaLoai", v);
-            setMaLoai(v);
+            string v = InputHelper::getStringOrDefault("Ma loai hinh ", moi.getMaLoai());
+            Sim thu = moi;
+            thu.setMaLoai(v);
+            Repository<SubType> repo("data/sub_types.txt");
+            napBangThamChieu(repo, "data/sub_types.txt");
+            if (repo.findById(thu.getMaLoai()) == nullptr)
+                throw ForeignKeyException("MaLoai", thu.getMaLoai());
+            moi = thu;
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -352,14 +360,16 @@ void Sim::capNhatThongTin() {
     // 3. Sua Ma IMEI (kiem tra ton tai trong devices.txt va chua gan cho SIM khac)
     while (true) {
         try {
-            string v = InputHelper::getStringOrDefault("Ma IMEI ", maIMEI);
-            Sim temp;
-            temp.setMaIMEI(v);   // kiem tra truoc, chua doi gia tri hien tai
+            string v = InputHelper::getStringOrDefault("Ma IMEI ", moi.getMaIMEI());
+            Sim thu = moi;
+            thu.setMaIMEI(v);
             if (v != "NONE" && !imeiTonTai(v))
                 throw ForeignKeyException("MaIMEI", v);
-            kiemTraTrungIMSI_IMEI(3, v, "Ma IMEI", ID);
-            setMaIMEI(v);
+            kiemTraTrungIMSI_IMEI(3, thu.getMaIMEI(), "Ma IMEI", ID);
+            moi = thu;
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -368,12 +378,14 @@ void Sim::capNhatThongTin() {
     // 4. Sua Ngay kich hoat (Khong duoc muon hon ngay Hop dong / Nap tien da co)
     while (true) {
         try {
-            string v = InputHelper::getStringOrDefault("Ngay kich hoat ", ngayKichHoat);
-            Sim temp;
-            temp.setNgayKichHoat(v); // Kiem tra dinh dang va <= homNay()
-            kiemTraHopLeNgayKichHoatMoi(ID, temp.getNgayKichHoat()); // Kiem tra cheo voi HD & Recharge
-            setNgayKichHoat(v);
+            string v = InputHelper::getStringOrDefault("Ngay kich hoat ", moi.getNgayKichHoat());
+            Sim thu = moi;
+            thu.setNgayKichHoat(v);
+            kiemTraHopLeNgayKichHoatMoi(ID, thu.getNgayKichHoat());
+            moi = thu;
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
@@ -382,16 +394,19 @@ void Sim::capNhatThongTin() {
     // 5. Sua Trang thai
     while (true) {
         try {
-            string v = InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", trangThai);
-            Sim temp;
-            temp.setTrangThai(v);
-            kiemTraKhoaSim(ID, v); // Neu chuyen sang BiKhoa thi kiem tra HD HieuLuc
-            setTrangThai(v);
+            string v = InputHelper::getStringOrDefault("Trang thai (HoatDong/BiKhoa) ", moi.getTrangThai());
+            Sim thu = moi;
+            thu.setTrangThai(v);
+            kiemTraKhoaSim(ID, thu.getTrangThai());
+            moi = thu;
             break;
+        } catch (const FileException&) {
+            throw;
         } catch (const BaseException& e) {
             cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
         }
     }
+    *this = moi;
 }
 
 void Sim::display() const { cout << *this << '\n'; }
@@ -411,7 +426,11 @@ void Sim::fromString(const string& line) {
     setTrangThai(f[5]);
 }
 
-bool Sim::tonTai(const string& soSim) { return timTrongFile(FILE_SIM, 0, soSim); }
+bool Sim::tonTai(const string& soSim) {
+    Repository<Sim> repo(FILE_SIM);
+    napBangThamChieu(repo, FILE_SIM);
+    return repo.findById(soSim) != nullptr;
+}
 
 bool Sim::operator==(const Sim& other) const { return ID == other.ID; }
 bool Sim::operator<(const Sim& other) const { return ID < other.ID; }
@@ -513,7 +532,8 @@ static void timKiem(Repository<Sim>& repo) {
         }
         for (const Sim& s : repo.getAll()) {
             Date d;
-            if (phanTichNgay(s.getNgayKichHoat(), d) && d.compare(tu) >= 0 && d.compare(den) <= 0)
+            d.input(s.getNgayKichHoat());
+            if (d.compare(tu) >= 0 && d.compare(den) <= 0)
                 ketQua.push_back(s);
         }
     } else {
@@ -536,11 +556,11 @@ static void sapXep(Repository<Sim>& repo) {
 
     auto truocVeNgay = [](const Sim& a, const Sim& b) {
         Date da, db;
-        phanTichNgay(a.getNgayKichHoat(), da);
-        phanTichNgay(b.getNgayKichHoat(), db);
+        da.input(a.getNgayKichHoat());
+        db.input(b.getNgayKichHoat());
         return da.compare(db) < 0;
     };
-    if (chon == 1) sort(ds.begin(), ds.end());                       // operator<
+    if (chon == 1) sort(ds.begin(), ds.end());                       
     else if (chon == 2) sort(ds.rbegin(), ds.rend());
     else if (chon == 3) sort(ds.begin(), ds.end(), truocVeNgay);
     else if (chon == 4) sort(ds.rbegin(), ds.rend(), truocVeNgay);
@@ -570,7 +590,7 @@ static void xoaSim(Repository<Sim>& repo) {
     Sim* p = repo.findById(so);
     if (p == nullptr) throw NotFoundException(so);
     inChiTiet(*p);
-    kiemTraRangBuocXoa(so);     // con Bill/Contract/CDR/Recharge tham chieu -> nem ReferencedException
+    kiemTraRangBuocXoa(so);
     if (!InputHelper::getConfirm("Ban chac chan muon xoa SIM nay? (y/n): ")) {
         cout << "Da huy xoa.\n";
         return;
