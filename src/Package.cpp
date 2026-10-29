@@ -219,29 +219,58 @@ void PackageMenu :: printHeader() {
 
 // ============================================================================
 // CHỨC NĂNG 1: THÊM MỚI GÓI CƯỚC (CREATE)
-// - Mục đích: Cho phép người dùng nhập thông tin và thêm một gói cước mới vào hệ thống.
+// - Mục đích: Cho phép nhân viên nhập thông số kỹ thuật và thêm một gói cước mới vào hệ thống.
 // - Kỹ thuật áp dụng:
-//   + Kiểm tra tính duy nhất của Mã gói cước (Primary Key không được trùng).
-//   + [FIX LỖI 5] Mã gói phải theo đúng định dạng PKG + số để đồng bộ với Contract.cpp.
-//   + Sử dụng InputHelper để bắt lỗi nhập liệu (chống tràn bộ đệm, ép kiểu an toàn).
+//   + Cơ chế tự động sinh mã ID (Auto-ID): Sử dụng InputHelper::generateAutoID cấp phát mã
+//     duy nhất dạng PKG + số thứ tự tăng dần, đảm bảo toàn vẹn khóa chính và đồng bộ với Contract.
+//   + Cơ chế trì hoãn cấp mã: Chỉ sinh mã sau khi nhân viên đã nhập đầy đủ và hợp lệ toàn bộ
+//     thông số, tránh việc hủy hoặc dừng giữa chừng làm nhảy số bộ đếm (package_counter.txt).
+//   + Tiện ích nhập liệu an toàn: Sử dụng InputHelper (getString, getDouble, getInt) để chống trôi
+//     lệnh, ép kiểu an toàn và kiểm tra miền giá trị hợp lệ (giá >= 0, chu kỳ >= 1 ngày...).
 //   + Áp dụng tính đóng gói: Constructor gọi các Setter để validate dữ liệu đầu vào.
 //   + Cơ chế Exception Handling: Bắt InvalidDataException nếu thông số vi phạm nghiệp vụ.
 //   + Đồng bộ hóa: repo.add() vừa nạp vào vector trong RAM, vừa ghi tự động ra file text.
 // ============================================================================
+
 void PackageMenu :: handleCreate(Repository<Package>& repo) {
     cout << "\n---------------- THEM GOI CUOC MOI ----------------\n";
     
-    // Bước 1: Tự động sinh mã gói cước theo định dạng PKG + số qua InputHelper
-    string id = InputHelper::generateAutoID(repo, "PKG", "data_counter/package_counter.txt");
-    cout << ">> Ma goi cuoc (tu dong sinh): " << id << "\n";
+    // Bước 1: Nhập tên gói cước và kiểm tra trùng lặp với danh sách đã có
+    string name;
+    while (true) {
+        name = InputHelper :: getString("Nhap ten goi cuoc (nhap 0 de thoat): ", false);
+        if (name == "0") {
+            cout << ">> Da huy thao tac them moi goi cuoc.\n";
+            return;
+        }
 
-    // Bước 2: Nhập các thông tin chi tiết của gói cước mới
-    string name  = InputHelper :: getString("Nhap ten goi cuoc: ", false);
+        // Kiểm tra xem tên gói cước đã tồn tại trong hệ thống chưa (tránh trùng lặp)
+        bool isDuplicate = false;
+        for (const auto& pkg : repo.getAll()) {
+            if (pkg.getName() == name) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (isDuplicate) {
+            cout << ">> [LOI] Ten goi cuoc [" << name << "] da ton tai tren he thong! Vui long nhap ten khac.\n";
+            continue;
+        }
+        break; // Tên hợp lệ, chưa từng tồn tại
+    }
+
+    // Nhập các thông số kỹ thuật của gói cước
     double price = InputHelper :: getDouble("Nhap gia cuoc VND: ", 0.0);
     int data     = InputHelper :: getInt("Nhap dung luong DataMB (MB): ", 0);
     int voice    = InputHelper :: getInt("Nhap thoi luong cuoc goi (phut): ", 0);
     int sms      = InputHelper :: getInt("Nhap so luong SMS: ", 0);
     int days     = InputHelper :: getInt("Nhap chu ky goi cuoc (ngay): ", 1);
+
+    // Bước 2: Chỉ khi đã nhập đầy đủ, hợp lệ và không trùng lặp, mới tự động sinh mã ID
+    // Tránh việc đang nhập dở hoặc dữ liệu không hợp lệ làm tăng bộ đếm ID
+    string id = InputHelper::generateAutoID(repo, "PKG", "data_counter/package_counter.txt");
+    cout << ">> Ma goi cuoc (tu dong sinh): " << id << "\n";
 
     // Bước 3: Khởi tạo đối tượng Package và thêm vào Repository
     // Toàn bộ logic kiểm tra tính hợp lệ dữ liệu (giá > 0, chu kỳ > 0, ...)
@@ -293,28 +322,38 @@ void PackageMenu :: handleReadAll(Repository<Package>& repo) {
 // CHỨC NĂNG 3: TÌM KIẾM GÓI CƯỚC THEO MÃ (READ / SEARCH)
 // - Mục đích: Tra cứu và xem chi tiết thông tin của một gói cước theo mã ID.
 // - Kỹ thuật áp dụng:
-//   + Tìm kiếm trực tiếp trên bộ nhớ RAM qua repo.findById(id).
-//   + Xử lý trường hợp con trỏ nullptr an toàn (nếu không tìm thấy đối tượng).
-//   + Tái sử dụng printHeader() và display() để hiển thị thông tin nhất quán.
+//   + Vòng lặp kiểm tra nhập liệu: Cho phép nhập lại nếu mã không tồn tại.
+//   + Cơ chế thoát an toàn: Nhập 0 để quay lại menu chính bất kỳ lúc nào.
+//   + Tìm kiếm trực tiếp trên RAM qua repo.findById(id).
+//   + Hiển thị đồng bộ theo định dạng bảng chuẩn bằng printHeader() và display().
 // ============================================================================
+
 void PackageMenu :: handleSearch(Repository<Package>& repo) {
     cout << "\n---------------- TIM KIEM GOI CUOC ----------------\n";
     
-    // Bước 1: Nhập mã gói cước cần tra cứu
-    string id = InputHelper :: getString("Nhap ma goi can tim: ", false);
-    
-    // Bước 2: Tìm kiếm đối tượng trong vector bộ nhớ
-    auto* pkg = repo.findById(id);
-    
-    // Bước 3: Kiểm tra và hiển thị kết quả
-    if (pkg == nullptr) {
-        cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
-        return;
-    } else {
+    while (true) {
+        // Bước 1: Nhập mã gói cước cần tra cứu (cho phép nhập 0 để thoát)
+        string id = InputHelper::getString("Nhap ma goi can tim (nhap 0 de thoat): ", false);
+        if (id == "0") {
+            cout << ">> Dang quay lai Menu...\n";
+            return;
+        }
+        
+        // Bước 2: Tìm kiếm đối tượng trong vector bộ nhớ
+        auto* pkg = repo.findById(id);
+        
+        // Bước 3: Kiểm tra kết quả tìm kiếm
+        if (pkg == nullptr) {
+            cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << ". Vui long thu lai!\n";
+            continue; // Cho phép nhập lại mã khác mà không bị văng ra menu
+        }
+
+        // Bước 4: Hiển thị thông tin chi tiết gói cước tìm thấy
         cout << "\n>> THONG TIN CHI TIET GOI CUOC:\n";
         printHeader();
         pkg->display();
         cout << string(85, '-') << "\n";
+        break; // Tìm thấy và in ra thành công -> kết thúc chức năng
     }
 }
 
@@ -411,12 +450,19 @@ void PackageMenu :: handleSort(Repository<Package>& repo) {
 void PackageMenu :: handleUpdate(Repository<Package>& repo) {
     cout << "\n---------------- CAP NHAT THONG TIN GOI CUOC ----------------\n";
     
-    // Bước 1: Nhập mã gói cước cần sửa và kiểm tra tồn tại
-    string id = InputHelper :: getString("Nhap ma goi cuoc can sua: ", false);
-    auto* pkg = repo.findById(id);
-    if (pkg == nullptr) {
-        cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
-        return; 
+    // Bước 1: Nhập mã gói cước cần sửa và kiểm tra tồn tại (cho phép nhập 0 để thoát)
+    string id;
+    Package* pkg = nullptr;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma goi cuoc can sua (nhap 0 de thoat): ", false);
+        if (id == "0") return;
+
+        pkg = repo.findById(id);
+        if (pkg == nullptr) {
+            cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << ". Vui long thu lai!\n";
+            continue;
+        }
+        break;
     }
     
     // Bước 2: Hiển thị thông tin hiện tại của gói cước để người dùng dễ quan sát
@@ -436,35 +482,24 @@ void PackageMenu :: handleUpdate(Repository<Package>& repo) {
     
     // Bước 4 & 5: Kiểm tra tính hợp lệ qua Setter và ghi đồng bộ ra file
     try {
-        // Chỉ cập nhật nếu người dùng nhập dữ liệu mới (chuỗi không rỗng)
-        if (!newName.empty()) {
-            pkg->setName(newName);
-        }
-        if (!priceStr.empty()) {
-            pkg->setPrice(stod(priceStr)); // Ép kiểu string sang double và kiểm tra > 0 qua setPrice
-        }
-        if (!dataStr.empty()) {
-            pkg->setDataMB(stoi(dataStr));  // Ép kiểu string sang int và kiểm tra >= 0 qua setDataMB
-        }
-        if (!voiceStr.empty()) {
-            pkg->setVoiceMinutes(stoi(voiceStr)); // Kiểm tra >= 0 qua setVoiceMinutes
-        }
-        if (!smsStr.empty()) {
-            pkg->setSMS(stoi(smsStr)); // Kiểm tra >= 0 qua setSMS
-        }
-        if (!daysStr.empty()) {
-            pkg->setDays(stoi(daysStr)); // Kiểm tra >= 1 qua setDays
-        }
-
-        // [FIX LOI 3] Tao ban sao de kiem tra tinh hop le cua TAT CA truong moi
+        // [FIX LOI 3] Dung ban sao: kiem tra tinh hop le cua TAT CA truong moi
         // truoc khi ghi vao doi tuong goc. Neu bat ky truong nao loi, khong co gi thay doi.
         Package updated = *pkg;
-        if (!newName.empty())  updated.setName(newName);
+        if (!newName.empty()) {
+            for (const auto& item : repo.getAll()) {
+                if (item.getID() != id && item.getName() == newName) {
+                    cout << "\n>> [THAT BAI] Ten goi cuoc [" << newName << "] da ton tai tren he thong!\n";
+                    return;
+                }
+            }
+            updated.setName(newName);
+        }
         if (!priceStr.empty()) updated.setPrice(stod(priceStr));
         if (!dataStr.empty())  updated.setDataMB(stoi(dataStr));
         if (!voiceStr.empty()) updated.setVoiceMinutes(stoi(voiceStr));
         if (!smsStr.empty())   updated.setSMS(stoi(smsStr));
         if (!daysStr.empty())  updated.setDays(stoi(daysStr));
+
         // Tat ca setter deu thanh cong -> ghi ban cap nhat vao repo va file
         repo.update(id, updated);
         cout << "\n>> [THANH CONG] Da cap nhat thong tin goi cuoc [" << id << "] thanh cong!\n";
@@ -488,12 +523,19 @@ void PackageMenu :: handleUpdate(Repository<Package>& repo) {
 void PackageMenu :: handleDelete(Repository<Package>& repo) {
     cout << "\n---------------- XOA GOI CUOC ----------------\n";
     
-    // Bước 1: Nhập mã gói cước và kiểm tra xem có tồn tại trong hệ thống không
-    string id = InputHelper :: getString("Nhap ma goi cuoc can xoa: ", false);
-    auto* pkg = repo.findById(id);
-    if (pkg == nullptr) {
-        cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << "\n";
-        return; 
+    // Bước 1: Nhập mã gói cước và kiểm tra xem có tồn tại trong hệ thống không (nhập 0 để thoát)
+    string id;
+    Package* pkg = nullptr;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma goi cuoc can xoa (nhap 0 de thoat): ", false);
+        if (id == "0") return;
+
+        pkg = repo.findById(id);
+        if (pkg == nullptr) {
+            cout << ">> [THONG BAO] Khong tim thay goi cuoc co ma: " << id << ". Vui long thu lai!\n";
+            continue;
+        }
+        break;
     }
     
     // Bước 2: Hiển thị lại thông tin gói cước chuẩn bị xóa

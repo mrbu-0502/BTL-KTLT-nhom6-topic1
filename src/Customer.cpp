@@ -169,41 +169,120 @@ void CustomerMenu :: printHeader() {
 }
 
 // ============================================================================
-// CHỨC NĂNG 1: THÊM MỚI KHÁCH HÀNG (CREATE)
-// - Mục đích: Cho phép người dùng nhập thông tin và thêm một khách hàng mới vào hệ thống.
-// - Kỹ thuật áp dụng:
-//   + Kiểm tra trùng lặp Mã khách hàng (Primary Key) qua repo.findById(id).
-//   + Sử dụng InputHelper để nhập dữ liệu an toàn và chống trôi lệnh.
-//   + Áp dụng tính bao gói dữ liệu: Khởi tạo đối tượng Customer, constructor sẽ gọi
-//     các Setter để tự động kiểm tra định dạng CCCD (12 số) và Ngày sinh (dd/mm/yyyy).
-//   + Xử lý ngoại lệ (Exception Handling): Bắt InvalidDataException nếu dữ liệu sai quy cách.
-//   + repo.add() lưu đối tượng vào vector trong bộ nhớ và tự động đồng bộ xuống file text.
+// CHỨC NĂNG 1: THÊM MỚI KHÁCH HÀNG (CREATE) 
 // ============================================================================
-void CustomerMenu :: handleCreate(Repository<Customer>& repo) {
+void CustomerMenu::handleCreate(Repository<Customer>& repo) {
     cout << "\n---------------- THEM KHACH HANG MOI ----------------\n";
 
-    // Bước 1: Tự động sinh mã khách hàng theo định dạng KH + số qua InputHelper
+    // 1. Nhập Tên khách hàng
+    string name;
+    while (true) {
+        name = InputHelper::getString("Nhap ten khach hang moi (nhap 0 de thoat): ", false);
+        if (name == "0") {
+            cout << ">> Da huy thao tac them moi khach hang.\n";
+            return;
+        }
+        if (name.find('|') != string::npos) {
+            cout << ">> [LOI] Ten khong duoc chua ky tu '|'. Vui long nhap lai!\n";
+            continue;
+        }
+        break;
+    }
+
+    // 2. Nhập CCCD: Kiểm tra cả độ dài, định dạng số VÀ tính duy nhất ngay tại chỗ
+    string CCCD;
+    while (true) {
+        CCCD = InputHelper::getString("Nhap CCCD cua khach hang moi (12 chu so, nhap 0 de thoat): ", false);
+        if (CCCD == "0") {
+            cout << ">> Da huy thao tac them moi khach hang.\n";
+            return;
+        }
+
+        // Kiểm tra độ dài và ký tự số
+        if (CCCD.length() != 12) {
+            cout << ">> [LOI] CCCD phai co dung 12 chu so! Vui long nhap lai.\n";
+            continue;
+        }
+        bool isNumber = true;
+        for (char ch : CCCD) {
+            if (!isdigit(ch)) {
+                isNumber = false;
+                break;
+            }
+        }
+        if (!isNumber) {
+            cout << ">> [LOI] CCCD chi duoc chua cac chu so! Vui long nhap lai.\n";
+            continue;
+        }
+
+        // Kiểm tra trùng lặp
+        bool isDuplicate = false;
+        for (const auto& cus : repo.getAll()) {
+            if (cus.getCCCD() == CCCD) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        if (isDuplicate) {
+            cout << ">> [LOI] So CCCD [" << CCCD << "] da ton tai tren he thong! Vui long nhap lai.\n";
+            continue;
+        }
+        break;
+    }
+
+    // 3. Nhập Địa chỉ
+    string Address;
+    while (true) {
+        Address = InputHelper::getString("Nhap dia chi cua khach hang moi (nhap 0 de thoat): ", false);
+        if (Address == "0") {
+            cout << ">> Da huy thao tac them moi khach hang.\n";
+            return;
+        }
+        if (Address.find('|') != string::npos) {
+            cout << ">> [LOI] Dia chi khong duoc chua ky tu '|'. Vui long nhap lai!\n";
+            continue;
+        }
+        break;
+    }
+
+    // 4. Nhập Ngày sinh: Kiểm tra định dạng dd/mm/yyyy và tính hợp lệ ngay tại chỗ
+    string DateOfBirth;
+    while (true) {
+        DateOfBirth = InputHelper::getString("Nhap ngay sinh cua khach hang moi (dd/mm/yyyy, nhap 0 de thoat): ", false);
+        if (DateOfBirth == "0") {
+            cout << ">> Da huy thao tac them moi khach hang.\n";
+            return;
+        }
+
+        int ngay, thang, nam;
+        char c1 = 0, c2 = 0;
+        stringstream ss(DateOfBirth);
+        if (!(ss >> ngay >> c1 >> thang >> c2 >> nam) || c1 != '/' || c2 != '/') {
+            cout << ">> [LOI] Ngay sinh phai theo dinh dang dd/mm/yyyy! Vui long nhap lai.\n";
+            continue;
+        }
+        Date d(ngay, thang, nam);
+        if (!d.valid()) {
+            cout << ">> [LOI] Ngay sinh khong hop le theo lich hoac vuot qua nam hien tai! Vui long nhap lai.\n";
+            continue;
+        }
+        DateOfBirth = d.output(); // Chuẩn hóa về dạng chuẩn (ví dụ 5/3/2000 -> 05/03/2000)
+        break;
+    }
+
+    // 5. CHỈ SINH MÃ ID KHI TẤT CẢ DỮ LIỆU ĐÃ HỢP LỆ 100% (Tránh làm thất thoát bộ đếm counter)
     string id = InputHelper::generateAutoID(repo, "KH", "data_counter/customer_counter.txt");
     cout << ">> Ma khach hang (tu dong sinh): " << id << "\n";
 
-    // Bước 2: Nhập các thông tin cá nhân của khách hàng
-    string name        = InputHelper :: getString("Nhap ten khach hang moi: ", false);
-    string CCCD        = InputHelper :: getString("Nhap CCCD cua khach hang moi (12 chu so): ", false);
-    string Address     = InputHelper :: getString("Nhap dia chi cua khach hang moi: ", false);
-    string DateOfBirth = InputHelper :: getString("Nhap ngay sinh cua khach hang moi (dd/mm/yyyy): ", false);
-
-    // Bước 3: Khởi tạo đối tượng Customer và kiểm tra hợp lệ qua Setter trong Constructor
     try {
         Customer newCus(id, name, CCCD, Address, DateOfBirth);
-        repo.add(newCus); // Thêm vào danh sách bộ nhớ và tự động ghi ra file customers.txt
+        repo.add(newCus); // Lưu vào RAM và tự động ghi đè ra file customers.txt
         cout << ">> [THANH CONG] Da them khach hang [" << id << "] vao he thong!\n";
     }
     catch (const exception& e) {
-        // Bắt lỗi nếu CCCD không đủ 12 số hoặc Ngày sinh không đúng chuẩn dd/mm/yyyy
         cout << ">> [THAT BAI] " << e.what() << "\n";
     }
 }
-
 // ============================================================================
 // CHỨC NĂNG 2: XEM TẤT CẢ KHÁCH HÀNG (READ ALL)
 // - Mục đích: Hiển thị danh sách tất cả khách hàng dưới dạng bảng có căn lề cột.
@@ -246,22 +325,25 @@ void CustomerMenu :: handleReadAll(Repository<Customer>& repo) {
 void CustomerMenu :: handleSearch(Repository<Customer>& repo) {
     cout << "\n---------------- TIM KIEM KHACH HANG ----------------\n";
     
-    // Bước 1: Nhập mã khách hàng cần tìm
-    string id = InputHelper :: getString("Nhap ma khach hang can xem: ", false);
+    while (true) {
+        // Bước 1: Nhập mã khách hàng cần tìm (nhap 0 de thoat)
+        string id = InputHelper :: getString("Nhap ma khach hang can xem (nhap 0 de thoat): ", false);
+        if (id == "0") return;
 
-    // Bước 2: Tìm kiếm đối tượng mang mã tương ứng trong vector
-    auto* cus = repo.findById(id);
+        // Bước 2: Tìm kiếm đối tượng mang mã tương ứng trong vector
+        auto* cus = repo.findById(id);
 
-    // Bước 3: Hiển thị thông tin chi tiết nếu tìm thấy hoặc thông báo không tồn tại
-    if (cus == nullptr) {
-        cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << "\n";
-        return;
-    }
-    else {
+        // Bước 3: Hiển thị thông tin chi tiết nếu tìm thấy hoặc thông báo không tồn tại
+        if (cus == nullptr) {
+            cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << ". Vui long thu lai!\n";
+            continue;
+        }
+
         cout << "\n>> THONG TIN CHI TIET KHACH HANG:\n";
         printHeader();
         cus->display();
         cout << string(78, '-') << "\n";
+        break;
     }
 }
 
@@ -384,12 +466,19 @@ void CustomerMenu :: handleSort(Repository<Customer>& repo) {
 void CustomerMenu :: handleUpdate(Repository<Customer>& repo) {
     cout << "\n---------------- CAP NHAT KHACH HANG ----------------\n";
     
-    // Bước 1: Nhập mã khách hàng cần sửa và kiểm tra tồn tại
-    string id = InputHelper :: getString("Nhap ma khach hang can sua: ", false);
-    auto* cus = repo.findById(id);
-    if (cus == nullptr) {
-        cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << "\n";
-        return; 
+    // Bước 1: Nhập mã khách hàng cần sửa và kiểm tra tồn tại (nhap 0 de thoat)
+    string id;
+    Customer* cus = nullptr;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma khach hang can sua (nhap 0 de thoat): ", false);
+        if (id == "0") return;
+
+        cus = repo.findById(id);
+        if (cus == nullptr) {
+            cout << ">> [THONG BAO] Khong tim thay khach hang co ma: " << id << ". Vui long thu lai!\n";
+            continue;
+        }
+        break;
     }
     
     // Bước 2: Hiển thị thông tin hiện tại của khách hàng để người dùng đối chiếu
@@ -411,7 +500,15 @@ void CustomerMenu :: handleUpdate(Repository<Customer>& repo) {
         // [FIX LOI 3] Dung ban sao: kiem tra tat ca truong hop le truoc khi ghi vao goc.
         Customer updated = *cus;
         if (!newName.empty())        updated.setFullName(newName);
-        if (!newCCCD.empty())        updated.setCCCD(newCCCD);
+        if (!newCCCD.empty()) {
+            for (const auto& item : repo.getAll()) {
+                if (item.getID() != id && item.getCCCD() == newCCCD) {
+                    cout << "\n>> [THAT BAI] So CCCD [" << newCCCD << "] da ton tai tren he thong!\n";
+                    return;
+                }
+            }
+            updated.setCCCD(newCCCD);
+        }
         if (!newAddress.empty())     updated.setAddress(newAddress);
         if (!newDateOfBirth.empty()) updated.setDateOfBirth(newDateOfBirth);
         // Tat ca setter deu thanh cong -> ghi ban cap nhat vao repo va file
@@ -435,13 +532,19 @@ void CustomerMenu :: handleUpdate(Repository<Customer>& repo) {
 void CustomerMenu :: handleDelete(Repository<Customer>& repo) {
     cout << "\n---------------- XOA KHACH HANG ----------------\n";
     
-    // Bước 1: Nhập mã và kiểm tra khách hàng có tồn tại trong hệ thống không
-    string id = InputHelper :: getString("Nhap ma khach hang can xoa: ", false);
-    Customer* cus = repo.findById(id);
-    
-    if (cus == nullptr) {
-        cout << ">> [Loi]: Khong tim thay khach hang co ma: " << id << "\n";
-        return;
+    // Bước 1: Nhập mã và kiểm tra khách hàng có tồn tại trong hệ thống không (nhap 0 de thoat)
+    string id;
+    Customer* cus = nullptr;
+    while (true) {
+        id = InputHelper :: getString("Nhap ma khach hang can xoa (nhap 0 de thoat): ", false);
+        if (id == "0") return;
+
+        cus = repo.findById(id);
+        if (cus == nullptr) {
+            cout << ">> [Loi]: Khong tim thay khach hang co ma: " << id << ". Vui long thu lai!\n";
+            continue;
+        }
+        break;
     }
 
     // Bước 2: Hiển thị lại thông tin khách hàng chuẩn bị xóa
