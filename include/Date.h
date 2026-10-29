@@ -1,5 +1,5 @@
 /*
- * Người thực hiện: Kiều Đức Hiệp - B24DCVT053
+ * Người thực hiện: Kiều Đức Hiệp
  * Module phụ trách: Date.h 
 */
 #pragma once 
