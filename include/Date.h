@@ -1,10 +1,7 @@
-/**
- * ==============================================================================
- * MODULE BASE - Date.h 
- * Người phụ trách: Kiều Đức Hiệp
- * ==============================================================================
- * 
- */
+/*
+ * Người thực hiện: Kiều Đức Hiệp - B24DCVT053
+ * Module phụ trách: Date.h 
+*/
 #pragma once 
 #include "Exceptions.h"
 #include <iostream>

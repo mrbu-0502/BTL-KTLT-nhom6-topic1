@@ -1,14 +1,8 @@
 /**
  * ==============================================================================
- * BÀI TẬP LỚN: HỆ THỐNG QUẢN LÝ THUÊ BAO DI ĐỘNG (NHÓM 06 - ĐỀ TÀI 01)
- * Học phần: Kỹ thuật lập trình
- * Người thực hiện: Bùi Gia Khánh
- * MSSV: B24DCVT191
- * Module phụ trách: Entity.h (Lớp cơ sở trừu tượng)
- * Use Case: Quản lý Khách hàng (Customer)
+ * Người phụ trách: Bùi Gia Khánh (B24DCVT191)
  * ==============================================================================
  */
-
 #pragma once
 #include "Entity.h"
 #include "Repository.h"
