@@ -307,15 +307,8 @@ void Sim::getInformation() {
         }
     }
 
-    // 6. Nhap Trang thai: HoatDong hoac BiKhoa
-    while (true) {
-        try {
-            setTrangThai(InputHelper::getString("Trang thai (HoatDong/BiKhoa): "));
-            break;
-        } catch (const BaseException& e) {
-            cout << "[Loi] " << e.what() << ". Vui long nhap lai.\n";
-        }
-    }
+    //6. Trang thai ban dau luon la HoatDong
+    setTrangThai("HoatDong");
 }
 
 void Sim::capNhatThongTin() {
@@ -481,6 +474,7 @@ static void themSim(Repository<Sim>& repo) {
     s.getInformation();
     repo.add(s);
     cout << "Them SIM thanh cong.\n";
+    inChiTiet(s);  
 }
 // ============================================================================
 // TIM KIEM

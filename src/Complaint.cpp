@@ -167,7 +167,7 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     }
     while(true){
         try{
-            string ngay = InputHelper::getString("nhap ngay (DD/MM/YYYY, nhap 0 de thoat):", false);
+            string ngay = InputHelper::getString("Nhap ngay (DD/MM/YYYY, nhap 0 de thoat):", false);
             if (ngay == "0") {
                 cout << "Da huy thao tac them moi.\n";
                 return;
@@ -197,7 +197,7 @@ static void themMoiComplaint(Repository<Complaint>& repo_complaint, Repository<C
     string maKN = InputHelper::generateAutoID(repo_complaint, "KN", "data_counter/complaint_counter.txt");
     Complaint kn(maKN, maHD, ngaygui.output(), noiDung, trangThai);
     repo_complaint.add(kn);
-    cout << "Them phieu khieu nai id: " << maKN << " thanh cong!\n";
+    cout << "Them phieu khieu nai ID: " << maKN << " thanh cong!\n";
 }
 
 
@@ -321,7 +321,7 @@ static void suaComplaint(Repository<Complaint>& repo_complaint, Repository<Contr
     }
     Complaint updated(id, maHDMoi, ngayguimoi.output(), noiDungMoi, trangThaimoi);
     repo_complaint.update(id, updated);
-    cout << "Cap nhat phieu khieu nai id: " << id << " thanh cong!\n";
+    cout << "Cap nhat phieu khieu nai ID: " << id << " thanh cong!\n";
 }
 
 //dong ma khieu nai
@@ -365,7 +365,7 @@ static void dongComplaint(Repository<Complaint>& repo_complaint) {
         Complaint tam = *p;
         tam.setTrangThai("Dong");
         repo_complaint.update(id, tam);
-        cout << "dong phieu khieu nai thanh cong!\n";
+        cout << "Dong phieu khieu nai thanh cong!\n";
     } else {
         cout << "Da huy thao tac dong phieu khieu nai.\n";
     }

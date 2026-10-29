@@ -279,6 +279,8 @@ void PackageMenu :: handleCreate(Repository<Package>& repo) {
         Package newPkg(id, name, price, data, voice, sms, days);
         repo.add(newPkg); // Thêm vào std::vector và tự động đồng bộ ghi ra file text
         cout << ">> [THANH CONG] Da them goi cuoc [" << id << "] vao he thong!\n";
+        printHeader();
+        newPkg.display();
     } 
     catch (const exception& e) {
         // Bắt ngoại lệ InvalidDataException ném ra từ các Setter nếu dữ liệu vi phạm

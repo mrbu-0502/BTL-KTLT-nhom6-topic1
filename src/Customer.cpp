@@ -278,6 +278,8 @@ void CustomerMenu::handleCreate(Repository<Customer>& repo) {
         Customer newCus(id, name, CCCD, Address, DateOfBirth);
         repo.add(newCus); // Lưu vào RAM và tự động ghi đè ra file customers.txt
         cout << ">> [THANH CONG] Da them khach hang [" << id << "] vao he thong!\n";
+        printHeader();
+        newCus.display();
     }
     catch (const exception& e) {
         cout << ">> [THAT BAI] " << e.what() << "\n";
