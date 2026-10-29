@@ -245,32 +245,38 @@ public:
     //Sinh ma ID tu dong
     template <typename T>
     static string generateAutoID(Repository<T>& repo, const string& prefix, const string& seqFilename) {
-        int maxID = 0;
-        
-        //Đọc ID lớn nhất từ file cấu hình
-        ifstream inFile(seqFilename);
-        if (inFile.is_open()) {
-            inFile >> maxID;
-            inFile.close();
-        } else {
-            for (const auto& item : repo.getAll()) {
-                try {
-                    int currentID = stoi(item.getID().substr(prefix.length()));
-                    if (currentID > maxID) maxID = currentID;
-                } catch (...) {
-                    // Bỏ qua nếu dữ liệu lỗi
-                }
+    int fileMaxID = 0;
+    int repoMaxID = 0;
+    ifstream inFile(seqFilename);
+    //Đọc từ file (nếu file rỗng hoặc lỗi, fileMaxID vẫn bằng 0)
+    if (inFile.is_open()) {
+        if (!(inFile >> fileMaxID) || fileMaxID < 0) {
+            fileMaxID = 0;
+        }
+        inFile.close();
+    }
+    //Quét Repo để tìm ID thực tế lớn nhất đang tồn tại
+    for (const auto& item : repo.getAll()) {
+        try {
+            string idStr = item.getID();
+            if (idStr.length() > prefix.length() && idStr.find(prefix) == 0) {
+                int currentID = stoi(idStr.substr(prefix.length()));
+                if (currentID > repoMaxID) repoMaxID = currentID;
             }
-        }
-        maxID++;
-        ofstream outFile(seqFilename);
-        if (outFile.is_open()) {
-            outFile << maxID;
-            outFile.close();
-        }
-        //Định dạng chuỗi (VD: prefix="HD", maxID=5 => "HD05")
-        stringstream nextID;
-        nextID << prefix << setfill('0') << setw(2) << maxID;
-        return nextID.str();
+        } catch (...) {}
+    }
+
+    int maxID = (fileMaxID > repoMaxID) ? fileMaxID : repoMaxID;
+    maxID++;
+
+    ofstream outFile(seqFilename, ios::trunc);
+    if (outFile.is_open()) {
+        outFile << maxID;
+        outFile.close();
+    }
+
+    stringstream nextID;
+    nextID << prefix << setfill('0') << setw(2) << maxID;
+    return nextID.str();
     }
 };

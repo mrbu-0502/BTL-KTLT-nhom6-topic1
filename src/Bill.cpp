@@ -3,7 +3,7 @@
 // Hoc phan: Ky thuat lap trinh
 // De tai 1: Quan ly thue bao di dong
 // Tac gia: Vu Quang Anh
-// Use Case: Quan Bill thanh toán
+// Use Case: Quan ly Bill thanh toán
 // ===============================================================
 #include "Bill.h"
 #include "Date.h"
